@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vibe Zone Entertainment</title>
+  <script>
+    // GitHub Pages SPA redirect
+    // This script takes the current URL and redirects to index.html with the path as a query parameter
+    (function() {
+      var redirect = sessionStorage.redirect;
+      delete sessionStorage.redirect;
+      if (redirect && redirect !== location.href) {
+        history.replaceState(null, null, redirect);
+      }
+    })();
+  </script>
+</head>
+<body>
+  <!-- This page is intentionally blank. GitHub Pages will serve this for 404s, 
+       and the script above will handle redirecting to the correct route. -->
+</body>
+</html>
