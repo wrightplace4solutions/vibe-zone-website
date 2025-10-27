@@ -19,9 +19,9 @@ const Contact = () => {
             </CardHeader>
             <CardContent>
               <Button variant="outline" className="w-full justify-start" asChild>
-                <a href="mailto:bookings@vzentertainment.fun">
+                <a href="mailto:booking@vzentertainment.fun">
                   <Mail className="mr-2 h-4 w-4" />
-                  bookings@vzentertainment.fun
+                  booking@vzentertainment.fun
                 </a>
               </Button>
               <p className="text-sm text-muted-foreground mt-4">
@@ -37,13 +37,13 @@ const Contact = () => {
             </CardHeader>
             <CardContent>
               <Button variant="outline" className="w-full justify-start" asChild>
-                <a href="tel:+15551234567">
+                <a href="tel:+18049247833">
                   <Phone className="mr-2 h-4 w-4" />
                   (555) 123-4567
                 </a>
               </Button>
               <p className="text-sm text-muted-foreground mt-4">
-                Available Mon-Fri, 10am-6pm EST
+                Available Mon-Fri, 8am-10pm EST
               </p>
             </CardContent>
           </Card>
@@ -56,7 +56,7 @@ const Contact = () => {
             <CardContent className="space-y-3">
               <Button variant="outline" className="w-full justify-start" asChild>
                 <a
-                  href="https://instagram.com/vzentertainment"
+                  href="https://instagram.com/djdefstef"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -66,7 +66,7 @@ const Contact = () => {
               </Button>
               <Button variant="outline" className="w-full justify-start" asChild>
                 <a
-                  href="https://tiktok.com/@vzentertainment"
+                  href="https://tiktok.com/@dj.defstef"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -110,7 +110,7 @@ const Contact = () => {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="font-medium">Monday - Friday</p>
-                <p className="text-muted-foreground">10:00 AM - 6:00 PM EST</p>
+                <p className="text-muted-foreground">8:00 AM - 10:00 PM EST</p>
               </div>
               <div>
                 <p className="font-medium">Saturday - Sunday</p>
