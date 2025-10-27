@@ -56,12 +56,12 @@ const Contact = () => {
             <CardContent className="space-y-3">
               <Button variant="outline" className="w-full justify-start" asChild>
                 <a
-                  href="https://instagram.com/djdefstef"
+                  href="https://instagram.com/dj.defstef"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   <Instagram className="mr-2 h-4 w-4" />
-                  @djdefstef
+                  @dj.defstef
                 </a>
               </Button>
               <Button variant="outline" className="w-full justify-start" asChild>

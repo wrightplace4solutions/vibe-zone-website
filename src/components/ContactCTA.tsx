@@ -36,7 +36,9 @@ export const ContactCTA = () => {
           
           <div className="flex justify-center gap-8">
             <a 
-              href="#" 
+              href="https://instagram.com/dj.defstef" 
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-muted-foreground hover:text-primary transition-colors"
               aria-label="Instagram"
             >

@@ -46,7 +46,7 @@ export const Footer = () => {
             <h3 className="font-bold text-lg mb-4">Follow Us</h3>
             <div className="flex space-x-4">
               <a
-                href="https://instagram.com/vzentertainment"
+                href="https://instagram.com/dj.defstef"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-foreground"
@@ -55,7 +55,7 @@ export const Footer = () => {
                 <Instagram className="h-6 w-6" />
               </a>
               <a
-                href="https://tiktok.com/@vzentertainment"
+                href="https://tiktok.com/@dj.defstef"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-foreground"
