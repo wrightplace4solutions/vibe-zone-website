@@ -1,4 +1,4 @@
-export const ZAP_CATCH_HOOK = import.meta.env.VITE_ZAP_CATCH_HOOK || "https://hooks.zapier.com/hooks/catch/REPLACE/ME";
+export const ZAP_CATCH_HOOK = import.meta.env.VITE_ZAP_CATCH_HOOK || "https://hook.us2.make.com/yb9heqwhecy4vnpnlbauixxf6nxc6nno";
 
 export const STRIPE_LINKS = {
   option1: import.meta.env.VITE_STRIPE_LINK_OPTION1 || "https://buy.stripe.com/REPLACE_OPTION1",
