@@ -429,7 +429,7 @@ const Booking = () => {
 
               <p className="text-xs text-center text-muted-foreground">
                 Need help? Email us at{" "}
-                <a href="mailto:bookings@vzentertainment.fun" className="text-primary hover:underline">
+                <a href="mailto:booking@vzentertainment.fun" className="text-primary hover:underline">
                   bookings@vzentertainment.fun
                 </a>
               </p>
