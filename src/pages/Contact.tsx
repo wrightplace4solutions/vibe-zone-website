@@ -39,7 +39,7 @@ const Contact = () => {
               <Button variant="outline" className="w-full justify-start" asChild>
                 <a href="tel:+18049247833">
                   <Phone className="mr-2 h-4 w-4" />
-                  (555) 123-4567
+                  (804) 924-7833
                 </a>
               </Button>
               <p className="text-sm text-muted-foreground mt-4">
@@ -61,7 +61,7 @@ const Contact = () => {
                   rel="noopener noreferrer"
                 >
                   <Instagram className="mr-2 h-4 w-4" />
-                  @vzentertainment
+                  @djdefstef
                 </a>
               </Button>
               <Button variant="outline" className="w-full justify-start" asChild>
@@ -71,7 +71,7 @@ const Contact = () => {
                   rel="noopener noreferrer"
                 >
                   <Music className="mr-2 h-4 w-4" />
-                  @vzentertainment
+                  @dj.defstef
                 </a>
               </Button>
             </CardContent>
