@@ -66,12 +66,12 @@ const Contact = () => {
               </Button>
               <Button variant="outline" className="w-full justify-start" asChild>
                 <a
-                  href="https://tiktok.com/@dj.defstef"
+                  href="https://tiktok.com/@djdefstef"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   <Music className="mr-2 h-4 w-4" />
-                  @dj.defstef
+                  @djdefstef
                 </a>
               </Button>
             </CardContent>
