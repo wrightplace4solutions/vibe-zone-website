@@ -177,7 +177,7 @@ const Booking = () => {
               <CardDescription>Tell us about your event</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="date">Event Date *</Label>
                 <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                   <PopoverTrigger asChild>
@@ -192,17 +192,20 @@ const Booking = () => {
                       {formData.date ? format(formData.date, "PPP") : "Pick a date"}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
+                  <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
                       selected={formData.date}
                       onSelect={(date) => {
-                        setFormData({ ...formData, date });
-                        setIsCalendarOpen(false);
-                        // Focus on start time after calendar closes
-                        setTimeout(() => {
-                          startTimeRef.current?.focus();
-                        }, 100);
+                        if (date) {
+                          setFormData({ ...formData, date });
+                          setIsCalendarOpen(false);
+                          // Focus on start time after a short delay to allow popover to close
+                          setTimeout(() => {
+                            startTimeRef.current?.focus();
+                            startTimeRef.current?.showPicker?.();
+                          }, 150);
+                        }
                       }}
                       disabled={(date) => date < new Date()}
                       initialFocus
@@ -211,8 +214,8 @@ const Booking = () => {
                 </Popover>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
                   <Label htmlFor="startTime">Start Time *</Label>
                   <Input
                     ref={startTimeRef}
@@ -220,67 +223,75 @@ const Booking = () => {
                     type="time"
                     value={formData.startTime}
                     onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+                    className="w-full"
                   />
                 </div>
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="endTime">End Time *</Label>
                   <Input
                     id="endTime"
                     type="time"
                     value={formData.endTime}
                     onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+                    className="w-full"
                   />
                 </div>
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="venueName">Venue Name *</Label>
                 <Input
                   id="venueName"
                   placeholder="e.g., Community Center, Smith Residence"
                   value={formData.venueName}
                   onChange={(e) => setFormData({ ...formData, venueName: e.target.value })}
+                  className="w-full"
                 />
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="streetAddress">Street Address *</Label>
                 <Input
                   id="streetAddress"
                   placeholder="e.g., 123 Main Street"
                   value={formData.streetAddress}
                   onChange={(e) => setFormData({ ...formData, streetAddress: e.target.value })}
+                  className="w-full"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
                   <Label htmlFor="city">City *</Label>
                   <Input
                     id="city"
                     placeholder="City"
                     value={formData.city}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    className="w-full"
                   />
                 </div>
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="state">State *</Label>
                   <Input
                     id="state"
                     placeholder="State"
                     value={formData.state}
                     onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                    className="w-full"
                   />
                 </div>
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="zipCode">ZIP Code *</Label>
                 <Input
                   id="zipCode"
                   placeholder="ZIP Code"
                   value={formData.zipCode}
                   onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
+                  className="w-full"
+                  maxLength={10}
                 />
               </div>
 
