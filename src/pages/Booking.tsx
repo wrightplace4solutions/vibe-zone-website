@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,12 +14,14 @@ import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { ZAP_CATCH_HOOK, STRIPE_LINKS, CASHAPP_LINKS, ZELLE_INFO, TZ, PACKAGES, ADD_ONS } from "@/config/booking";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { stripePromise } from "@/lib/stripe";
+import { supabase } from "@/integrations/supabase/client";
 
 type PackageType = "option1" | "option2";
 
@@ -41,12 +43,33 @@ interface FormData {
 }
 
 const Booking = () => {
+  const [searchParams] = useSearchParams();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [holdConfirmed, setHoldConfirmed] = useState(false);
   const [showAddOns, setShowAddOns] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [processingStripe, setProcessingStripe] = useState(false);
   const startTimeRef = useRef<HTMLInputElement>(null);
+
+  // Check for payment status from URL params
+  useEffect(() => {
+    const paymentStatus = searchParams.get('payment_status');
+    const sessionId = searchParams.get('session_id');
+    
+    if (paymentStatus === 'success' && sessionId) {
+      toast({
+        title: "Payment Successful!",
+        description: "Your deposit has been received. We'll send you a confirmation email shortly.",
+      });
+    } else if (paymentStatus === 'cancelled') {
+      toast({
+        title: "Payment Cancelled",
+        description: "Your payment was cancelled. You can try again when you're ready.",
+        variant: "destructive",
+      });
+    }
+  }, [searchParams]);
 
   const [formData, setFormData] = useState<FormData>({
     date: undefined,
@@ -171,6 +194,44 @@ const Booking = () => {
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleStripeCheckout = async () => {
+    setProcessingStripe(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+        body: {
+          packageType: formData.package,
+          customerEmail: formData.email,
+          customerName: formData.name,
+          eventDate: formData.date ? format(formData.date, "yyyy-MM-dd") : "",
+          eventDetails: {
+            venueName: formData.venueName,
+            address: `${formData.streetAddress}, ${formData.city}, ${formData.state} ${formData.zipCode}`,
+            startTime: formData.startTime,
+            endTime: formData.endTime,
+          },
+        },
+      });
+
+      if (error) throw error;
+
+      const stripe = await stripePromise;
+      if (!stripe) throw new Error("Stripe failed to initialize");
+
+      // Redirect to Stripe Checkout
+      window.location.href = data.url;
+    } catch (error) {
+      console.error("Stripe checkout error:", error);
+      toast({
+        title: "Payment Error",
+        description: "Unable to initialize payment. Please try again or use an alternative payment method.",
+        variant: "destructive",
+      });
+    } finally {
+      setProcessingStripe(false);
     }
   };
 
@@ -506,15 +567,10 @@ const Booking = () => {
                 <Button
                   size="lg"
                   className="w-full"
-                  asChild
+                  onClick={handleStripeCheckout}
+                  disabled={processingStripe}
                 >
-                  <a
-                    href={STRIPE_LINKS[formData.package]}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Pay with Stripe (Card) - ${PACKAGES[formData.package].deposit}
-                  </a>
+                  {processingStripe ? "Processing..." : `Pay with Card (Stripe) - $${PACKAGES[formData.package].deposit}`}
                 </Button>
 
                 <Button
