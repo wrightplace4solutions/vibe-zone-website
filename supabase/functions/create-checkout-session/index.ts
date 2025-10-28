@@ -1,3 +1,4 @@
+// @ts-nocheck - This is a Deno Edge Function, not a Node.js/TypeScript file
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.14.0?target=deno";
 

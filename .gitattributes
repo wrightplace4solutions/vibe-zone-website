@@ -1,0 +1,13 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Ignore example files from Stripe security scans
+*.example linguist-vendored
+.env.example linguist-documentation
+supabase/.env.example linguist-documentation
+
+# Mark documentation as documentation
+*.md linguist-documentation
+
+# Mark Supabase functions as Deno
+supabase/functions/** linguist-language=TypeScript

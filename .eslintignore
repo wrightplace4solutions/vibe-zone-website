@@ -1,0 +1,28 @@
+# Supabase Edge Functions (Deno runtime, not Node.js)
+supabase/functions/**
+
+# Documentation files with example API keys
+*.md
+STRIPE_*.md
+PAYMENT_FLOW.md
+
+# Environment example files (contain placeholder keys)
+.env.example
+supabase/.env.example
+
+# Build output
+dist
+.next
+out
+build
+
+# Dependencies
+node_modules
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db

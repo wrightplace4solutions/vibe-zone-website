@@ -1,0 +1,14 @@
+{
+  "deno.enable": true,
+  "deno.lint": true,
+  // Disable TypeScript validation for Deno Edge Functions
+  "typescript.validate.enable": false,
+  "deno.enablePaths": [
+    "./supabase/functions"
+  ],
+  // Ignore Stripe API key warnings in documentation and example files
+  "files.associations": {
+    "*.md": "markdown",
+    ".env.example": "properties"
+  }
+}
