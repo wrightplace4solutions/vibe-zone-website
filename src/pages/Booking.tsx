@@ -13,7 +13,7 @@ import { toast } from "@/hooks/use-toast";
 import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { ZAP_CATCH_HOOK, STRIPE_LINKS, TZ, PACKAGES, ADD_ONS } from "@/config/booking";
+import { ZAP_CATCH_HOOK, STRIPE_LINKS, CASHAPP_LINKS, ZELLE_INFO, TZ, PACKAGES, ADD_ONS } from "@/config/booking";
 import { Link } from "react-router-dom";
 import {
   Collapsible,
@@ -121,7 +121,14 @@ const Booking = () => {
       date: formData.date ? format(formData.date, "yyyy-MM-dd") : "",
       start: formData.startTime,
       end: formData.endTime,
-      venue: fullAddress,
+      venueName: formData.venueName,
+      address: {
+        street: formData.streetAddress,
+        city: formData.city,
+        state: formData.state,
+        zip: formData.zipCode,
+      },
+      fullAddress: fullAddress,
       package: PACKAGES[formData.package].name,
       deposit: PACKAGES[formData.package].deposit,
       notes: formData.notes,
@@ -276,8 +283,9 @@ const Booking = () => {
                   <Input
                     id="state"
                     placeholder="State"
+                    maxLength={2}
                     value={formData.state}
-                    onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, state: e.target.value.toUpperCase() })}
                     className="w-full"
                   />
                 </div>
@@ -288,10 +296,10 @@ const Booking = () => {
                 <Input
                   id="zipCode"
                   placeholder="ZIP Code"
+                  maxLength={5}
                   value={formData.zipCode}
-                  onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, zipCode: e.target.value.replace(/\D/g, '') })}
                   className="w-full"
-                  maxLength={10}
                 />
               </div>
 
@@ -481,27 +489,56 @@ const Booking = () => {
                 </p>
               </div>
 
-              <p className="text-sm text-muted-foreground">
-                Click below to securely pay your deposit via Stripe. You'll receive a confirmation email once complete.
+              <p className="text-sm text-muted-foreground mb-4">
+                Choose your preferred payment method to complete your ${PACKAGES[formData.package].deposit} deposit:
               </p>
 
-              <Button
-                size="lg"
-                className="w-full"
-                asChild
-              >
-                <a
-                  href={STRIPE_LINKS[formData.package]}
-                  target="_blank"
-                  rel="noopener noreferrer"
+              <div className="space-y-3">
+                <Button
+                  size="lg"
+                  className="w-full"
+                  asChild
                 >
-                  Pay Deposit Now (${PACKAGES[formData.package].deposit})
-                </a>
-              </Button>
+                  <a
+                    href={STRIPE_LINKS[formData.package]}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Pay with Stripe (Card) - ${PACKAGES[formData.package].deposit}
+                  </a>
+                </Button>
 
-              <p className="text-xs text-center text-muted-foreground">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="w-full"
+                  asChild
+                >
+                  <a
+                    href={CASHAPP_LINKS[formData.package]}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Pay with Cash App - ${PACKAGES[formData.package].deposit}
+                  </a>
+                </Button>
+
+                <div className="border rounded-lg p-4 bg-muted/50">
+                  <p className="font-medium mb-2">Pay with Zelle:</p>
+                  <div className="text-sm space-y-1">
+                    <p>Email: <span className="font-mono text-primary">{ZELLE_INFO.email}</span></p>
+                    <p>Phone: <span className="font-mono text-primary">{ZELLE_INFO.phone}</span></p>
+                    <p className="text-muted-foreground mt-2">Amount: ${PACKAGES[formData.package].deposit}</p>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      After sending, reply to your confirmation email with the transaction ID
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-xs text-center text-muted-foreground mt-4">
                 Need help? Email us at{" "}
-                <a href="mailto:booking@vzentertainment.fun" className="text-primary hover:underline">
+                <a href="mailto:bookings@vzentertainment.fun" className="text-primary hover:underline">
                   bookings@vzentertainment.fun
                 </a>
               </p>

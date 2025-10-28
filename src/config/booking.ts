@@ -5,6 +5,16 @@ export const STRIPE_LINKS = {
   option2: import.meta.env.VITE_STRIPE_LINK_OPTION2 || "https://buy.stripe.com/REPLACE_OPTION2",
 };
 
+export const CASHAPP_LINKS = {
+  option1: import.meta.env.VITE_CASHAPP_LINK_OPTION1 || "https://cash.app/$REPLACE/100",
+  option2: import.meta.env.VITE_CASHAPP_LINK_OPTION2 || "https://cash.app/$REPLACE/150",
+};
+
+export const ZELLE_INFO = {
+  email: import.meta.env.VITE_ZELLE_EMAIL || "payments@vzentertainment.fun",
+  phone: import.meta.env.VITE_ZELLE_PHONE || "(555) 123-4567",
+};
+
 export const TZ = "America/New_York";
 
 export const PACKAGES = {
