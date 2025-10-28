@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -27,7 +27,11 @@ interface FormData {
   date: Date | undefined;
   startTime: string;
   endTime: string;
-  venue: string;
+  venueName: string;
+  streetAddress: string;
+  city: string;
+  state: string;
+  zipCode: string;
   package: PackageType;
   name: string;
   email: string;
@@ -41,12 +45,18 @@ const Booking = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [holdConfirmed, setHoldConfirmed] = useState(false);
   const [showAddOns, setShowAddOns] = useState(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const startTimeRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState<FormData>({
     date: undefined,
     startTime: "",
     endTime: "",
-    venue: "",
+    venueName: "",
+    streetAddress: "",
+    city: "",
+    state: "",
+    zipCode: "",
     package: "option1",
     name: "",
     email: "",
@@ -57,10 +67,10 @@ const Booking = () => {
 
   const validateStep = (stepNum: number): boolean => {
     if (stepNum === 1) {
-      if (!formData.date || !formData.startTime || !formData.endTime || !formData.venue) {
+      if (!formData.date || !formData.startTime || !formData.endTime || !formData.venueName || !formData.streetAddress || !formData.city || !formData.state || !formData.zipCode) {
         toast({
           title: "Missing Information",
-          description: "Please fill out all event details",
+          description: "Please fill out all event details and address fields",
           variant: "destructive",
         });
         return false;
@@ -109,7 +119,13 @@ const Booking = () => {
       date: formData.date ? format(formData.date, "yyyy-MM-dd") : "",
       start: formData.startTime,
       end: formData.endTime,
-      venue: formData.venue,
+      venueName: formData.venueName,
+      address: {
+        street: formData.streetAddress,
+        city: formData.city,
+        state: formData.state,
+        zip: formData.zipCode,
+      },
       package: PACKAGES[formData.package].name,
       deposit: PACKAGES[formData.package].deposit,
       notes: formData.notes,
@@ -167,7 +183,7 @@ const Booking = () => {
             <CardContent className="space-y-4">
               <div>
                 <Label htmlFor="date">Event Date *</Label>
-                <Popover>
+                <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
@@ -184,7 +200,11 @@ const Booking = () => {
                     <Calendar
                       mode="single"
                       selected={formData.date}
-                      onSelect={(date) => setFormData({ ...formData, date })}
+                      onSelect={(date) => {
+                        setFormData({ ...formData, date });
+                        setIsCalendarOpen(false);
+                        setTimeout(() => startTimeRef.current?.focus(), 100);
+                      }}
                       disabled={(date) => date < new Date()}
                       initialFocus
                     />
@@ -196,6 +216,7 @@ const Booking = () => {
                 <div>
                   <Label htmlFor="startTime">Start Time *</Label>
                   <Input
+                    ref={startTimeRef}
                     id="startTime"
                     type="time"
                     value={formData.startTime}
@@ -214,12 +235,55 @@ const Booking = () => {
               </div>
 
               <div>
-                <Label htmlFor="venue">Venue / Address *</Label>
+                <Label htmlFor="venueName">Venue Name *</Label>
                 <Input
-                  id="venue"
-                  placeholder="Where's the party at?"
-                  value={formData.venue}
-                  onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
+                  id="venueName"
+                  placeholder="e.g., The Grand Ballroom"
+                  value={formData.venueName}
+                  onChange={(e) => setFormData({ ...formData, venueName: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="streetAddress">Street Address *</Label>
+                <Input
+                  id="streetAddress"
+                  placeholder="123 Main Street"
+                  value={formData.streetAddress}
+                  onChange={(e) => setFormData({ ...formData, streetAddress: e.target.value })}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="city">City *</Label>
+                  <Input
+                    id="city"
+                    placeholder="New York"
+                    value={formData.city}
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="state">State *</Label>
+                  <Input
+                    id="state"
+                    placeholder="NY"
+                    maxLength={2}
+                    value={formData.state}
+                    onChange={(e) => setFormData({ ...formData, state: e.target.value.toUpperCase() })}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="zipCode">ZIP Code *</Label>
+                <Input
+                  id="zipCode"
+                  placeholder="10001"
+                  maxLength={5}
+                  value={formData.zipCode}
+                  onChange={(e) => setFormData({ ...formData, zipCode: e.target.value.replace(/\D/g, '') })}
                 />
               </div>
 
