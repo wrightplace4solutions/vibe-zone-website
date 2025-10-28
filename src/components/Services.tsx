@@ -5,7 +5,7 @@ const services = [
   {
     icon: Music,
     title: "Line Dance Specialist",
-    description: "Expert in country line dance classics and latest hits that get everyone on the floor",
+    description: "Experienced with Urban line dance classics and latest hits that get everyone on the floor",
     color: "text-neon-cyan",
   },
   {

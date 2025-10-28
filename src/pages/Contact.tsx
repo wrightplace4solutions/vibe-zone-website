@@ -8,7 +8,7 @@ const Contact = () => {
       <div className="container mx-auto px-4 max-w-4xl">
         <h1 className="text-4xl font-bold mb-6">Get In Touch</h1>
         <p className="text-muted-foreground mb-8">
-          Ready to book or have questions? We're here to help! #LETS WORK!!
+          Ready to book or have questions? We're here to help! #LETSWORK!!
         </p>
 
         <div className="grid md:grid-cols-2 gap-6">

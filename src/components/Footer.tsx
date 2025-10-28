@@ -13,7 +13,7 @@ export const Footer = () => {
             <p className="text-muted-foreground text-sm">
               Professional DJ services for all occasions
             </p>
-            <p className="text-primary font-bold mt-4 text-xl">#LETS WORK!!</p>
+            <p className="text-primary font-bold mt-4 text-xl">#LETSWORK!!</p>
           </div>
 
           <div>

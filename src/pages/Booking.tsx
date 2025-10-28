@@ -181,7 +181,7 @@ const Booking = () => {
       <div className="container mx-auto px-4 max-w-3xl">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">Thank you for reserving our DJ services.</h1>
-          <p className="text-muted-foreground">We are looking forward to helping to make your event unforgettable! #LETS WORK!!</p>
+          <p className="text-muted-foreground">We are looking forward to helping to make your event unforgettable! #LETSWORK!!</p>
         </div>
 
         <Progress value={progress} className="mb-8" />
