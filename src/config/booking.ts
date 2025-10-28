@@ -15,16 +15,16 @@ export const PACKAGES = {
     description: "Essential DJ setup - bring your vibe, we bring the sound"
   },
   option2: {
-    name: "Full Setup + Rentals",
+    name: "Full Setup + Rentals Fees",
     basePrice: 550,
     deposit: 150,
-    description: "Complete setup with lighting and PA rental options"
+    description: "Complete setup of DJ area, sound system (PA), including rental equipment"
   }
 };
 
 export const ADD_ONS = [
   { name: "Basic Lighting Package", price: 80 },
   { name: "Premium Lighting Package", price: 110 },
-  { name: "PA Rental (Small Venue)", price: 120 },
-  { name: "PA Rental (Large Venue)", price: 160 },
+  { name: "PA Rental (Small Venue)", description: "People: up to ~25–100 guests\n\nSpace: up to ~1,000–1,500 sq ft (e.g., small banquet room, lounge, bar area, community room)", price: 120 },
+  { name: "PA Rental (Large Venue)", description:"Guest count: 300–800+ people (weddings, convention ballrooms, gyms, big halls).\n\nRoom size: ≈8,000–20,000 sq ft (or longer throws of 80–150 ft from DJ to back wall).", price: 160 },
 ];
