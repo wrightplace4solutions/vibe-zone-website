@@ -68,7 +68,7 @@ export const Footer = () => {
         </div>
 
         <div className="border-t mt-8 pt-8 text-center text-muted-foreground text-sm">
-          <p>&copy; {currentYear} Vibe Zone Entertainment. All rights reserved.</p>
+          <p>&copy; {currentYear} Vibe Zone Entertainment and Soulware Systems. All rights reserved.</p>
         </div>
       </div>
     </footer>
