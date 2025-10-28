@@ -171,8 +171,8 @@ const Booking = () => {
     <div className="min-h-screen bg-background py-12">
       <div className="container mx-auto px-4 max-w-3xl">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Book Your Event</h1>
-          <p className="text-muted-foreground">Let's make your event unforgettable! #LETS WORK!!</p>
+          <h1 className="text-4xl font-bold mb-2">Thank you for reserving our DJ services.</h1>
+          <p className="text-muted-foreground">We are looking forward to helping to make your event unforgettable! #LETS WORK!!</p>
         </div>
 
         <Progress value={progress} className="mb-8" />
