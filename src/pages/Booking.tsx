@@ -107,6 +107,15 @@ const Booking = () => {
     setStep(step - 1);
   };
 
+  const formatTimeTo12Hour = (time24: string): string => {
+    if (!time24) return "";
+    const [hours, minutes] = time24.split(":");
+    const hour = parseInt(hours, 10);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${minutes} ${ampm}`;
+  };
+
   const handleSubmit = async () => {
     if (!validateStep(3)) return;
 
@@ -482,7 +491,7 @@ const Booking = () => {
               <div className="bg-muted p-4 rounded-lg space-y-2">
                 <p className="font-medium">Your Details:</p>
                 <p className="text-sm">Date: {formData.date && format(formData.date, "PPP")}</p>
-                <p className="text-sm">Time: {formData.startTime} - {formData.endTime}</p>
+                <p className="text-sm">Time: {formatTimeTo12Hour(formData.startTime)} - {formatTimeTo12Hour(formData.endTime)}</p>
                 <p className="text-sm">Package: {PACKAGES[formData.package].name}</p>
                 <p className="text-sm text-primary font-semibold">
                   Deposit Required: ${PACKAGES[formData.package].deposit}
