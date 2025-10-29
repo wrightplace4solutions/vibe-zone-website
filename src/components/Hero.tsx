@@ -15,8 +15,9 @@ export const Hero = () => {
         <div className="max-w-4xl mx-auto">
           <img 
             src={vibeZoneLogo} 
-            alt="Vibe Zone Entertainment" 
-            className="w-full max-w-2xl mx-auto mb-8 animate-glow-pulse"
+            alt="Vibe Zone Entertainment - DJ Def Stef specializing in Line Dance and Trail Ride music" 
+            className="w-full max-w-lg mx-auto mb-8 animate-glow-pulse"
+            loading="eager"
           />
           
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
