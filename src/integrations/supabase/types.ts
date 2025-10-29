@@ -16,52 +16,85 @@ export type Database = {
     Tables: {
       bookings: {
         Row: {
+          city: string | null
+          confirmed_at: string | null
           created_at: string
           customer_email: string
           customer_name: string
           customer_phone: string
           deposit_amount: number | null
+          end_time: string | null
           event_date: string
           event_type: string
           google_calendar_event_id: string | null
           id: string
           notes: string | null
+          package_type: string | null
           service_tier: string
+          start_time: string | null
+          state: string | null
           status: string
+          street_address: string | null
+          stripe_payment_intent: string | null
+          stripe_session_id: string | null
           total_amount: number
           updated_at: string
+          venue_name: string | null
+          zip_code: string | null
         }
         Insert: {
+          city?: string | null
+          confirmed_at?: string | null
           created_at?: string
           customer_email: string
           customer_name: string
           customer_phone: string
           deposit_amount?: number | null
+          end_time?: string | null
           event_date: string
           event_type: string
           google_calendar_event_id?: string | null
           id?: string
           notes?: string | null
+          package_type?: string | null
           service_tier: string
+          start_time?: string | null
+          state?: string | null
           status?: string
+          street_address?: string | null
+          stripe_payment_intent?: string | null
+          stripe_session_id?: string | null
           total_amount: number
           updated_at?: string
+          venue_name?: string | null
+          zip_code?: string | null
         }
         Update: {
+          city?: string | null
+          confirmed_at?: string | null
           created_at?: string
           customer_email?: string
           customer_name?: string
           customer_phone?: string
           deposit_amount?: number | null
+          end_time?: string | null
           event_date?: string
           event_type?: string
           google_calendar_event_id?: string | null
           id?: string
           notes?: string | null
+          package_type?: string | null
           service_tier?: string
+          start_time?: string | null
+          state?: string | null
           status?: string
+          street_address?: string | null
+          stripe_payment_intent?: string | null
+          stripe_session_id?: string | null
           total_amount?: number
           updated_at?: string
+          venue_name?: string | null
+          zip_code?: string | null
         }
         Relationships: []
       }

@@ -1,6 +1,7 @@
 // @ts-nocheck - This is a Deno Edge Function, not a Node.js/TypeScript file
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.14.0?target=deno";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.76.1";
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
   apiVersion: "2024-10-28.acacia",
@@ -8,6 +9,10 @@ const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
 });
 
 const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET") || "";
+
+const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
+const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 serve(async (req) => {
   const signature = req.headers.get("stripe-signature");
@@ -26,27 +31,49 @@ serve(async (req) => {
         const session = event.data.object as Stripe.Checkout.Session;
         console.log("Payment successful:", session.id);
         
-        // You can add logic here to:
-        // 1. Update your database with the payment confirmation
-        // 2. Send confirmation email
-        // 3. Update booking status
-        
         const metadata = session.metadata;
-        console.log("Booking confirmed for:", {
-          customerName: metadata?.customerName,
-          eventDate: metadata?.eventDate,
-          packageType: metadata?.packageType,
-        });
+        const bookingId = metadata?.bookingId;
         
-        // TODO: Add your business logic here
-        // For example, update Supabase with payment confirmation
+        if (bookingId) {
+          // Update booking status to confirmed
+          const { error: updateError } = await supabase
+            .from("bookings")
+            .update({
+              status: "confirmed",
+              stripe_payment_intent: session.payment_intent as string,
+              confirmed_at: new Date().toISOString(),
+            })
+            .eq("id", bookingId);
+          
+          if (updateError) {
+            console.error("Error updating booking:", updateError);
+          } else {
+            console.log("Booking confirmed:", bookingId);
+          }
+        } else {
+          console.warn("No booking ID in session metadata");
+        }
         
         break;
       }
       case "payment_intent.payment_failed": {
         const paymentIntent = event.data.object;
         console.log("Payment failed:", paymentIntent.id);
-        // TODO: Handle payment failure
+        
+        // Try to find and update the booking
+        const { data: booking } = await supabase
+          .from("bookings")
+          .select("id")
+          .eq("stripe_payment_intent", paymentIntent.id)
+          .single();
+        
+        if (booking) {
+          await supabase
+            .from("bookings")
+            .update({ status: "payment_failed" })
+            .eq("id", booking.id);
+        }
+        
         break;
       }
       default:

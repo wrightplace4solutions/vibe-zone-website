@@ -50,18 +50,41 @@ const Booking = () => {
   const [showAddOns, setShowAddOns] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [processingStripe, setProcessingStripe] = useState(false);
+  const [bookingConfirmed, setBookingConfirmed] = useState(false);
   const startTimeRef = useRef<HTMLInputElement>(null);
 
-  // Check for payment status from URL params
+  // Check for payment status from URL params and verify booking
   useEffect(() => {
     const paymentStatus = searchParams.get('payment_status');
     const sessionId = searchParams.get('session_id');
+    const bookingId = searchParams.get('booking_id');
     
-    if (paymentStatus === 'success' && sessionId) {
-      toast({
-        title: "Payment Successful!",
-        description: "Your deposit has been received. We'll send you a confirmation email shortly.",
-      });
+    if (paymentStatus === 'success' && sessionId && bookingId) {
+      // Check booking status in database
+      const checkBookingStatus = async () => {
+        const { data: booking, error } = await supabase
+          .from('bookings')
+          .select('status')
+          .eq('id', bookingId)
+          .single();
+        
+        if (!error && booking?.status === 'confirmed') {
+          setBookingConfirmed(true);
+          setStep(5); // Show confirmation step
+          toast({
+            title: "Payment Successful!",
+            description: "Your deposit has been received and your booking is confirmed!",
+          });
+        } else {
+          // Status might not be updated yet, show pending message
+          toast({
+            title: "Payment Processing",
+            description: "Your payment is being processed. You'll receive a confirmation email shortly.",
+          });
+        }
+      };
+      
+      checkBookingStatus();
     } else if (paymentStatus === 'cancelled') {
       toast({
         title: "Payment Cancelled",
@@ -206,20 +229,22 @@ const Booking = () => {
           packageType: formData.package,
           customerEmail: formData.email,
           customerName: formData.name,
+          customerPhone: formData.phone,
           eventDate: formData.date ? format(formData.date, "yyyy-MM-dd") : "",
           eventDetails: {
             venueName: formData.venueName,
-            address: `${formData.streetAddress}, ${formData.city}, ${formData.state} ${formData.zipCode}`,
+            streetAddress: formData.streetAddress,
+            city: formData.city,
+            state: formData.state,
+            zipCode: formData.zipCode,
             startTime: formData.startTime,
             endTime: formData.endTime,
           },
+          notes: formData.notes,
         },
       });
 
       if (error) throw error;
-
-      const stripe = await stripePromise;
-      if (!stripe) throw new Error("Stripe failed to initialize");
 
       // Redirect to Stripe Checkout
       window.location.href = data.url;
@@ -567,15 +592,10 @@ const Booking = () => {
                 <Button
                   size="lg"
                   className="w-full"
-                  asChild
+                  onClick={handleStripeCheckout}
+                  disabled={processingStripe}
                 >
-                  <a
-                    href={STRIPE_LINKS[formData.package]}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Pay Deposit with Stripe - ${PACKAGES[formData.package].deposit}
-                  </a>
+                  {processingStripe ? "Processing..." : `Pay Deposit with Stripe - $${PACKAGES[formData.package].deposit}`}
                 </Button>
 
                 <Button
@@ -608,6 +628,47 @@ const Booking = () => {
 
               <p className="text-xs text-center text-muted-foreground mt-4">
                 Need help? Email us at{" "}
+                <a href="mailto:bookings@vzentertainment.fun" className="text-primary hover:underline">
+                  bookings@vzentertainment.fun
+                </a>
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {step === 5 && bookingConfirmed && (
+          <Card className="border-green-500 bg-green-50 dark:bg-green-950">
+            <CardHeader>
+              <CardTitle className="text-green-600 dark:text-green-400 flex items-center gap-2">
+                <span className="text-3xl">✓</span> Booking Confirmed!
+              </CardTitle>
+              <CardDescription className="text-green-700 dark:text-green-300">
+                Your payment has been processed and your booking is confirmed.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="bg-white dark:bg-gray-900 p-4 rounded-lg space-y-2 border border-green-200 dark:border-green-800">
+                <p className="font-medium text-green-800 dark:text-green-200">Your Confirmed Event:</p>
+                <p className="text-sm"><strong>Date:</strong> {formData.date && format(formData.date, "PPP")}</p>
+                <p className="text-sm"><strong>Time:</strong> {formatTimeTo12Hour(formData.startTime)} - {formatTimeTo12Hour(formData.endTime)}</p>
+                <p className="text-sm"><strong>Venue:</strong> {formData.venueName}</p>
+                <p className="text-sm"><strong>Package:</strong> {PACKAGES[formData.package].name}</p>
+                <p className="text-sm text-green-600 dark:text-green-400 font-semibold">
+                  <strong>Deposit Paid:</strong> ${PACKAGES[formData.package].deposit}
+                </p>
+              </div>
+
+              <div className="bg-muted p-4 rounded-lg">
+                <p className="text-sm font-medium mb-2">What's Next?</p>
+                <ul className="text-sm space-y-1 list-disc list-inside text-muted-foreground">
+                  <li>You'll receive a confirmation email shortly</li>
+                  <li>We'll contact you 1-2 weeks before your event to finalize details</li>
+                  <li>The remaining balance is due on the day of the event</li>
+                </ul>
+              </div>
+
+              <p className="text-sm text-center text-muted-foreground">
+                Questions? Email us at{" "}
                 <a href="mailto:bookings@vzentertainment.fun" className="text-primary hover:underline">
                   bookings@vzentertainment.fun
                 </a>
