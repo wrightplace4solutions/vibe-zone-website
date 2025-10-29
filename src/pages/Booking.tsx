@@ -567,10 +567,15 @@ const Booking = () => {
                 <Button
                   size="lg"
                   className="w-full"
-                  onClick={handleStripeCheckout}
-                  disabled={processingStripe}
+                  asChild
                 >
-                  {processingStripe ? "Processing..." : `Pay with Card (Stripe) - $${PACKAGES[formData.package].deposit}`}
+                  <a
+                    href={STRIPE_LINKS[formData.package]}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Pay Deposit with Stripe - ${PACKAGES[formData.package].deposit}
+                  </a>
                 </Button>
 
                 <Button
