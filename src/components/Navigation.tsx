@@ -27,7 +27,6 @@ export const Navigation = () => {
               alt="Vibe Zone Entertainment" 
               className="h-10 w-auto"
             />
-            <span className="font-bold text-xl hidden sm:inline">Vibe Zone Entertainment</span>
           </Link>
 
           {/* Desktop Navigation */}
