@@ -4,12 +4,21 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { addToGoogleCalendar } from '@/lib/google-calendar';
 
 export default function BookingSuccess() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-  const [bookingDetails, setBookingDetails] = useState<any>(null);
+  const [bookingDetails, setBookingDetails] = useState<{
+    customer_name: string;
+    customer_email: string;
+    event_date: string;
+    event_type: string;
+    venue_name?: string;
+    start_time?: string;
+    end_time?: string;
+  } | null>(null);
 
   useEffect(() => {
     const sessionId = searchParams.get('session_id');
@@ -42,8 +51,14 @@ export default function BookingSuccess() {
       setBookingDetails(booking);
       setStatus('success');
 
-      // TODO: Add Google Calendar integration here
-      // We can call a simple API endpoint to add to calendar
+      // Add to Google Calendar
+      try {
+        await addToGoogleCalendar(booking);
+        console.log('Event added to Google Calendar');
+      } catch (calendarError) {
+        console.error('Failed to add to calendar, but booking confirmed:', calendarError);
+        // Don't fail the whole process if calendar fails
+      }
       
     } catch (error) {
       console.error('Error confirming booking:', error);
