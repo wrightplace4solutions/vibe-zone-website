@@ -10,6 +10,7 @@ export interface CheckoutSessionData {
   customerEmail: string;
   customerName: string;
   eventDate: string;
+  bookingId: string;
   eventDetails: {
     venueName: string;
     address: string;
