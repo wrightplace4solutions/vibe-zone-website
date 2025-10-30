@@ -1,5 +1,3 @@
-export const ZAP_CATCH_HOOK = import.meta.env.VITE_ZAP_CATCH_HOOK || "https://hook.us2.make.com/yb9heqwhecy4vnpnlbauixxf6nxc6nno";
-
 export const STRIPE_LINKS = {
   option1: import.meta.env.VITE_STRIPE_LINK_OPTION1 || "https://checkout.vzentertainment.fun/b/test_fZueVd1WI8977At9pu5ZC00",
   option2: import.meta.env.VITE_STRIPE_LINK_OPTION2 || "https://checkout.vzentertainment.fun/b/test_4gMeVdcBm9db6wp0SY5ZC01",

@@ -60,44 +60,9 @@ serve(async (req) => {
             } else {
               console.log("Booking confirmed:", bookingId);
               
-              // Send booking data to Make.com webhook for Google Calendar integration
-              try {
-                const webhookUrl = "https://hook.us2.make.com/yb9heqwhecy4vnpnlbauixxf6nxc6nno";
-                const webhookResponse = await fetch(webhookUrl, {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    booking_id: bookingId,
-                    customer_name: booking.customer_name,
-                    customer_email: booking.customer_email,
-                    customer_phone: booking.customer_phone,
-                    event_type: booking.event_type,
-                    event_date: booking.event_date,
-                    start_time: booking.start_time,
-                    end_time: booking.end_time,
-                    venue_name: booking.venue_name,
-                    street_address: booking.street_address,
-                    city: booking.city,
-                    state: booking.state,
-                    zip_code: booking.zip_code,
-                    package_type: booking.package_type,
-                    service_tier: booking.service_tier,
-                    total_amount: booking.total_amount,
-                    notes: booking.notes,
-                    confirmed_at: new Date().toISOString(),
-                  }),
-                });
-
-                if (!webhookResponse.ok) {
-                  console.error("Failed to send to Make.com webhook:", await webhookResponse.text());
-                } else {
-                  console.log("Successfully sent booking to Make.com webhook");
-                }
-              } catch (webhookError) {
-                console.error("Error calling Make.com webhook:", webhookError);
-              }
+              // TODO: Add Google Calendar integration here using direct API
+              // Use GOOGLE_CALENDAR_CLIENT_ID, GOOGLE_CALENDAR_CLIENT_SECRET, 
+              // and GOOGLE_CALENDAR_REFRESH_TOKEN from Supabase secrets
             }
           }
         } else {

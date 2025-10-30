@@ -13,7 +13,7 @@ import { toast } from "@/hooks/use-toast";
 import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { ZAP_CATCH_HOOK, STRIPE_LINKS, CASHAPP_LINKS, ZELLE_INFO, TZ, PACKAGES, ADD_ONS } from "@/config/booking";
+import { STRIPE_LINKS, CASHAPP_LINKS, ZELLE_INFO, TZ, PACKAGES, ADD_ONS } from "@/config/booking";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   Collapsible,
@@ -167,47 +167,43 @@ const Booking = () => {
 
     setIsSubmitting(true);
 
-    const fullAddress = `${formData.venueName}, ${formData.streetAddress}, ${formData.city}, ${formData.state} ${formData.zipCode}`;
-
-    const payload = {
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      date: formData.date ? format(formData.date, "yyyy-MM-dd") : "",
-      start: formData.startTime,
-      end: formData.endTime,
-      venueName: formData.venueName,
-      address: {
-        street: formData.streetAddress,
-        city: formData.city,
-        state: formData.state,
-        zip: formData.zipCode,
-      },
-      fullAddress: fullAddress,
-      package: PACKAGES[formData.package].name,
-      deposit: PACKAGES[formData.package].deposit,
-      notes: formData.notes,
-      timezone: TZ,
-      source: "vzentertainment.fun",
-    };
-
     try {
-      const response = await fetch(ZAP_CATCH_HOOK, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      // Save booking to Supabase database
+      const { data: booking, error: dbError } = await supabase
+        .from("bookings")
+        .insert({
+          customer_name: formData.name,
+          customer_email: formData.email,
+          customer_phone: formData.phone,
+          event_date: formData.date ? format(formData.date, "yyyy-MM-dd") : "",
+          event_type: "DJ Service", // Default event type
+          start_time: formData.startTime,
+          end_time: formData.endTime,
+          venue_name: formData.venueName,
+          street_address: formData.streetAddress,
+          city: formData.city,
+          state: formData.state,
+          zip_code: formData.zipCode,
+          package_type: formData.package,
+          service_tier: PACKAGES[formData.package].name,
+          total_amount: PACKAGES[formData.package].deposit,
+          deposit_amount: PACKAGES[formData.package].deposit,
+          notes: formData.notes,
+          status: "pending",
+        })
+        .select()
+        .single();
 
-      if (response.ok || response.type === "opaque") {
-        setHoldConfirmed(true);
-        setStep(4);
-        toast({
-          title: "Hold Requested!",
-          description: "Check your email and complete the deposit to confirm.",
-        });
-      } else {
-        throw new Error("Failed to submit");
+      if (dbError) {
+        throw dbError;
       }
+
+      setHoldConfirmed(true);
+      setStep(4);
+      toast({
+        title: "Hold Requested!",
+        description: "Check your email and complete the deposit to confirm.",
+      });
     } catch (error) {
       console.error("Booking error:", error);
       toast({
