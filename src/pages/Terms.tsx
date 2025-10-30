@@ -9,6 +9,30 @@ const Terms = () => {
 
         <div className="space-y-8">
           <section>
+            <h2 className="text-2xl font-semibold mb-4">Booking & Payment Timeline</h2>
+            <div className="prose prose-slate dark:prose-invert">
+              <p>
+                <strong>Hold Requests:</strong> When you submit a booking request, we place a temporary HOLD on your 
+                selected date for 48 hours. This hold is reserved under your name and event details.
+              </p>
+              <p>
+                <strong>48-Hour Payment Window:</strong> To confirm your booking, you must complete the deposit payment 
+                within 48 hours of submitting your booking request. If payment is made during the same session, your 
+                booking is immediately confirmed. If paying later, you have up to 48 hours from the time of booking.
+              </p>
+              <p>
+                <strong>Expired Holds:</strong> If payment is not received within 48 hours, the hold will automatically 
+                be released and the date becomes available to other clients. Both you and Vibe Zone Entertainment will 
+                receive a notification when a hold expires. You may submit a new booking request if the date is still available.
+              </p>
+              <p>
+                <strong>Confirmation:</strong> Once payment is received, you will receive an email confirmation with all 
+                event details and your booking status will be updated to "Confirmed."
+              </p>
+            </div>
+          </section>
+
+          <section>
             <h2 className="text-2xl font-semibold mb-4">Scope of Service & Hours</h2>
             <div className="prose prose-slate dark:prose-invert">
               <p>

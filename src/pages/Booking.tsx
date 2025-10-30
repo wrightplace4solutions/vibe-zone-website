@@ -20,7 +20,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { stripePromise } from "@/lib/stripe";
 import { supabase } from "@/integrations/supabase/client";
 
 type PackageType = "option1" | "option2";
@@ -49,7 +48,6 @@ const Booking = () => {
   const [holdConfirmed, setHoldConfirmed] = useState(false);
   const [showAddOns, setShowAddOns] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [processingStripe, setProcessingStripe] = useState(false);
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
   const startTimeRef = useRef<HTMLInputElement>(null);
 
@@ -216,46 +214,6 @@ const Booking = () => {
     }
   };
 
-  const handleStripeCheckout = async () => {
-    setProcessingStripe(true);
-
-    try {
-      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
-        body: {
-          packageType: formData.package,
-          customerEmail: formData.email,
-          customerName: formData.name,
-          customerPhone: formData.phone,
-          eventDate: formData.date ? format(formData.date, "yyyy-MM-dd") : "",
-          eventDetails: {
-            venueName: formData.venueName,
-            streetAddress: formData.streetAddress,
-            city: formData.city,
-            state: formData.state,
-            zipCode: formData.zipCode,
-            startTime: formData.startTime,
-            endTime: formData.endTime,
-          },
-          notes: formData.notes,
-        },
-      });
-
-      if (error) throw error;
-
-      // Redirect to Stripe Checkout
-      window.location.href = data.url;
-    } catch (error) {
-      console.error("Stripe checkout error:", error);
-      toast({
-        title: "Payment Error",
-        description: "Unable to initialize payment. Please try again or use an alternative payment method.",
-        variant: "destructive",
-      });
-    } finally {
-      setProcessingStripe(false);
-    }
-  };
-
   const progress = (step / 4) * 100;
 
   return (
@@ -264,6 +222,19 @@ const Booking = () => {
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">Thank you for reserving our DJ services.</h1>
           <p className="text-muted-foreground">We are looking forward to helping to make your event unforgettable! #LETSWORK!!</p>
+        </div>
+
+        <div className="mb-6 p-4 border-l-4 border-primary bg-muted/50 rounded-r-lg">
+          <h3 className="font-semibold mb-2 flex items-center gap-2">
+            <CalendarIcon className="h-5 w-5 text-primary" />
+            48-Hour Hold Policy
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Your booking request creates a <strong>48-hour hold</strong> on your selected date. 
+            To confirm your booking, please complete the deposit payment within 48 hours. 
+            If payment is not received within this timeframe, the hold will be automatically released 
+            and you'll receive a notification. Payment made during this session will immediately confirm your booking.
+          </p>
         </div>
 
         <Progress value={progress} className="mb-8" />
@@ -566,12 +537,21 @@ const Booking = () => {
             <CardHeader>
               <CardTitle className="text-primary">Hold Requested Successfully!</CardTitle>
               <CardDescription>
-                We've placed a temporary HOLD on your date. Complete the deposit within 24 hours to confirm.
+                We've placed a temporary 48-HOUR HOLD on your date under "{formData.name} - {formData.date && format(formData.date, "MMM d, yyyy")}". Complete the deposit within 48 hours to confirm your booking.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 p-4 rounded-lg">
+                <p className="text-sm font-semibold text-amber-900 dark:text-amber-100 mb-2">⏰ Important: 48-Hour Hold Policy</p>
+                <p className="text-sm text-amber-800 dark:text-amber-200">
+                  Your booking hold expires in 48 hours. If payment is not received by then, the hold will be automatically 
+                  released and both you and our team will be notified. Pay now to secure your date immediately!
+                </p>
+              </div>
+
               <div className="bg-muted p-4 rounded-lg space-y-2">
                 <p className="font-medium">Your Details:</p>
+                <p className="text-sm">Client Name: {formData.name}</p>
                 <p className="text-sm">Date: {formData.date && format(formData.date, "PPP")}</p>
                 <p className="text-sm">Time: {formatTimeTo12Hour(formData.startTime)} - {formatTimeTo12Hour(formData.endTime)}</p>
                 <p className="text-sm">Package: {PACKAGES[formData.package].name}</p>
@@ -588,10 +568,15 @@ const Booking = () => {
                 <Button
                   size="lg"
                   className="w-full"
-                  onClick={handleStripeCheckout}
-                  disabled={processingStripe}
+                  asChild
                 >
-                  {processingStripe ? "Processing..." : `Pay Deposit with Stripe - $${PACKAGES[formData.package].deposit}`}
+                  <a
+                    href={STRIPE_LINKS[formData.package]}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Pay Deposit with Stripe - ${PACKAGES[formData.package].deposit}
+                  </a>
                 </Button>
 
                 <Button
