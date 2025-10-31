@@ -51,7 +51,7 @@ export const Services = () => {
             return (
               <Card 
                 key={index}
-                className="bg-card/50 backdrop-blur border-border hover:border-primary/50 transition-all duration-300 hover:scale-105 group animate-fade-in"
+                className="bg-card/50 backdrop-blur border-border transition-all duration-300 group animate-fade-in"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <CardContent className="p-6 text-center">
