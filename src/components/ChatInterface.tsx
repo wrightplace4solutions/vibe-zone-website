@@ -149,7 +149,7 @@ export const ChatInterface = () => {
       {/* Chat Toggle Button */}
       <Button
         onClick={() => setIsOpen(!isOpen)}
-        className="sticky bottom-6 right-6 ml-auto h-14 w-14 rounded-full shadow-neon-cyan z-50 mt-6 mr-6"
+        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-neon-cyan z-50"
         size="icon"
       >
         <MessageSquare className="h-6 w-6" />
@@ -157,7 +157,7 @@ export const ChatInterface = () => {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="sticky bottom-24 right-6 ml-auto w-96 h-[600px] bg-card border border-border rounded-lg shadow-neon-cyan z-50 flex flex-col mr-6">
+        <div className="fixed bottom-24 right-6 w-96 h-[600px] bg-card border border-border rounded-lg shadow-neon-cyan z-50 flex flex-col">
           {/* Header */}
           <div className="p-4 border-b border-border">
             <h3 className="text-lg font-bold">Vibe Zone DJ Assistant</h3>
