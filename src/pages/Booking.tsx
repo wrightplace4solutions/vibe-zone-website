@@ -20,7 +20,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { supabase } from "@/integrations/supabase/client";
 
 type PackageType = "option1" | "option2";
 
@@ -58,27 +57,31 @@ const Booking = () => {
     const bookingId = searchParams.get('booking_id');
     
     if (paymentStatus === 'success' && sessionId && bookingId) {
-      // Check booking status in database
       const checkBookingStatus = async () => {
-        const { data: booking, error } = await supabase
-          .from('bookings')
-          .select('status')
-          .eq('id', bookingId)
-          .single();
-        
-        if (!error && booking?.status === 'confirmed') {
-          setBookingConfirmed(true);
-          setStep(5); // Show confirmation step
-          toast({
-            title: "Payment Successful!",
-            description: "Your deposit has been received and your booking is confirmed!",
-          });
-        } else {
-          // Status might not be updated yet, show pending message
-          toast({
-            title: "Payment Processing",
-            description: "Your payment is being processed. You'll receive a confirmation email shortly.",
-          });
+        try {
+          const { supabase } = await import("@/integrations/supabase/client");
+          const { data: booking, error } = await supabase
+            .from('bookings')
+            .select('status')
+            .eq('id', bookingId)
+            .maybeSingle();
+          
+          if (!error && booking?.status === 'confirmed') {
+            setBookingConfirmed(true);
+            setStep(5); // Show confirmation step
+            toast({
+              title: "Payment Successful!",
+              description: "Your deposit has been received and your booking is confirmed!",
+            });
+          } else {
+            // Status might not be updated yet, show pending message
+            toast({
+              title: "Payment Processing",
+              description: "Your payment is being processed. You'll receive a confirmation email shortly.",
+            });
+          }
+        } catch (e) {
+          console.error('Booking status check failed', e);
         }
       };
       
@@ -166,7 +169,8 @@ const Booking = () => {
     setIsSubmitting(true);
 
     try {
-      // Save booking to Supabase database
+      // Save booking to backend
+      const { supabase } = await import("@/integrations/supabase/client");
       const { data: booking, error: dbError } = await supabase
         .from("bookings")
         .insert({
@@ -174,7 +178,7 @@ const Booking = () => {
           customer_email: formData.email,
           customer_phone: formData.phone,
           event_date: formData.date ? format(formData.date, "yyyy-MM-dd") : "",
-          event_type: "DJ Service", // Default event type
+          event_type: "DJ Service",
           start_time: formData.startTime,
           end_time: formData.endTime,
           venue_name: formData.venueName,
