@@ -157,7 +157,7 @@ export const ChatInterface = () => {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 w-96 h-[600px] bg-card border border-border rounded-lg shadow-neon-cyan z-50 flex flex-col">
+        <div className="fixed bottom-24 right-6 w-96 max-h-[calc(100vh-8rem)] h-[600px] bg-card border border-border rounded-lg shadow-neon-cyan z-50 flex flex-col">
           {/* Header */}
           <div className="p-4 border-b border-border">
             <h3 className="text-lg font-bold">Vibe Zone DJ Assistant</h3>
