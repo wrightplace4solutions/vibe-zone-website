@@ -5,7 +5,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { MessageSquare, X, Send, ThumbsUp, ThumbsDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 interface Message {
   role: "user" | "assistant";
@@ -35,7 +34,19 @@ export const ChatInterface = () => {
 
   const loadConversationHistory = async (email: string) => {
     setIsLoadingHistory(true);
+    
+    // Add welcome message immediately without DB
+    const welcomeMsg = {
+      id: crypto.randomUUID(),
+      role: "assistant" as const,
+      content: "Hey there! 👋 Welcome to Vibe Zone Entertainment! I'm here to help you find the perfect DJ package for your event. Tell me about your upcoming celebration! #LETSWORK",
+    };
+    setMessages([welcomeMsg]);
+    
     try {
+      // Dynamically import Supabase only when needed
+      const { supabase } = await import("@/integrations/supabase/client");
+      
       const { data: conversations, error: convError } = await supabase
         .from("chat_conversations")
         .select("id")
@@ -67,23 +78,11 @@ export const ChatInterface = () => {
             }))
           );
         } else {
-          // No previous messages, add welcome message
-          const welcomeMsg = {
-            id: crypto.randomUUID(),
-            role: "assistant" as const,
-            content: "Hey there! 👋 Welcome to Vibe Zone Entertainment! I'm here to help you find the perfect DJ package for your event. Tell me about your upcoming celebration! #LETSWORK",
-          };
-          setMessages([welcomeMsg]);
+          // Save welcome message to DB
           await saveMessageToDb("assistant", welcomeMsg.content, welcomeMsg.id);
         }
       } else {
-        // New conversation, add welcome message
-        const welcomeMsg = {
-          id: crypto.randomUUID(),
-          role: "assistant" as const,
-          content: "Hey there! 👋 Welcome to Vibe Zone Entertainment! I'm here to help you find the perfect DJ package for your event. Tell me about your upcoming celebration! #LETSWORK",
-        };
-        setMessages([welcomeMsg]);
+        // New conversation
         const { data: newConv, error: convError } = await supabase
           .from("chat_conversations")
           .insert({
@@ -99,11 +98,8 @@ export const ChatInterface = () => {
       }
     } catch (error) {
       console.error("Error loading conversation:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load conversation history",
-        variant: "destructive",
-      });
+      // Don't show error toast, just continue without DB persistence
+      console.log("Chat will work without conversation history");
     } finally {
       setIsLoadingHistory(false);
     }
@@ -126,10 +122,11 @@ export const ChatInterface = () => {
   const saveMessageToDb = async (role: "user" | "assistant", content: string, msgId?: string) => {
     try {
       if (!conversationId) {
-        console.error("No conversation ID available");
-        return;
+        return; // Skip if no conversation ID
       }
 
+      const { supabase } = await import("@/integrations/supabase/client");
+      
       const { error: msgError } = await supabase.from("chat_messages").insert({
         id: msgId || crypto.randomUUID(),
         conversation_id: conversationId,
@@ -140,6 +137,7 @@ export const ChatInterface = () => {
       if (msgError) throw msgError;
     } catch (error) {
       console.error("Error saving message:", error);
+      // Continue without DB persistence
     }
   };
 
@@ -251,6 +249,7 @@ export const ChatInterface = () => {
     );
 
     try {
+      const { supabase } = await import("@/integrations/supabase/client");
       await supabase
         .from("chat_messages")
         .update({ feedback: feedbackType })
