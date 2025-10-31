@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Smartphone, Users, ListMusic, ThumbsUp } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const features = [
   {
@@ -67,12 +68,28 @@ export const VibeQueShowcase = () => {
               })}
             </div>
             
-            <Button 
-              size="lg"
-              className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold text-lg px-8 py-6 transition-all hover:scale-105"
-            >
-              Learn More About Vibe Que
-            </Button>
+            <div className="flex flex-wrap gap-4">
+              <Button 
+                size="lg"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg px-8 py-6 transition-all hover:scale-105"
+                asChild
+              >
+                <a href="#" target="_blank" rel="noopener noreferrer">
+                  Explore VibeQue App
+                </a>
+              </Button>
+              
+              <Button 
+                size="lg"
+                variant="outline"
+                className="font-bold text-lg px-8 py-6 transition-all hover:scale-105"
+                asChild
+              >
+                <Link to="/vibeque">
+                  Learn More
+                </Link>
+              </Button>
+            </div>
           </div>
           
           {/* Right side - Visual */}

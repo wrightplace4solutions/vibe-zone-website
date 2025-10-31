@@ -11,6 +11,7 @@ import { lazy, Suspense } from "react";
 const Index = lazy(() => import("./pages/Index"));
 const Booking = lazy(() => import("./pages/Booking"));
 const BookingSuccess = lazy(() => import("./pages/BookingSuccess"));
+const VibeQue = lazy(() => import("./pages/VibeQue"));
 const Terms = lazy(() => import("./pages/Terms"));
 const Refunds = lazy(() => import("./pages/Refunds"));
 const Contact = lazy(() => import("./pages/Contact"));
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/booking" element={<Booking />} />
             <Route path="/booking/success" element={<BookingSuccess />} />
+            <Route path="/vibeque" element={<VibeQue />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/refunds" element={<Refunds />} />
             <Route path="/contact" element={<Contact />} />
