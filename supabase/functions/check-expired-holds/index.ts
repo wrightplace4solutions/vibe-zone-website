@@ -78,10 +78,11 @@ serve(async (req) => {
         });
       } catch (error) {
         console.error(`Error processing booking ${booking.id}:`, error);
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
         results.push({
           booking_id: booking.id,
           success: false,
-          error: error.message,
+          error: errorMessage,
         });
       }
     }
@@ -99,8 +100,9 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error("Error in check-expired-holds:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       {
         headers: { "Content-Type": "application/json" },
         status: 500,
