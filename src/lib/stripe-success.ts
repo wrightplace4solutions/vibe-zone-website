@@ -1,9 +1,7 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
-const stripe = new Stripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY?.replace('pk_', 'sk_') || '', {
-  apiVersion: '2024-10-28.acacia',
-});
+const stripe = new Stripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY?.replace('pk_', 'sk_') || '');
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || '';

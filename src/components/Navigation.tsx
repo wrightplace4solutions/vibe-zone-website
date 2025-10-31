@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import vibeZoneLogo from "@/assets/vibe-zone-logo.png";
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,7 +24,7 @@ export const Navigation = () => {
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center space-x-2">
             <img 
-              src="/src/assets/vibe-zone-logo.png" 
+              src={vibeZoneLogo} 
               alt="Vibe Zone Entertainment" 
               className="h-10 w-auto"
             />
