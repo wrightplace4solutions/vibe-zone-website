@@ -2,8 +2,10 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, ThumbsUp, ThumbsDown, MessageSquare } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { MessageSquare, X, Send, ThumbsUp, ThumbsDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Message {
   role: "user" | "assistant";
@@ -13,107 +15,217 @@ interface Message {
 }
 
 export const ChatInterface = () => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "welcome",
-      role: "assistant",
-      content: "Hey there! 👋 Welcome to Vibe Zone Entertainment! I'm here to help you find the perfect DJ package for your event. Tell me about your upcoming celebration! #LETSWORK",
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [showEmailCapture, setShowEmailCapture] = useState(true);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages, isTyping]);
+  }, [messages]);
 
-  const streamChat = async (userMessage: string) => {
-    const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
-    
+  const loadConversationHistory = async (email: string) => {
+    setIsLoadingHistory(true);
     try {
-      const response = await fetch(CHAT_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
-        body: JSON.stringify({
-          messages: messages
-            .filter((m) => m.role !== "assistant" || m.content)
-            .map((m) => ({ role: m.role, content: m.content }))
-            .concat([{ role: "user", content: userMessage }]),
-        }),
+      const { data: conversations, error: convError } = await supabase
+        .from("chat_conversations")
+        .select("id")
+        .eq("customer_email", email)
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      if (convError) throw convError;
+
+      if (conversations && conversations.length > 0) {
+        const convId = conversations[0].id;
+        setConversationId(convId);
+
+        const { data: msgs, error: msgsError } = await supabase
+          .from("chat_messages")
+          .select("*")
+          .eq("conversation_id", convId)
+          .order("created_at", { ascending: true });
+
+        if (msgsError) throw msgsError;
+
+        if (msgs && msgs.length > 0) {
+          setMessages(
+            msgs.map((msg) => ({
+              role: msg.role as "user" | "assistant",
+              content: msg.content,
+              id: msg.id,
+              feedback: msg.feedback as "positive" | "negative" | undefined,
+            }))
+          );
+        } else {
+          // No previous messages, add welcome message
+          const welcomeMsg = {
+            id: crypto.randomUUID(),
+            role: "assistant" as const,
+            content: "Hey there! 👋 Welcome to Vibe Zone Entertainment! I'm here to help you find the perfect DJ package for your event. Tell me about your upcoming celebration! #LETSWORK",
+          };
+          setMessages([welcomeMsg]);
+          await saveMessageToDb("assistant", welcomeMsg.content, welcomeMsg.id);
+        }
+      } else {
+        // New conversation, add welcome message
+        const welcomeMsg = {
+          id: crypto.randomUUID(),
+          role: "assistant" as const,
+          content: "Hey there! 👋 Welcome to Vibe Zone Entertainment! I'm here to help you find the perfect DJ package for your event. Tell me about your upcoming celebration! #LETSWORK",
+        };
+        setMessages([welcomeMsg]);
+        const { data: newConv, error: convError } = await supabase
+          .from("chat_conversations")
+          .insert({
+            customer_email: email,
+            customer_name: name || null,
+          })
+          .select()
+          .single();
+
+        if (convError) throw convError;
+        setConversationId(newConv.id);
+        await saveMessageToDb("assistant", welcomeMsg.content, welcomeMsg.id);
+      }
+    } catch (error) {
+      console.error("Error loading conversation:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load conversation history",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  };
+
+  const startConversation = async () => {
+    if (!email.trim()) {
+      toast({
+        title: "Email Required",
+        description: "Please enter your email to start chatting",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    await loadConversationHistory(email);
+    setShowEmailCapture(false);
+  };
+
+  const saveMessageToDb = async (role: "user" | "assistant", content: string, msgId?: string) => {
+    try {
+      if (!conversationId) {
+        console.error("No conversation ID available");
+        return;
+      }
+
+      const { error: msgError } = await supabase.from("chat_messages").insert({
+        id: msgId || crypto.randomUUID(),
+        conversation_id: conversationId,
+        role,
+        content,
       });
 
+      if (msgError) throw msgError;
+    } catch (error) {
+      console.error("Error saving message:", error);
+    }
+  };
+
+  const streamChat = async (userMessage: string) => {
+    setIsTyping(true);
+    const assistantMessageId = crypto.randomUUID();
+    
+    await saveMessageToDb("user", userMessage);
+    
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            messages: [...messages, { role: "user", content: userMessage }],
+          }),
+        }
+      );
+
       if (!response.ok || !response.body) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || "Failed to start chat stream");
+        throw new Error("Failed to start stream");
       }
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
-      let textBuffer = "";
-      let streamDone = false;
-      let assistantContent = "";
+      let assistantResponse = "";
 
-      const assistantMessageId = Date.now().toString();
-      setMessages((prev) => [
-        ...prev,
-        { id: assistantMessageId, role: "assistant", content: "" },
-      ]);
-
-      while (!streamDone) {
+      while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        textBuffer += decoder.decode(value, { stream: true });
 
-        let newlineIndex: number;
-        while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
-          let line = textBuffer.slice(0, newlineIndex);
-          textBuffer = textBuffer.slice(newlineIndex + 1);
+        const chunk = decoder.decode(value);
+        const lines = chunk.split("\n");
 
-          if (line.endsWith("\r")) line = line.slice(0, -1);
-          if (line.startsWith(":") || line.trim() === "") continue;
-          if (!line.startsWith("data: ")) continue;
+        for (const line of lines) {
+          if (line.startsWith("data: ")) {
+            const data = line.slice(6);
+            if (data === "[DONE]") continue;
 
-          const jsonStr = line.slice(6).trim();
-          if (jsonStr === "[DONE]") {
-            streamDone = true;
-            break;
-          }
+            try {
+              const parsed = JSON.parse(data);
+              const content = parsed.choices?.[0]?.delta?.content;
 
-          try {
-            const parsed = JSON.parse(jsonStr);
-            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
-            if (content) {
-              assistantContent += content;
-              setMessages((prev) =>
-                prev.map((m) =>
-                  m.id === assistantMessageId ? { ...m, content: assistantContent } : m
-                )
-              );
+              if (content) {
+                assistantResponse += content;
+                setMessages((prev) => {
+                  const newMessages = [...prev];
+                  const lastMessage = newMessages[newMessages.length - 1];
+
+                  if (lastMessage?.role === "assistant" && lastMessage.id === assistantMessageId) {
+                    newMessages[newMessages.length - 1] = {
+                      ...lastMessage,
+                      content: assistantResponse,
+                    };
+                  } else {
+                    newMessages.push({
+                      role: "assistant",
+                      content: assistantResponse,
+                      id: assistantMessageId,
+                    });
+                  }
+                  return newMessages;
+                });
+              }
+            } catch (e) {
+              // Skip invalid JSON
             }
-          } catch {
-            textBuffer = line + "\n" + textBuffer;
-            break;
           }
         }
       }
 
-      setIsTyping(false);
+      await saveMessageToDb("assistant", assistantResponse, assistantMessageId);
     } catch (error) {
       console.error("Chat error:", error);
-      setIsTyping(false);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to send message",
+        description: "Failed to get response. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsTyping(false);
     }
   };
 
@@ -122,25 +234,34 @@ export const ChatInterface = () => {
 
     const userMessage = input.trim();
     setInput("");
-    setIsTyping(true);
-
+    
     setMessages((prev) => [
       ...prev,
-      { id: Date.now().toString(), role: "user", content: userMessage },
+      { id: crypto.randomUUID(), role: "user", content: userMessage },
     ]);
 
     await streamChat(userMessage);
   };
 
-  const handleFeedback = (messageId: string, feedbackType: "positive" | "negative") => {
-    setMessages((prev) =>
-      prev.map((m) =>
-        m.id === messageId ? { ...m, feedback: feedbackType } : m
+  const handleFeedback = async (messageId: string, feedbackType: "positive" | "negative") => {
+    setMessages(prevMessages =>
+      prevMessages.map(msg =>
+        msg.id === messageId ? { ...msg, feedback: feedbackType } : msg
       )
     );
+
+    try {
+      await supabase
+        .from("chat_messages")
+        .update({ feedback: feedbackType })
+        .eq("id", messageId);
+    } catch (error) {
+      console.error("Error saving feedback:", error);
+    }
+
     toast({
       title: "Thanks for your feedback!",
-      description: "Your input helps us improve our service.",
+      description: "Your feedback helps us improve our service.",
     });
   };
 
@@ -159,94 +280,137 @@ export const ChatInterface = () => {
       {isOpen && (
         <div className="fixed bottom-24 right-6 w-96 max-h-[calc(100vh-8rem)] h-[600px] bg-card border border-border rounded-lg shadow-neon-cyan z-50 flex flex-col">
           {/* Header */}
-          <div className="p-4 border-b border-border">
-            <h3 className="text-lg font-bold">Vibe Zone DJ Assistant</h3>
-            <p className="text-sm text-muted-foreground">Get a quote or check availability</p>
+          <div className="p-4 border-b border-border flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-bold">Vibe Zone DJ Assistant</h3>
+              <p className="text-sm text-muted-foreground">Ask about pricing, packages, or availability!</p>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
+              <X className="h-4 w-4" />
+            </Button>
           </div>
 
-          {/* Messages */}
-          <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-            <div className="space-y-4">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex flex-col ${
-                    message.role === "user" ? "items-end" : "items-start"
-                  }`}
-                >
+          {/* Email Capture or Messages */}
+          {showEmailCapture ? (
+            <div className="flex-1 p-6 flex flex-col items-center justify-center gap-4">
+              <MessageSquare className="h-16 w-16 text-primary" />
+              <div className="text-center">
+                <h4 className="font-semibold mb-2">Start a Conversation</h4>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Enter your email to begin chatting. We'll save your conversation history!
+                </p>
+              </div>
+              <div className="w-full space-y-3">
+                <Input
+                  type="email"
+                  placeholder="Your email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && startConversation()}
+                />
+                <Input
+                  type="text"
+                  placeholder="Your name (optional)"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && startConversation()}
+                />
+                <Button onClick={startConversation} className="w-full">
+                  Start Chatting
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Messages */}
+              <ScrollArea className="flex-1 p-4">
+                {isLoadingHistory && (
+                  <div className="text-center text-sm text-muted-foreground py-4">
+                    Loading your conversation history...
+                  </div>
+                )}
+                {messages.map((message, index) => (
                   <div
-                    className={`max-w-[80%] rounded-lg p-3 ${
-                      message.role === "user"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-secondary text-secondary-foreground"
+                    key={message.id}
+                    className={`mb-4 flex flex-col ${
+                      message.role === "user" ? "items-end" : "items-start"
                     }`}
                   >
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                  </div>
-                  
-                  {message.role === "assistant" && message.content && (
-                    <div className="flex gap-2 mt-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleFeedback(message.id, "positive")}
-                        className={message.feedback === "positive" ? "text-primary" : ""}
-                      >
-                        <ThumbsUp className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleFeedback(message.id, "negative")}
-                        className={message.feedback === "negative" ? "text-destructive" : ""}
-                      >
-                        <ThumbsDown className="h-4 w-4" />
-                      </Button>
+                    <div
+                      className={`max-w-[80%] rounded-lg p-3 ${
+                        message.role === "user"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-secondary text-secondary-foreground"
+                      }`}
+                    >
+                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                     </div>
-                  )}
-                </div>
-              ))}
-              
-              {isTyping && (
-                <div className="flex items-start">
-                  <div className="bg-secondary text-secondary-foreground rounded-lg p-3">
-                    <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                      <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                      <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                    
+                    {message.role === "assistant" && message.content && (
+                      <div className="flex gap-2 mt-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleFeedback(message.id, "positive")}
+                          className={message.feedback === "positive" ? "text-primary" : ""}
+                        >
+                          <ThumbsUp className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleFeedback(message.id, "negative")}
+                          className={message.feedback === "negative" ? "text-destructive" : ""}
+                        >
+                          <ThumbsDown className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                
+                {isTyping && (
+                  <div className="flex items-start mb-4">
+                    <div className="bg-secondary text-secondary-foreground rounded-lg p-3">
+                      <div className="flex gap-1">
+                        <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                        <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                        <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
-          </ScrollArea>
+                )}
+                <div ref={scrollRef} />
+              </ScrollArea>
 
-          {/* Input */}
-          <div className="p-4 border-t border-border">
-            <div className="flex gap-2">
-              <Textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                  }
-                }}
-                placeholder="Ask about pricing, availability, or booking..."
-                className="min-h-[60px] resize-none"
-                disabled={isTyping}
-              />
-              <Button
-                onClick={sendMessage}
-                disabled={!input.trim() || isTyping}
-                size="icon"
-                className="h-[60px]"
-              >
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+              {/* Input Area */}
+              <div className="p-4 border-t border-border">
+                <div className="flex gap-2">
+                  <Textarea
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        sendMessage();
+                      }
+                    }}
+                    placeholder="Ask about packages, pricing, or availability..."
+                    className="flex-1 min-h-[60px] max-h-[120px]"
+                    disabled={isTyping}
+                  />
+                  <Button
+                    onClick={sendMessage}
+                    disabled={isTyping || !input.trim()}
+                    size="icon"
+                    className="self-end"
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
     </>
