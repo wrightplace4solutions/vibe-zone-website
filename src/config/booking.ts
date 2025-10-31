@@ -4,8 +4,8 @@ export const STRIPE_LINKS = {
 };
 
 export const CASHAPP_LINKS = {
-  option1: import.meta.env.VITE_CASHAPP_LINK_OPTION1 || "https://cash.app/$REPLACE/100",
-  option2: import.meta.env.VITE_CASHAPP_LINK_OPTION2 || "https://cash.app/$REPLACE/150",
+  option1: import.meta.env.VITE_CASHAPP_LINK_OPTION1 || "https://cash.app/$REPLACE/275",
+  option2: import.meta.env.VITE_CASHAPP_LINK_OPTION2 || "https://cash.app/$REPLACE/475",
 };
 
 export const ZELLE_INFO = {
@@ -18,21 +18,21 @@ export const TZ = "America/New_York";
 export const PACKAGES = {
   option1: {
     name: "Plug-and-Play",
-    basePrice: 400,
-    deposit: 100,
-    description: "Essential DJ setup - bring your vibe, we bring the sound"
+    basePrice: 550,
+    deposit: 275,
+    description: "4 hours - You provide the sound system, we bring the skills and music"
   },
   option2: {
-    name: "Full Setup + Rentals Fees",
-    basePrice: 550,
-    deposit: 150,
-    description: "Complete setup of DJ area, sound system (PA), including rental equipment"
+    name: "Full Setup",
+    basePrice: 950,
+    deposit: 475,
+    description: "4-5 hours - Complete DJ setup with our professional sound system (PA) and equipment"
   }
 };
 
 export const ADD_ONS = [
-  { name: "Basic Lighting Package", price: 80 },
-  { name: "Premium Lighting Package", price: 110 },
-  { name: "PA Rental (Small Venue)", description: "People: up to ~25–100 guests\n\nSpace: up to ~1,000–1,500 sq ft (e.g., small banquet room, lounge, bar area, community room)", price: 120 },
-  { name: "PA Rental (Large Venue)", description:"Guest count: 300–800+ people (weddings, convention ballrooms, gyms, big halls).\n\nRoom size: ≈8,000–20,000 sq ft (or longer throws of 80–150 ft from DJ to back wall).", price: 160 },
+  { name: "Basic Lighting Package", price: 125 },
+  { name: "Premium Lighting Package", price: 250 },
+  { name: "Large Venue (100-300+ guests)", description: "Additional fee for larger venues with 100-300+ guests", price: 200 },
+  { name: "Extra Hour", description: "Additional hour of DJ services beyond package time", price: 150 },
 ];
