@@ -10,11 +10,11 @@ export const Navigation = () => {
 
   const links = [
     { path: "/", label: "Home" },
-    { path: "/vibeque", label: "VibeQue" },
     { path: "/booking", label: "Booking" },
     { path: "/terms", label: "Terms" },
     { path: "/refunds", label: "Refunds" },
     { path: "/contact", label: "Contact" },
+    { path: "/vibeque", label: "VibeQue" },
   ];
 
   const isActive = (path: string) => location.pathname === path;
