@@ -110,6 +110,11 @@ serve(async (req) => {
       ],
       mode: "payment",
       customer_email: customerEmail,
+      billing_address_collection: "auto",
+      customer_creation: "always",
+      phone_number_collection: {
+        enabled: false,
+      },
       client_reference_id: packageType,
       metadata: {
         bookingId: booking.id,
