@@ -228,19 +228,6 @@ const Booking = () => {
           <p className="text-muted-foreground">We are looking forward to helping to make your event unforgettable! #LETSWORK!!</p>
         </div>
 
-        <div className="mb-6 p-4 border-l-4 border-primary bg-muted/50 rounded-r-lg">
-          <h3 className="font-semibold mb-2 flex items-center gap-2">
-            <CalendarIcon className="h-5 w-5 text-primary" />
-            48-Hour Hold Policy
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            Your booking request creates a <strong>48-hour hold</strong> on your selected date. 
-            To confirm your booking, please complete the deposit payment within 48 hours. 
-            If payment is not received within this timeframe, the hold will be automatically released 
-            and you'll receive a notification. Payment made during this session will immediately confirm your booking.
-          </p>
-        </div>
-
         <Progress value={progress} className="mb-8" />
 
         {step === 1 && (
@@ -572,15 +559,44 @@ const Booking = () => {
                 <Button
                   size="lg"
                   className="w-full"
-                  asChild
+                  onClick={async () => {
+                    try {
+                      const { supabase } = await import("@/integrations/supabase/client");
+                      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+                        body: {
+                          packageType: formData.package,
+                          customerEmail: formData.email,
+                          customerName: formData.name,
+                          customerPhone: formData.phone,
+                          eventDate: formData.date ? format(formData.date, "yyyy-MM-dd") : "",
+                          eventDetails: {
+                            venueName: formData.venueName,
+                            streetAddress: formData.streetAddress,
+                            city: formData.city,
+                            state: formData.state,
+                            zipCode: formData.zipCode,
+                            startTime: formData.startTime,
+                            endTime: formData.endTime,
+                          },
+                          notes: formData.notes,
+                        },
+                      });
+
+                      if (error) throw error;
+                      if (data?.url) {
+                        window.location.href = data.url;
+                      }
+                    } catch (error) {
+                      console.error('Stripe checkout error:', error);
+                      toast({
+                        title: "Error",
+                        description: "Unable to start payment. Please try again.",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
                 >
-                  <a
-                    href={STRIPE_LINKS[formData.package]}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Pay Deposit with Stripe - ${PACKAGES[formData.package].deposit}
-                  </a>
+                  Pay Deposit with Stripe - ${PACKAGES[formData.package].deposit}
                 </Button>
 
                 <Button
