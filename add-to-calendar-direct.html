@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Booking to Google Calendar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .booking-details {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .booking-details h3 {
+            margin-top: 0;
+        }
+        .booking-details p {
+            margin: 8px 0;
+        }
+        button {
+            background: #0070f3;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #0051cc;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .gcal-link {
+            background: #34a853;
+            display: block;
+            text-align: center;
+            text-decoration: none;
+        }
+        .gcal-link:hover {
+            background: #2d8e47;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗓️ Add Your DJ Booking to Google Calendar</h1>
+        
+        <div class="info">
+            <strong>Quick Solution:</strong><br>
+            Since we can't deploy the Edge Function due to Supabase permissions, use the button below to add this event directly to your Google Calendar.
+        </div>
+
+        <div class="booking-details">
+            <h3>📋 Booking Details</h3>
+            <p><strong>Event:</strong> DJ Service</p>
+            <p><strong>Customer:</strong> STEPHANIE C WRIGHT</p>
+            <p><strong>Email:</strong> dcn8tve2@yahoo.com</p>
+            <p><strong>Phone:</strong> 8045365835</p>
+            <p><strong>Date:</strong> Friday, November 7, 2025</p>
+            <p><strong>Time:</strong> 4:00 PM - 10:00 PM</p>
+            <p><strong>Venue:</strong> community center</p>
+            <p><strong>Address:</strong> 5615 Melbeck Court, North Chesterfield, VA 23234</p>
+            <p><strong>Booking ID:</strong> bf54cd31-5daf-46b7-ae0c-ac8651c591b0</p>
+        </div>
+
+        <a href="#" id="addToCalendar" class="gcal-link button">
+            📅 Add to Google Calendar
+        </a>
+    </div>
+
+    <script>
+        // Create Google Calendar link
+        const eventDetails = {
+            text: 'Vibe Zone Entertainment - DJ Service',
+            dates: '20251107T160000/20251107T220000', // Nov 7, 2025, 4PM-10PM EST
+            details: `Vibe Zone Entertainment Booking
+
+Customer: STEPHANIE C WRIGHT
+Email: dcn8tve2@yahoo.com
+Phone: 8045365835
+
+Event Type: DJ Service
+Location: community center, 5615 Melbeck Court, North Chesterfield, VA 23234
+
+Booking ID: bf54cd31-5daf-46b7-ae0c-ac8651c591b0
+Status: Confirmed`,
+            location: 'community center, 5615 Melbeck Court, North Chesterfield, VA 23234',
+            add: 'dcn8tve2@yahoo.com' // Add customer as attendee
+        };
+
+        const calendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE` +
+            `&text=${encodeURIComponent(eventDetails.text)}` +
+            `&dates=${eventDetails.dates}` +
+            `&details=${encodeURIComponent(eventDetails.details)}` +
+            `&location=${encodeURIComponent(eventDetails.location)}` +
+            `&add=${encodeURIComponent(eventDetails.add)}`;
+
+        document.getElementById('addToCalendar').href = calendarUrl;
+        document.getElementById('addToCalendar').target = '_blank';
+    </script>
+</body>
+</html>
