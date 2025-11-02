@@ -1,0 +1,3 @@
+# Ignore YAML validation warnings for GitHub secrets
+*.yml
+*.yaml
