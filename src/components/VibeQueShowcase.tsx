@@ -35,7 +35,7 @@ export const VibeQueShowcase = () => {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left side - Content */}
           <div className="animate-fade-in">
-            <h2 className="text-xl md:text-3xl font-bold mb-6">
+            <h2 className="text-2xl md:text-4xl font-bold mb-6">
               <span className="text-neon-cyan">Vibe Que</span>
               <br />
               <span className="text-neon-orange">Interactive DJ App</span>
