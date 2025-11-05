@@ -20,7 +20,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { supabase } from "@/integrations/supabase/client";
+
 
 type PackageType = "option1" | "option2";
 
@@ -60,6 +60,7 @@ const Booking = () => {
     if (paymentStatus === 'success' && sessionId && bookingId) {
       const checkBookingStatus = async () => {
         try {
+          const { supabase } = await import("@/integrations/supabase/client");
           const { data: booking, error } = await supabase
             .from('bookings')
             .select('status')
@@ -170,6 +171,7 @@ const Booking = () => {
 
     try {
       // Save booking to backend
+      const { supabase } = await import("@/integrations/supabase/client");
       const { data: booking, error: dbError } = await supabase
         .from("bookings")
         .insert({
@@ -560,6 +562,7 @@ const Booking = () => {
                   className="w-full"
                   onClick={async () => {
                     try {
+                      const { supabase } = await import("@/integrations/supabase/client");
                       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
                         body: {
                           packageType: formData.package,
