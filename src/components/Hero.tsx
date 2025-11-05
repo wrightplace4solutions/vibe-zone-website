@@ -3,7 +3,7 @@ import vibeZoneLogo from "@/assets/vibe-zone-logo.png";
 
 export const Hero = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-hero">
+    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-gradient-hero pt-20">
       {/* Animated background grid */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(0,217,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,217,255,0.1)_1px,transparent_1px)] bg-[size:50px_50px] [perspective:1000px] [transform:rotateX(60deg)] opacity-30"></div>
       
@@ -16,7 +16,7 @@ export const Hero = () => {
           <img 
             src={vibeZoneLogo} 
             alt="Vibe Zone Entertainment - DJ Def Stef specializing in Line Dance and Trail Ride music" 
-            className="w-full max-w-lg mx-auto mb-8 animate-glow-pulse"
+            className="w-full max-w-md mx-auto mb-8 animate-glow-pulse"
             loading="eager"
           />
           
