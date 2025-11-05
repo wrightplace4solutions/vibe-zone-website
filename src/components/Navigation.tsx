@@ -10,6 +10,7 @@ export const Navigation = () => {
 
   const links = [
     { path: "/", label: "Home" },
+    { path: "/pricing", label: "Pricing" },
     { path: "/booking", label: "Booking" },
     { path: "/terms", label: "Terms" },
     { path: "/refunds", label: "Refunds" },

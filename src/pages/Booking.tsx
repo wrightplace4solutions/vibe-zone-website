@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/collapsible";
 
 
-type PackageType = "option1" | "option2";
+type PackageType = "essentialVibe" | "premiumExperience" | "vzPartyStarter" | "ultimateExperience";
 
 interface FormData {
   date: Date | undefined;
@@ -34,6 +34,7 @@ interface FormData {
   state: string;
   zipCode: string;
   package: PackageType;
+  selectedAddOns: string[];
   name: string;
   email: string;
   phone: string;
@@ -105,7 +106,8 @@ const Booking = () => {
     city: "",
     state: "",
     zipCode: "",
-    package: "option1",
+    package: "essentialVibe",
+    selectedAddOns: [],
     name: "",
     email: "",
     phone: "",
@@ -164,12 +166,25 @@ const Booking = () => {
     return `${hour12}:${minutes} ${ampm}`;
   };
 
+  const calculateTotals = () => {
+    const basePrice = PACKAGES[formData.package].basePrice;
+    const addOnsTotal = formData.selectedAddOns.reduce((sum, addonName) => {
+      const addon = ADD_ONS.find(a => a.name === addonName);
+      return sum + (addon?.price || 0);
+    }, 0);
+    const totalAmount = basePrice + addOnsTotal;
+    const depositAmount = Math.round(totalAmount * 0.5); // 50% deposit
+    return { basePrice, addOnsTotal, totalAmount, depositAmount };
+  };
+
   const handleSubmit = async () => {
     if (!validateStep(3)) return;
 
     setIsSubmitting(true);
 
     try {
+      const { basePrice, addOnsTotal, totalAmount, depositAmount } = calculateTotals();
+      
       // Save booking to backend
       const { supabase } = await import("@/integrations/supabase/client");
       const { data: booking, error: dbError } = await supabase
@@ -189,9 +204,9 @@ const Booking = () => {
           zip_code: formData.zipCode,
           package_type: formData.package,
           service_tier: PACKAGES[formData.package].name,
-          total_amount: PACKAGES[formData.package].deposit,
-          deposit_amount: PACKAGES[formData.package].deposit,
-          notes: formData.notes,
+          total_amount: totalAmount,
+          deposit_amount: depositAmount,
+          notes: `${formData.notes}\n\nSelected Add-ons: ${formData.selectedAddOns.length > 0 ? formData.selectedAddOns.join(", ") : "None"}`,
           status: "pending",
         })
         .select()
@@ -377,56 +392,106 @@ const Booking = () => {
                 value={formData.package}
                 onValueChange={(value) => setFormData({ ...formData, package: value as PackageType })}
               >
-                <div className="flex items-start space-x-3 p-4 border rounded-lg">
-                  <RadioGroupItem value="option1" id="option1" />
-                  <div className="flex-1">
-                    <Label htmlFor="option1" className="text-base font-semibold cursor-pointer">
-                      {PACKAGES.option1.name} — ${PACKAGES.option1.basePrice}
-                    </Label>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {PACKAGES.option1.description}
-                    </p>
-                    <p className="text-sm font-medium text-primary mt-2">
-                      Deposit due now: ${PACKAGES.option1.deposit}
-                    </p>
+                {Object.entries(PACKAGES).map(([key, pkg]) => (
+                  <div key={key} className="flex items-start space-x-3 p-4 border rounded-lg hover:border-primary/50 transition-all">
+                    <RadioGroupItem value={key} id={key} />
+                    <div className="flex-1">
+                      <Label htmlFor={key} className="text-base font-semibold cursor-pointer">
+                        {pkg.name} — ${pkg.basePrice}
+                      </Label>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {pkg.duration} • {pkg.description}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        {pkg.bestFor}
+                      </p>
+                    </div>
                   </div>
-                </div>
-
-                <div className="flex items-start space-x-3 p-4 border rounded-lg">
-                  <RadioGroupItem value="option2" id="option2" />
-                  <div className="flex-1">
-                    <Label htmlFor="option2" className="text-base font-semibold cursor-pointer">
-                      {PACKAGES.option2.name} — ${PACKAGES.option2.basePrice}+
-                    </Label>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {PACKAGES.option2.description}
-                    </p>
-                    <p className="text-sm font-medium text-primary mt-2">
-                      Deposit due now: ${PACKAGES.option2.deposit}
-                    </p>
-                  </div>
-                </div>
+                ))}
               </RadioGroup>
 
-              <Collapsible open={showAddOns} onOpenChange={setShowAddOns}>
-                <CollapsibleTrigger className="flex items-center text-sm text-muted-foreground hover:text-foreground">
-                  <ChevronRight className={cn("h-4 w-4 mr-1 transition-transform", showAddOns && "rotate-90")} />
-                  View available add-ons (for reference)
-                </CollapsibleTrigger>
-                <CollapsibleContent className="mt-4">
-                  <div className="space-y-2 pl-5">
-                    {ADD_ONS.map((addon) => (
-                      <div key={addon.name} className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">{addon.name}</span>
-                        <span className="font-medium">${addon.price}</span>
+              <div className="border-t pt-4">
+                <h3 className="font-medium mb-3">Add-Ons (Optional)</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Select any add-ons to see real-time pricing updates
+                </p>
+                <div className="space-y-3">
+                  {ADD_ONS.map((addon) => (
+                    <div key={addon.name} className="flex items-start space-x-3 p-3 border rounded-lg">
+                      <Checkbox
+                        id={addon.name}
+                        checked={formData.selectedAddOns.includes(addon.name)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setFormData({
+                              ...formData,
+                              selectedAddOns: [...formData.selectedAddOns, addon.name],
+                            });
+                          } else {
+                            setFormData({
+                              ...formData,
+                              selectedAddOns: formData.selectedAddOns.filter(a => a !== addon.name),
+                            });
+                          }
+                        }}
+                      />
+                      <div className="flex-1">
+                        <Label htmlFor={addon.name} className="cursor-pointer font-medium">
+                          {addon.name}
+                        </Label>
+                        <p className="text-sm text-muted-foreground">{addon.description}</p>
                       </div>
-                    ))}
-                    <p className="text-xs text-muted-foreground mt-3">
-                      Specify any add-ons you're interested in the notes section on the next step
-                    </p>
+                      <span className="font-semibold text-primary">${addon.price}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {(() => {
+                const { basePrice, addOnsTotal, totalAmount, depositAmount } = calculateTotals();
+                return (
+                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Package: {PACKAGES[formData.package].name}</span>
+                      <span>${basePrice}</span>
+                    </div>
+                    {formData.selectedAddOns.length > 0 && (
+                      <>
+                        <div className="text-sm font-medium">Selected Add-ons:</div>
+                        {formData.selectedAddOns.map(addonName => {
+                          const addon = ADD_ONS.find(a => a.name === addonName);
+                          return (
+                            <div key={addonName} className="flex justify-between text-sm pl-4">
+                              <span className="text-muted-foreground">{addonName}</span>
+                              <span>${addon?.price}</span>
+                            </div>
+                          );
+                        })}
+                      </>
+                    )}
+                    <div className="border-t pt-2 mt-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Subtotal:</span>
+                        <span>${basePrice}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>Add-ons Total:</span>
+                        <span>${addOnsTotal}</span>
+                      </div>
+                    </div>
+                    <div className="border-t pt-2 mt-2">
+                      <div className="flex justify-between font-bold text-lg">
+                        <span>Total Amount:</span>
+                        <span className="text-primary">${totalAmount}</span>
+                      </div>
+                      <div className="flex justify-between font-semibold text-base mt-1">
+                        <span>Deposit Due Now (50%):</span>
+                        <span className="text-accent">${depositAmount}</span>
+                      </div>
+                    </div>
                   </div>
-                </CollapsibleContent>
-              </Collapsible>
+                );
+              })()}
 
               <div className="flex justify-between">
                 <Button variant="outline" onClick={handleBack}>
@@ -541,19 +606,30 @@ const Booking = () => {
                 </p>
               </div>
 
-              <div className="bg-muted p-4 rounded-lg space-y-2">
-                <p className="font-medium">Your Details:</p>
-                <p className="text-sm">Client Name: {formData.name}</p>
-                <p className="text-sm">Date: {formData.date && format(formData.date, "PPP")}</p>
-                <p className="text-sm">Time: {formatTimeTo12Hour(formData.startTime)} - {formatTimeTo12Hour(formData.endTime)}</p>
-                <p className="text-sm">Package: {PACKAGES[formData.package].name}</p>
-                <p className="text-sm text-primary font-semibold">
-                  Deposit Required: ${PACKAGES[formData.package].deposit}
-                </p>
-              </div>
+              {(() => {
+                const { basePrice, addOnsTotal, totalAmount, depositAmount } = calculateTotals();
+                return (
+                  <div className="bg-muted p-4 rounded-lg space-y-2">
+                    <p className="font-medium">Your Details:</p>
+                    <p className="text-sm">Client Name: {formData.name}</p>
+                    <p className="text-sm">Date: {formData.date && format(formData.date, "PPP")}</p>
+                    <p className="text-sm">Time: {formatTimeTo12Hour(formData.startTime)} - {formatTimeTo12Hour(formData.endTime)}</p>
+                    <p className="text-sm">Package: {PACKAGES[formData.package].name}</p>
+                    {formData.selectedAddOns.length > 0 && (
+                      <p className="text-sm">Add-ons: {formData.selectedAddOns.join(", ")}</p>
+                    )}
+                    <div className="border-t pt-2 mt-2">
+                      <p className="text-sm">Total: ${totalAmount}</p>
+                      <p className="text-sm text-primary font-semibold">
+                        Deposit Required (50%): ${depositAmount}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })()}
 
               <p className="text-sm text-muted-foreground mb-4">
-                Choose your preferred payment method to complete your ${PACKAGES[formData.package].deposit} deposit:
+                Choose your preferred payment method to complete your ${calculateTotals().depositAmount} deposit:
               </p>
 
               <div className="space-y-3">
@@ -597,22 +673,7 @@ const Booking = () => {
                     }
                   }}
                 >
-                  Pay Deposit with Stripe - ${PACKAGES[formData.package].deposit}
-                </Button>
-
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="w-full"
-                  asChild
-                >
-                  <a
-                    href={CASHAPP_LINKS[formData.package]}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Pay with Cash App - ${PACKAGES[formData.package].deposit}
-                  </a>
+                  Pay Deposit with Stripe - ${calculateTotals().depositAmount}
                 </Button>
 
                 <div className="border rounded-lg p-4 bg-muted/50">
@@ -620,7 +681,7 @@ const Booking = () => {
                   <div className="text-sm space-y-1">
                     <p>Email: <span className="font-mono text-primary">{ZELLE_INFO.email}</span></p>
                     <p>Phone: <span className="font-mono text-primary">{ZELLE_INFO.phone}</span></p>
-                    <p className="text-muted-foreground mt-2">Amount: ${PACKAGES[formData.package].deposit}</p>
+                    <p className="text-muted-foreground mt-2">Amount: ${calculateTotals().depositAmount}</p>
                     <p className="text-xs text-muted-foreground mt-2">
                       After sending, reply to your confirmation email with the transaction ID
                     </p>
@@ -649,16 +710,25 @@ const Booking = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="bg-white dark:bg-gray-900 p-4 rounded-lg space-y-2 border border-green-200 dark:border-green-800">
-                <p className="font-medium text-green-800 dark:text-green-200">Your Confirmed Event:</p>
-                <p className="text-sm"><strong>Date:</strong> {formData.date && format(formData.date, "PPP")}</p>
-                <p className="text-sm"><strong>Time:</strong> {formatTimeTo12Hour(formData.startTime)} - {formatTimeTo12Hour(formData.endTime)}</p>
-                <p className="text-sm"><strong>Venue:</strong> {formData.venueName}</p>
-                <p className="text-sm"><strong>Package:</strong> {PACKAGES[formData.package].name}</p>
-                <p className="text-sm text-green-600 dark:text-green-400 font-semibold">
-                  <strong>Deposit Paid:</strong> ${PACKAGES[formData.package].deposit}
-                </p>
-              </div>
+              {(() => {
+                const { totalAmount, depositAmount } = calculateTotals();
+                return (
+                  <div className="bg-white dark:bg-gray-900 p-4 rounded-lg space-y-2 border border-green-200 dark:border-green-800">
+                    <p className="font-medium text-green-800 dark:text-green-200">Your Confirmed Event:</p>
+                    <p className="text-sm"><strong>Date:</strong> {formData.date && format(formData.date, "PPP")}</p>
+                    <p className="text-sm"><strong>Time:</strong> {formatTimeTo12Hour(formData.startTime)} - {formatTimeTo12Hour(formData.endTime)}</p>
+                    <p className="text-sm"><strong>Venue:</strong> {formData.venueName}</p>
+                    <p className="text-sm"><strong>Package:</strong> {PACKAGES[formData.package].name}</p>
+                    {formData.selectedAddOns.length > 0 && (
+                      <p className="text-sm"><strong>Add-ons:</strong> {formData.selectedAddOns.join(", ")}</p>
+                    )}
+                    <p className="text-sm"><strong>Total Amount:</strong> ${totalAmount}</p>
+                    <p className="text-sm text-green-600 dark:text-green-400 font-semibold">
+                      <strong>Deposit Paid:</strong> ${depositAmount}
+                    </p>
+                  </div>
+                );
+              })()}
 
               <div className="bg-muted p-4 rounded-lg">
                 <p className="text-sm font-medium mb-2">What's Next?</p>

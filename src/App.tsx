@@ -9,6 +9,7 @@ import { ChatInterface } from "@/components/ChatInterface";
 import { lazy, Suspense } from "react";
 
 const Index = lazy(() => import("./pages/Index"));
+const Pricing = lazy(() => import("./pages/Pricing"));
 const Booking = lazy(() => import("./pages/Booking"));
 const BookingSuccess = lazy(() => import("./pages/BookingSuccess"));
 const VibeQue = lazy(() => import("./pages/VibeQue"));
@@ -29,6 +30,7 @@ const App = () => (
         <Suspense fallback={<div className="p-6 text-foreground">Loading…</div>}>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/pricing" element={<Pricing />} />
             <Route path="/booking" element={<Booking />} />
             <Route path="/booking/success" element={<BookingSuccess />} />
             <Route path="/vibeque" element={<VibeQue />} />
