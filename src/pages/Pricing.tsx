@@ -4,18 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { Check, Music, Sparkles, Zap, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { PACKAGES, ADD_ONS, IMPORTANT_NOTES } from "@/config/booking";
-
 const Pricing = () => {
-  const plugAndPlayPackages = Object.entries(PACKAGES).filter(
-    ([_, pkg]) => pkg.category === "Plug-and-Play Options"
-  );
-  
-  const completeSetupPackages = Object.entries(PACKAGES).filter(
-    ([_, pkg]) => pkg.category === "Complete Entertainment Setups"
-  );
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+  const plugAndPlayPackages = Object.entries(PACKAGES).filter(([_, pkg]) => pkg.category === "Plug-and-Play Options");
+  const completeSetupPackages = Object.entries(PACKAGES).filter(([_, pkg]) => pkg.category === "Complete Entertainment Setups");
+  return <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       {/* Hero Section */}
       <section className="py-16 px-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10"></div>
@@ -54,14 +46,11 @@ const Pricing = () => {
           <div className="text-center mb-12">
             <Music className="w-12 h-12 mx-auto mb-4 text-primary" />
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Plug-and-Play Options</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              You provide the sound system, we bring the skills and music
-            </p>
+            <p className="text-muted-foreground max-w-2xl mx-auto">Your venue provide the sound system, we bring the skills and music</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
-            {plugAndPlayPackages.map(([key, pkg]) => (
-              <Card key={key} className="relative overflow-hidden border-2 hover:border-primary/50 transition-all">
+            {plugAndPlayPackages.map(([key, pkg]) => <Card key={key} className="relative overflow-hidden border-2 hover:border-primary/50 transition-all">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/20 to-transparent rounded-bl-full"></div>
                 <CardHeader>
                   <CardTitle className="text-2xl">{pkg.name}</CardTitle>
@@ -76,20 +65,17 @@ const Pricing = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    {pkg.includes.map((item, idx) => (
-                      <div key={idx} className="flex items-start gap-2">
+                    {pkg.includes.map((item, idx) => <div key={idx} className="flex items-start gap-2">
                         <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <span className="text-sm">{item}</span>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                   <div className="pt-4 border-t">
                     <p className="text-sm font-medium text-muted-foreground">Best for:</p>
                     <p className="text-sm mt-1">{pkg.bestFor}</p>
                   </div>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
       </section>
@@ -106,13 +92,10 @@ const Pricing = () => {
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
-            {completeSetupPackages.map(([key, pkg], idx) => (
-              <Card key={key} className="relative overflow-hidden border-2 hover:border-primary/50 transition-all">
-                {idx === 0 && (
-                  <Badge className="absolute top-4 right-4 z-10">
+            {completeSetupPackages.map(([key, pkg], idx) => <Card key={key} className="relative overflow-hidden border-2 hover:border-primary/50 transition-all">
+                {idx === 0 && <Badge className="absolute top-4 right-4 z-10">
                     Most Popular
-                  </Badge>
-                )}
+                  </Badge>}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-accent/20 to-transparent rounded-bl-full"></div>
                 <CardHeader>
                   <CardTitle className="text-2xl">{pkg.name}</CardTitle>
@@ -127,20 +110,17 @@ const Pricing = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    {pkg.includes.map((item, idx) => (
-                      <div key={idx} className="flex items-start gap-2">
+                    {pkg.includes.map((item, idx) => <div key={idx} className="flex items-start gap-2">
                         <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <span className="text-sm">{item}</span>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                   <div className="pt-4 border-t">
                     <p className="text-sm font-medium text-muted-foreground">Best for:</p>
                     <p className="text-sm mt-1">{pkg.bestFor}</p>
                   </div>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
       </section>
@@ -156,8 +136,7 @@ const Pricing = () => {
           </div>
 
           <div className="grid sm:grid-cols-2 gap-6">
-            {ADD_ONS.map((addon, idx) => (
-              <Card key={idx} className="hover:border-primary/50 transition-all">
+            {ADD_ONS.map((addon, idx) => <Card key={idx} className="hover:border-primary/50 transition-all">
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">{addon.name}</CardTitle>
@@ -165,8 +144,7 @@ const Pricing = () => {
                   </div>
                   <CardDescription>{addon.description}</CardDescription>
                 </CardHeader>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
       </section>
@@ -178,12 +156,10 @@ const Pricing = () => {
           <Card>
             <CardContent className="pt-6">
               <div className="space-y-3">
-                {IMPORTANT_NOTES.map((note, idx) => (
-                  <div key={idx} className="flex items-start gap-3">
+                {IMPORTANT_NOTES.map((note, idx) => <div key={idx} className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                     <p className="text-sm">{note}</p>
-                  </div>
-                ))}
+                  </div>)}
               </div>
             </CardContent>
           </Card>
@@ -211,8 +187,6 @@ const Pricing = () => {
           </div>
         </div>
       </section>
-    </div>
-  );
+    </div>;
 };
-
 export default Pricing;
