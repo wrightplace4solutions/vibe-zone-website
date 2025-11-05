@@ -27,7 +27,7 @@ const features = [
 
 export const VibeQueShowcase = () => {
   return (
-    <section className="py-24 px-4 relative overflow-hidden">
+    <section className="py-16 px-4 relative overflow-hidden">
       {/* Gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10"></div>
       
