@@ -1,4 +1,4 @@
-import { Instagram, Music } from "lucide-react";
+import { Instagram, Facebook, Music2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const Footer = () => {
@@ -55,13 +55,22 @@ export const Footer = () => {
                 <Instagram className="h-6 w-6" />
               </a>
               <a
+                href="https://facebook.com/djdefstef1"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground"
+                aria-label="Facebook"
+              >
+                <Facebook className="h-6 w-6" />
+              </a>
+              <a
                 href="https://tiktok.com/@djdefstef"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-foreground"
                 aria-label="TikTok"
               >
-                <Music className="h-6 w-6" />
+                <Music2 className="h-6 w-6" />
               </a>
             </div>
           </div>
