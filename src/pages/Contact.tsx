@@ -1,4 +1,4 @@
-import { Mail, Phone, Instagram, Music } from "lucide-react";
+import { Mail, Phone, Instagram, Music2, Facebook } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -66,11 +66,21 @@ const Contact = () => {
               </Button>
               <Button variant="outline" className="w-full justify-start" asChild>
                 <a
+                  href="https://facebook.com/djdefstef1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Facebook className="mr-2 h-4 w-4" />
+                  @djdefstef1
+                </a>
+              </Button>
+              <Button variant="outline" className="w-full justify-start" asChild>
+                <a
                   href="https://tiktok.com/@djdefstef"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <Music className="mr-2 h-4 w-4" />
+                  <Music2 className="mr-2 h-4 w-4" />
                   @djdefstef
                 </a>
               </Button>

@@ -8,15 +8,17 @@ import { Footer } from "@/components/Footer";
 import { ChatInterface } from "@/components/ChatInterface";
 import { lazy, Suspense } from "react";
 
-const Index = lazy(() => import("./pages/Index"));
-const Pricing = lazy(() => import("./pages/Pricing"));
-const Booking = lazy(() => import("./pages/Booking"));
-const BookingSuccess = lazy(() => import("./pages/BookingSuccess"));
-const VibeQue = lazy(() => import("./pages/VibeQue"));
-const Terms = lazy(() => import("./pages/Terms"));
-const Refunds = lazy(() => import("./pages/Refunds"));
-const Contact = lazy(() => import("./pages/Contact"));
-const NotFound = lazy(() => import("./pages/NotFound"));
+const ComingSoon = lazy(() => import("./pages/ComingSoon"));
+// Temporarily disabled while showing coming soon page
+// const Index = lazy(() => import("./pages/Index"));
+// const Pricing = lazy(() => import("./pages/Pricing"));
+// const Booking = lazy(() => import("./pages/Booking"));
+// const BookingSuccess = lazy(() => import("./pages/BookingSuccess"));
+// const VibeQue = lazy(() => import("./pages/VibeQue"));
+// const Terms = lazy(() => import("./pages/Terms"));
+// const Refunds = lazy(() => import("./pages/Refunds"));
+// const Contact = lazy(() => import("./pages/Contact"));
+// const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
 
@@ -26,7 +28,14 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Navigation />
+        {/* Temporarily showing Coming Soon page for all routes */}
+        <Suspense fallback={<div className="p-6 text-foreground">Loading…</div>}>
+          <Routes>
+            <Route path="*" element={<ComingSoon />} />
+          </Routes>
+        </Suspense>
+        {/* Normal routes - uncomment these and remove ComingSoon route above to restore full site */}
+        {/* <Navigation />
         <Suspense fallback={<div className="p-6 text-foreground">Loading…</div>}>
           <Routes>
             <Route path="/" element={<Index />} />
@@ -37,12 +46,11 @@ const App = () => (
             <Route path="/terms" element={<Terms />} />
             <Route path="/refunds" element={<Refunds />} />
             <Route path="/contact" element={<Contact />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
         <ChatInterface />
-        <Footer />
+        <Footer /> */}
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
