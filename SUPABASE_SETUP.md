@@ -72,7 +72,7 @@ Set environment variables for your Edge Functions:
 
 ```bash
 # Stripe secrets
-supabase secrets set STRIPE_SECRET_KEY=sk_test_YOUR_SECRET_KEY
+supabase secrets set STRIPE_SECRET_KEY=sk_test_<YOUR_SECRET_KEY>
 supabase secrets set STRIPE_WEBHOOK_SECRET=whsec_YOUR_WEBHOOK_SECRET
 
 # Google Calendar secrets
