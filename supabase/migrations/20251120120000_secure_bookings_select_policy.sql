@@ -1,25 +1,27 @@
--- Harden SELECT access to bookings table to prevent public data exposure
+-- Harden SELECT access to bookings table to prevent public data exposure by
+-- replacing the permissive SELECT policy with a scoped email match and trusted roles
 
--- Helper function to read the caller's email claim from the JWT
-CREATE OR REPLACE FUNCTION public.current_user_email()
-RETURNS text
-LANGUAGE sql
-STABLE
-AS $$
-  SELECT lower(coalesce(auth.jwt() ->> 'email', ''));
-$$;
+DO $policy$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname = 'public'
+      AND tablename = 'bookings'
+      AND policyname = 'Anyone can view their own bookings by email'
+  ) THEN
+    EXECUTE 'DROP POLICY "Anyone can view their own bookings by email" ON public.bookings';
+  END IF;
 
--- Replace the insecure policy that allowed anyone to read all bookings
-DROP POLICY IF EXISTS "Anyone can view their own bookings by email" ON public.bookings;
-
--- Only authenticated users whose email matches the booking, or privileged roles, may read rows
-CREATE POLICY "Customers can read their bookings"
-ON public.bookings
-FOR SELECT
-USING (
-  auth.role() IN ('service_role', 'supabase_admin')
-  OR (
-    auth.role() = 'authenticated'
-    AND lower(customer_email) = public.current_user_email()
-  )
-);
+  EXECUTE $ddl$
+    CREATE POLICY "Customers can read their bookings"
+    ON public.bookings
+    FOR SELECT
+    USING (
+      coalesce(json_extract_path_text(auth.jwt(), 'role'), '') IN ('service_role', 'supabase_admin')
+      OR (
+        coalesce(json_extract_path_text(auth.jwt(), 'role'), '') = 'authenticated'
+        AND lower(customer_email) = lower(coalesce(json_extract_path_text(auth.jwt(), 'email'), ''))
+      )
+    )
+  $ddl$;
+END $policy$;
