@@ -26,6 +26,12 @@ Since you're using Lovable for your website, the Supabase Edge Functions need to
    - Copy/paste the code from: `supabase/functions/stripe-webhook/index.ts`
    - Click **"Deploy function"**
 
+4. **Deploy `get-booking-status` function:**
+   - Click **"Create a new function"**
+   - Name: `get-booking-status`
+   - Copy/paste the code from: `supabase/functions/get-booking-status/index.ts`
+   - Click **"Deploy function"**
+
 ### Option 2: Deploy via GitHub (Automated)
 
 1. **Push your code to GitHub** (already done ✅)
@@ -52,6 +58,7 @@ npx supabase link --project-ref ffikkqixlmexusrcxaov
 # Deploy all functions
 npx supabase functions deploy create-checkout-session
 npx supabase functions deploy stripe-webhook
+npx supabase functions deploy get-booking-status
 ```
 
 ## 🔍 Verify Deployment:
@@ -61,8 +68,9 @@ After deploying, check:
 
 You should see:
 - ✅ `chat` (existing from VibeQue)
-- ✅ `create-checkout-session` (new)
-- ✅ `stripe-webhook` (new)
+- ✅ `create-checkout-session`
+- ✅ `stripe-webhook`
+- ✅ `get-booking-status`
 
 ## 📝 Important Notes:
 

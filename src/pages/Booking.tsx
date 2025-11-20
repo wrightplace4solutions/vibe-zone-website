@@ -62,13 +62,11 @@ const Booking = () => {
       const checkBookingStatus = async () => {
         try {
           const { supabase } = await import("@/integrations/supabase/client");
-          const { data: booking, error } = await supabase
-            .from('bookings')
-            .select('status')
-            .eq('id', bookingId)
-            .maybeSingle();
-          
-          if (!error && booking?.status === 'confirmed') {
+          const { data, error } = await supabase.functions.invoke('get-booking-status', {
+            body: { bookingId, sessionId },
+          });
+
+          if (!error && data?.booking?.status === 'confirmed') {
             setBookingConfirmed(true);
             setStep(5); // Show confirmation step
             toast({

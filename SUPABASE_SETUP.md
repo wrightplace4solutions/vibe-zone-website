@@ -61,6 +61,9 @@ supabase functions deploy stripe-webhook
 
 # Deploy expired holds checker
 supabase functions deploy check-expired-holds
+
+# Deploy secure booking status lookup
+supabase functions deploy get-booking-status
 ```
 
 ### 5. Add Supabase Secrets

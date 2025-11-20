@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { addToGoogleCalendar } from '@/lib/google-calendar';
+
+const MAX_BOOKING_STATUS_RETRIES = 5;
 
 export default function BookingSuccess() {
   const [searchParams] = useSearchParams();
@@ -18,8 +20,12 @@ export default function BookingSuccess() {
     venue_name?: string;
     start_time?: string;
     end_time?: string;
+    street_address?: string;
+    city?: string;
+    state?: string;
+    zip_code?: string;
+    notes?: string | null;
   } | null>(null);
-
   useEffect(() => {
     const sessionId = searchParams.get('session_id');
     const bookingId = searchParams.get('booking_id');
@@ -30,24 +36,28 @@ export default function BookingSuccess() {
     }
 
     confirmBooking(sessionId, bookingId);
-  }, [searchParams]);
+  }, [confirmBooking, searchParams]);
 
-  async function confirmBooking(sessionId: string, bookingId: string) {
+  const confirmBooking = useCallback(async (sessionId: string, bookingId: string, attempt = 0) => {
     try {
       const { supabase } = await import('@/integrations/supabase/client');
-      // Update booking to confirmed
-      const { data: booking, error } = await supabase
-        .from('bookings')
-        .update({
-          status: 'confirmed',
-          stripe_session_id: sessionId,
-          confirmed_at: new Date().toISOString(),
-        })
-        .eq('id', bookingId)
-        .select()
-        .single();
+      const { data, error } = await supabase.functions.invoke('get-booking-status', {
+        body: { sessionId, bookingId },
+      });
 
       if (error) throw error;
+
+      const booking = data?.booking;
+
+      if (!booking || booking.status !== 'confirmed') {
+        if (attempt < MAX_BOOKING_STATUS_RETRIES) {
+          setTimeout(() => confirmBooking(sessionId, bookingId, attempt + 1), 4000);
+          return;
+        }
+
+        setStatus('error');
+        return;
+      }
 
       setBookingDetails(booking);
       setStatus('success');
@@ -65,7 +75,7 @@ export default function BookingSuccess() {
       console.error('Error confirming booking:', error);
       setStatus('error');
     }
-  }
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-purple-900 flex items-center justify-center p-4">

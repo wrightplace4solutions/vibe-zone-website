@@ -221,6 +221,13 @@ Since you don't have Supabase CLI, we'll deploy functions manually:
    - In the code editor, paste the contents from `supabase/functions/check-expired-holds/index.ts`
    - Click **"Deploy"**
 
+4. **Deploy `get-booking-status` Function**
+  - Click **"Deploy a new function"** again
+  - Function name: `get-booking-status`
+  - Click **"Create function"**
+  - In the code editor, paste the contents from `supabase/functions/get-booking-status/index.ts`
+  - Click **"Deploy"**
+
 ---
 
 ### Step 3: Set Up Secrets (Environment Variables)
@@ -338,6 +345,7 @@ SELECT cron.schedule(
 - [ ] `bookings` table exists with all columns
 - [ ] `stripe-webhook` function deployed
 - [ ] `check-expired-holds` function deployed
+- [ ] `get-booking-status` function deployed
 - [ ] All secrets added to Edge Functions
 - [ ] Stripe webhook configured and secret added
 - [ ] Cron job set up for expired holds
