@@ -76,9 +76,9 @@ supabase secrets set STRIPE_SECRET_KEY=sk_test_YOUR_SECRET_KEY
 supabase secrets set STRIPE_WEBHOOK_SECRET=whsec_YOUR_WEBHOOK_SECRET
 
 # Google Calendar secrets
-supabase secrets set GOOGLE_CALENDAR_CLIENT_ID=1025490265919-0vn7hg2259ndgsdan674ossq83aco9js.apps.googleusercontent.com
-supabase secrets set GOOGLE_CALENDAR_CLIENT_SECRET=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
-supabase secrets set GOOGLE_CALENDAR_REFRESH_TOKEN=L9IrWjBt9Rc2OM8HaZ7oyIV0divBxMp4YbYa1DUBqTYoCVSb8SXGWinUhVtKniqkuiLUcOk
+supabase secrets set GOOGLE_CALENDAR_CLIENT_ID=your_google_client_id
+supabase secrets set GOOGLE_CALENDAR_CLIENT_SECRET=your_google_client_secret
+supabase secrets set GOOGLE_CALENDAR_REFRESH_TOKEN=your_google_refresh_token
 
 # Verify secrets are set
 supabase secrets list
