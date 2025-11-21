@@ -1,10 +1,16 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { MessageSquare, X, Send, ThumbsUp, ThumbsDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import type { Session } from "@supabase/supabase-js";
 
 interface Message {
   role: "user" | "assistant";
@@ -21,8 +27,14 @@ export const ChatInterface = () => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [conversationId, setConversationId] = useState<string | null>(null);
-  const [showEmailCapture, setShowEmailCapture] = useState(true);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [authStage, setAuthStage] = useState<"collect" | "verify" | "chat">("collect");
+  const [otpCode, setOtpCode] = useState("");
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
+  const [initialSessionCheckComplete, setInitialSessionCheckComplete] = useState(false);
+  const [historyLoadedForEmail, setHistoryLoadedForEmail] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -32,7 +44,35 @@ export const ChatInterface = () => {
     }
   }, [messages]);
 
-  const loadConversationHistory = async (email: string) => {
+  const saveMessageToDb = useCallback(async (
+    role: "user" | "assistant",
+    content: string,
+    msgId?: string,
+    conversationOverride?: string,
+  ) => {
+    try {
+      const targetConversationId = conversationOverride || conversationId;
+      if (!targetConversationId) {
+        return; // Skip if no conversation ID
+      }
+
+      const { supabase } = await import("@/integrations/supabase/client");
+      
+      const { error: msgError } = await supabase.from("chat_messages").insert({
+        id: msgId || crypto.randomUUID(),
+        conversation_id: targetConversationId,
+        role,
+        content,
+      });
+
+      if (msgError) throw msgError;
+    } catch (error) {
+      console.error("Error saving message:", error);
+      // Continue without DB persistence
+    }
+  }, [conversationId]);
+
+  const loadConversationHistory = useCallback(async (emailAddress: string, customerName?: string) => {
     setIsLoadingHistory(true);
     
     // Add welcome message immediately without DB
@@ -50,7 +90,7 @@ export const ChatInterface = () => {
       const { data: conversations, error: convError } = await supabase
         .from("chat_conversations")
         .select("id")
-        .eq("customer_email", email)
+        .eq("customer_email", emailAddress)
         .order("created_at", { ascending: false })
         .limit(1);
 
@@ -79,23 +119,24 @@ export const ChatInterface = () => {
           );
         } else {
           // Save welcome message to DB
-          await saveMessageToDb("assistant", welcomeMsg.content, welcomeMsg.id);
+          await saveMessageToDb("assistant", welcomeMsg.content, welcomeMsg.id, convId);
         }
       } else {
         // New conversation
         const { data: newConv, error: convError } = await supabase
           .from("chat_conversations")
           .insert({
-            customer_email: email,
-            customer_name: name || null,
+            customer_email: emailAddress,
+            customer_name: customerName || null,
           })
           .select()
           .single();
 
         if (convError) throw convError;
         setConversationId(newConv.id);
-        await saveMessageToDb("assistant", welcomeMsg.content, welcomeMsg.id);
+        await saveMessageToDb("assistant", welcomeMsg.content, welcomeMsg.id, newConv.id);
       }
+      setHistoryLoadedForEmail(emailAddress);
     } catch (error) {
       console.error("Error loading conversation:", error);
       // Don't show error toast, just continue without DB persistence
@@ -103,41 +144,109 @@ export const ChatInterface = () => {
     } finally {
       setIsLoadingHistory(false);
     }
-  };
+  }, [saveMessageToDb]);
 
-  const startConversation = async () => {
+  useEffect(() => {
+    if (initialSessionCheckComplete) {
+      return;
+    }
+
+    const restoreSession = async () => {
+      try {
+        const { supabase } = await import("@/integrations/supabase/client");
+        const { data } = await supabase.auth.getSession();
+        if (data.session?.user?.email) {
+          setSession(data.session);
+          setEmail(data.session.user.email);
+          setAuthStage("chat");
+          if (historyLoadedForEmail !== data.session.user.email) {
+            await loadConversationHistory(
+              data.session.user.email,
+              (data.session.user.user_metadata as { full_name?: string } | null)?.full_name,
+            );
+          }
+        }
+      } catch (error) {
+        console.error("Unable to restore Supabase session", error);
+      } finally {
+        setInitialSessionCheckComplete(true);
+      }
+    };
+
+    void restoreSession();
+  }, [initialSessionCheckComplete, historyLoadedForEmail, loadConversationHistory]);
+
+  const requestOtp = async () => {
     if (!email.trim()) {
       toast({
         title: "Email Required",
-        description: "Please enter your email to start chatting",
+        description: "Please enter your email to continue",
         variant: "destructive",
       });
       return;
     }
 
-    await loadConversationHistory(email);
-    setShowEmailCapture(false);
-  };
-
-  const saveMessageToDb = async (role: "user" | "assistant", content: string, msgId?: string) => {
+    setAuthError(null);
+    setIsAuthLoading(true);
     try {
-      if (!conversationId) {
-        return; // Skip if no conversation ID
-      }
-
       const { supabase } = await import("@/integrations/supabase/client");
-      
-      const { error: msgError } = await supabase.from("chat_messages").insert({
-        id: msgId || crypto.randomUUID(),
-        conversation_id: conversationId,
-        role,
-        content,
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email.trim(),
+        options: {
+          shouldCreateUser: true,
+          data: name ? { full_name: name } : undefined,
+          emailRedirectTo: typeof window !== "undefined" ? window.location.origin : undefined,
+        },
       });
 
-      if (msgError) throw msgError;
+      if (error) throw error;
+      setOtpCode("");
+      setAuthStage("verify");
+      toast({
+        title: "Check your inbox",
+        description: "We emailed you a 6-digit verification code.",
+      });
     } catch (error) {
-      console.error("Error saving message:", error);
-      // Continue without DB persistence
+      console.error("OTP request failed", error);
+      setAuthError("We couldn't send the code. Please try again.");
+    } finally {
+      setIsAuthLoading(false);
+    }
+  };
+
+  const verifyOtp = async () => {
+    if (otpCode.trim().length !== 6) {
+      setAuthError("Enter the 6-digit code from your email.");
+      return;
+    }
+
+    setIsAuthLoading(true);
+    setAuthError(null);
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data, error } = await supabase.auth.verifyOtp({
+        email: email.trim(),
+        token: otpCode.trim(),
+        type: "email",
+      });
+
+      if (error) throw error;
+
+      const activeSession = data.session;
+      if (!activeSession?.user?.email) {
+        throw new Error("Missing Supabase session");
+      }
+
+      setSession(activeSession);
+      setAuthStage("chat");
+      if (!historyLoadedForEmail || historyLoadedForEmail !== activeSession.user.email) {
+        await loadConversationHistory(activeSession.user.email, name || undefined);
+      }
+    } catch (error) {
+      console.error("OTP verification failed", error);
+      setAuthError("Invalid or expired code. Please request a new one.");
+    } finally {
+      setIsAuthLoading(false);
     }
   };
 
@@ -148,13 +257,26 @@ export const ChatInterface = () => {
     await saveMessageToDb("user", userMessage);
     
     try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const cachedSession = session ?? (await supabase.auth.getSession()).data.session;
+      const accessToken = cachedSession?.access_token;
+
+      if (!accessToken) {
+        throw new Error("Missing authenticated session");
+      }
+
+      if (!session && cachedSession) {
+        setSession(cachedSession);
+      }
+
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            Authorization: `Bearer ${accessToken}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
           },
           body: JSON.stringify({
             messages: [...messages, { role: "user", content: userMessage }],
@@ -290,34 +412,73 @@ export const ChatInterface = () => {
           </div>
 
           {/* Email Capture or Messages */}
-          {showEmailCapture ? (
+          {authStage !== "chat" ? (
             <div className="flex-1 p-6 flex flex-col items-center justify-center gap-4">
               <MessageSquare className="h-16 w-16 text-primary" />
               <div className="text-center">
                 <h4 className="font-semibold mb-2">Start a Conversation</h4>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Enter your email to begin chatting. We'll save your conversation history!
-                </p>
+                {authStage === "collect" ? (
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Enter your email to request a secure one-time code and continue chatting.
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Enter the 6-digit security code we sent to your email to unlock chat history.
+                  </p>
+                )}
               </div>
-              <div className="w-full space-y-3">
-                <Input
-                  type="email"
-                  placeholder="Your email address"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && startConversation()}
-                />
-                <Input
-                  type="text"
-                  placeholder="Your name (optional)"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && startConversation()}
-                />
-                <Button onClick={startConversation} className="w-full">
-                  Start Chatting
-                </Button>
-              </div>
+              {authStage === "collect" && (
+                <div className="w-full space-y-3">
+                  <Input
+                    type="email"
+                    placeholder="Your email address"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && requestOtp()}
+                  />
+                  <Input
+                    type="text"
+                    placeholder="Your name (optional)"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && requestOtp()}
+                  />
+                  {authError && (
+                    <p className="text-sm text-destructive text-center">{authError}</p>
+                  )}
+                  <Button onClick={requestOtp} className="w-full" disabled={isAuthLoading}>
+                    {isAuthLoading ? "Sending..." : "Send Secure Code"}
+                  </Button>
+                </div>
+              )}
+
+              {authStage === "verify" && (
+                <div className="w-full space-y-4">
+                  <InputOTP
+                    maxLength={6}
+                    value={otpCode}
+                    onChange={(value) => setOtpCode(value)}
+                    className="w-full"
+                  >
+                    <InputOTPGroup className="flex justify-center gap-3">
+                      {Array.from({ length: 6 }).map((_, index) => (
+                        <InputOTPSlot key={`otp-slot-${index}`} index={index} className="w-10 h-12 text-lg" />
+                      ))}
+                    </InputOTPGroup>
+                  </InputOTP>
+                  {authError && (
+                    <p className="text-sm text-destructive text-center">{authError}</p>
+                  )}
+                  <div className="flex flex-col gap-2">
+                    <Button onClick={verifyOtp} disabled={isAuthLoading}>
+                      {isAuthLoading ? "Verifying..." : "Verify & Continue"}
+                    </Button>
+                    <Button variant="ghost" onClick={requestOtp} disabled={isAuthLoading}>
+                      Resend Code
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <>

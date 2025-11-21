@@ -40,7 +40,10 @@ interface FormData {
   phone: string;
   notes: string;
   agreedToTerms: boolean;
+  honeypot: string;
 }
+
+const MIN_FORM_COMPLETION_MS = 5000;
 
 const Booking = () => {
   const [searchParams] = useSearchParams();
@@ -50,7 +53,9 @@ const Booking = () => {
   const [showAddOns, setShowAddOns] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
+  const [activeBookingId, setActiveBookingId] = useState<string | null>(null);
   const startTimeRef = useRef<HTMLInputElement>(null);
+  const formStartRef = useRef<number>(Date.now());
 
   // Check for payment status from URL params and verify booking
   useEffect(() => {
@@ -58,6 +63,10 @@ const Booking = () => {
     const sessionId = searchParams.get('session_id');
     const bookingId = searchParams.get('booking_id');
     
+    if (bookingId) {
+      setActiveBookingId(bookingId);
+    }
+
     if (paymentStatus === 'success' && sessionId && bookingId) {
       const checkBookingStatus = async () => {
         try {
@@ -111,6 +120,7 @@ const Booking = () => {
     phone: "",
     notes: "",
     agreedToTerms: false,
+    honeypot: "",
   });
 
   const validateStep = (stepNum: number): boolean => {
@@ -178,42 +188,71 @@ const Booking = () => {
   const handleSubmit = async () => {
     if (!validateStep(3)) return;
 
+    if (formData.honeypot.trim().length > 0) {
+      toast({
+        title: "Submission blocked",
+        description: "We could not verify your request. Please contact us directly.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const timeOnForm = Date.now() - formStartRef.current;
+    if (timeOnForm < MIN_FORM_COMPLETION_MS) {
+      toast({
+        title: "Almost there",
+        description: "Take a moment to review your details before submitting.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      const { basePrice, addOnsTotal, totalAmount, depositAmount } = calculateTotals();
-      
-      // Save booking to backend
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { data: booking, error: dbError } = await supabase
-        .from("bookings")
-        .insert({
-          customer_name: formData.name,
-          customer_email: formData.email,
-          customer_phone: formData.phone,
-          event_date: formData.date ? format(formData.date, "yyyy-MM-dd") : "",
-          event_type: "DJ Service",
-          start_time: formData.startTime,
-          end_time: formData.endTime,
-          venue_name: formData.venueName,
-          street_address: formData.streetAddress,
+      const eventDate = formData.date ? format(formData.date, "yyyy-MM-dd") : "";
+      const payload = {
+        packageType: formData.package,
+        selectedAddOns: formData.selectedAddOns,
+        customer: {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+        },
+        event: {
+          date: eventDate,
+          startTime: formData.startTime,
+          endTime: formData.endTime,
+          venueName: formData.venueName,
+          streetAddress: formData.streetAddress,
           city: formData.city,
           state: formData.state,
-          zip_code: formData.zipCode,
-          package_type: formData.package,
-          service_tier: PACKAGES[formData.package].name,
-          total_amount: totalAmount,
-          deposit_amount: depositAmount,
-          notes: `${formData.notes}\n\nSelected Add-ons: ${formData.selectedAddOns.length > 0 ? formData.selectedAddOns.join(", ") : "None"}`,
-          status: "pending",
-        })
-        .select()
-        .single();
+          zipCode: formData.zipCode,
+        },
+        notes: formData.notes,
+        honeypot: formData.honeypot,
+      };
 
-      if (dbError) {
-        throw dbError;
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data, error } = await supabase.functions.invoke("create-booking-hold", {
+        body: payload,
+      });
+
+      if (error) {
+        const status = (error as { status?: number })?.status;
+        toast({
+          title: status === 429 ? "Too many requests" : "Booking error",
+          description: error.message ?? "Unable to submit request. Please try again.",
+          variant: "destructive",
+        });
+        return;
       }
 
+      if (!data?.booking?.id) {
+        throw new Error("Missing booking response");
+      }
+
+      setActiveBookingId(data.booking.id);
       setHoldConfirmed(true);
       setStep(4);
       toast({
@@ -251,6 +290,15 @@ const Booking = () => {
               <CardDescription>Tell us about your event</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <input
+                type="text"
+                value={formData.honeypot}
+                onChange={(e) => setFormData({ ...formData, honeypot: e.target.value })}
+                tabIndex={-1}
+                autoComplete="off"
+                className="hidden"
+                aria-hidden="true"
+              />
               <div className="space-y-2">
                 <Label htmlFor="date">Event Date *</Label>
                 <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
@@ -636,9 +684,18 @@ const Booking = () => {
                   className="w-full"
                   onClick={async () => {
                     try {
+                      if (!activeBookingId) {
+                        toast({
+                          title: "Booking required",
+                          description: "Create your hold before starting payment.",
+                          variant: "destructive",
+                        });
+                        return;
+                      }
                       const { supabase } = await import("@/integrations/supabase/client");
                       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
                         body: {
+                          bookingId: activeBookingId,
                           packageType: formData.package,
                           customerEmail: formData.email,
                           customerName: formData.name,

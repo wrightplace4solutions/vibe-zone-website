@@ -4,6 +4,18 @@
   functions = "netlify/functions"
 
 [[redirects]]
+  from = "http://vzentertainment.fun/*"
+  to = "https://vzentertainment.fun/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.vzentertainment.fun/*"
+  to = "https://www.vzentertainment.fun/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
@@ -12,3 +24,11 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    Content-Security-Policy = "default-src 'self'; connect-src 'self' https://*.supabase.co https://*.supabase.net https://*.supabase.in https://ai.gateway.lovable.dev https://api.stripe.com https://hooks.stripe.com https://js.stripe.com; script-src 'self' https://js.stripe.com 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com; form-action 'self' https://hooks.stripe.com https://api.stripe.com; base-uri 'self'; frame-ancestors 'none'; object-src 'none'; upgrade-insecure-requests"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Content-Type-Options = "nosniff"

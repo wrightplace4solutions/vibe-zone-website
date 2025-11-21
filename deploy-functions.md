@@ -32,6 +32,12 @@ Since you're using Lovable for your website, the Supabase Edge Functions need to
    - Copy/paste the code from: `supabase/functions/get-booking-status/index.ts`
    - Click **"Deploy function"**
 
+5. **Deploy `create-booking-hold` function (rate limiting + bot mitigation):**
+   - Click **"Create a new function"**
+   - Name: `create-booking-hold`
+   - Copy/paste the code from: `supabase/functions/create-booking-hold/index.ts`
+   - Click **"Deploy function"**
+
 ### Option 2: Deploy via GitHub (Automated)
 
 1. **Push your code to GitHub** (already done ✅)
@@ -59,6 +65,7 @@ npx supabase link --project-ref ffikkqixlmexusrcxaov
 npx supabase functions deploy create-checkout-session
 npx supabase functions deploy stripe-webhook
 npx supabase functions deploy get-booking-status
+npx supabase functions deploy create-booking-hold
 ```
 
 ## 🔍 Verify Deployment:
@@ -71,6 +78,7 @@ You should see:
 - ✅ `create-checkout-session`
 - ✅ `stripe-webhook`
 - ✅ `get-booking-status`
+- ✅ `create-booking-hold`
 
 ## 📝 Important Notes:
 
@@ -79,9 +87,11 @@ You should see:
 - VibeQue's `chat` function won't interfere with Stripe functions
 - Each function has its own endpoint URL
 
-**Your Stripe Functions will be available at:**
+**Your Supabase Functions will be available at:**
 - Create Checkout: `https://ffikkqixlmexusrcxaov.supabase.co/functions/v1/create-checkout-session`
+- Booking Hold Guard: `https://ffikkqixlmexusrcxaov.supabase.co/functions/v1/create-booking-hold`
 - Webhook: `https://ffikkqixlmexusrcxaov.supabase.co/functions/v1/stripe-webhook`
+- Status Check: `https://ffikkqixlmexusrcxaov.supabase.co/functions/v1/get-booking-status`
 
 **When Publishing with Lovable:**
 - Lovable publishes your frontend code
@@ -91,7 +101,7 @@ You should see:
 ## ✅ Final Checklist Before Going Live:
 
 - [ ] Stripe secrets added to Supabase
-- [ ] Both Edge Functions deployed
+- [ ] All Edge Functions deployed (`chat`, `create-booking-hold`, `create-checkout-session`, `stripe-webhook`, `get-booking-status`)
 - [ ] Webhook created in Stripe Dashboard
 - [ ] Website published via Lovable
 - [ ] Test payment with test card (4242 4242 4242 4242)
