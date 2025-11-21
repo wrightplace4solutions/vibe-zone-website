@@ -4,7 +4,6 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { addToGoogleCalendar } from '@/lib/google-calendar';
 
 const MAX_BOOKING_STATUS_RETRIES = 5;
 
@@ -26,17 +25,6 @@ export default function BookingSuccess() {
     zip_code?: string;
     notes?: string | null;
   } | null>(null);
-  useEffect(() => {
-    const sessionId = searchParams.get('session_id');
-    const bookingId = searchParams.get('booking_id');
-
-    if (!sessionId || !bookingId) {
-      setStatus('error');
-      return;
-    }
-
-    confirmBooking(sessionId, bookingId);
-  }, [confirmBooking, searchParams]);
 
   const confirmBooking = useCallback(async (sessionId: string, bookingId: string, attempt = 0) => {
     try {
@@ -61,21 +49,24 @@ export default function BookingSuccess() {
 
       setBookingDetails(booking);
       setStatus('success');
-
-      // Add to Google Calendar
-      try {
-        await addToGoogleCalendar(booking);
-        console.log('Event added to Google Calendar');
-      } catch (calendarError) {
-        console.error('Failed to add to calendar, but booking confirmed:', calendarError);
-        // Don't fail the whole process if calendar fails
-      }
       
     } catch (error) {
       console.error('Error confirming booking:', error);
       setStatus('error');
     }
   }, []);
+
+  useEffect(() => {
+    const sessionId = searchParams.get('session_id');
+    const bookingId = searchParams.get('booking_id');
+
+    if (!sessionId || !bookingId) {
+      setStatus('error');
+      return;
+    }
+
+    confirmBooking(sessionId, bookingId);
+  }, [confirmBooking, searchParams]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-purple-900 flex items-center justify-center p-4">
