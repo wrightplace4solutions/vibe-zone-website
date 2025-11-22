@@ -16,8 +16,8 @@ const VibeQue = lazy(() => import("./pages/VibeQue"));
 const Terms = lazy(() => import("./pages/Terms"));
 const Refunds = lazy(() => import("./pages/Refunds"));
 const Contact = lazy(() => import("./pages/Contact"));
-const Auth = lazy(() => import("./pages/Auth"));
-const MyBookings = lazy(() => import("./pages/MyBookings"));
+const Auth = lazy(() => import("./pages/Auth")); // NEW
+const MyBookings = lazy(() => import("./pages/MyBookings")); // NEW
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -35,12 +35,12 @@ const App = () => (
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/booking" element={<Booking />} />
             <Route path="/booking/success" element={<BookingSuccess />} />
+            <Route path="/auth" element={<Auth />} /> {/* NEW */}
+            <Route path="/my-bookings" element={<MyBookings />} /> {/* NEW */}
             <Route path="/vibeque" element={<VibeQue />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/refunds" element={<Refunds />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/my-bookings" element={<MyBookings />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
