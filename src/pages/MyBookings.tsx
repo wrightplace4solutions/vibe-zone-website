@@ -12,7 +12,7 @@ interface Booking {
   event_date: string;
   start_time: string;
   end_time: string;
-  service_type: string;
+  package_type: string;
   email: string;
   phone: string;
   status: string;
@@ -55,15 +55,15 @@ export default function MyBookings() {
 
   const fetchBookings = async (email: string) => {
     try {
-      const { data, error } = await supabase
+      const response = await supabase
         .from('bookings')
-        .select('*')
+        .select('id, event_date, start_time, end_time, package_type, email, phone, status, created_at')
         .eq('email', email)
         .order('event_date', { ascending: false });
 
-      if (error) throw error;
+      if (response.error) throw response.error;
 
-      setBookings(data || []);
+      setBookings((response.data as unknown as Booking[]) || []);
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -125,7 +125,7 @@ export default function MyBookings() {
                   <div className="flex justify-between items-start">
                     <div>
                       <CardTitle className="capitalize">
-                        {booking.service_type.replace(/-/g, ' ')}
+                        {booking.package_type.replace(/-/g, ' ')}
                       </CardTitle>
                       <CardDescription className="flex items-center gap-2 mt-2">
                         <Calendar className="h-4 w-4" />
