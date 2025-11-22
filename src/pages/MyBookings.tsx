@@ -1,88 +1,83 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Calendar, Clock, Mail, LogOut } from 'lucide-react';
+import { Loader2, Calendar, MapPin, LogOut } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { format } from 'date-fns';
 
 interface Booking {
   id: string;
   event_date: string;
-  start_time: string;
-  end_time: string;
-  package_type: string;
-  email: string;
-  phone: string;
+  event_type: string;
+  service_tier: string;
+  venue_name?: string;
+  start_time?: string;
+  end_time?: string;
+  street_address?: string;
+  city?: string;
+  state?: string;
+  zip_code?: string;
   status: string;
   created_at: string;
+  customer_name: string;
+  notes?: string;
 }
 
 export default function MyBookings() {
-  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
-  const [userEmail, setUserEmail] = useState('');
-  const { toast } = useToast();
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [userEmail, setUserEmail] = useState<string>('');
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     checkAuth();
   }, []);
 
   const checkAuth = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        navigate('/auth');
-        return;
-      }
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      navigate('/auth');
+      return;
+    }
 
-      setUserEmail(session.user.email || '');
-      await fetchBookings(session.user.email || '');
+    setUserEmail(session.user.email || '');
+    loadBookings(session.user.email || '');
+  };
+
+  const loadBookings = async (email: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('*')
+        .eq('customer_email', email)
+        .order('event_date', { ascending: true });
+
+      if (error) throw error;
+
+      setBookings(data || []);
     } catch (error: any) {
       toast({
-        title: 'Error',
-        description: 'Failed to check authentication',
+        title: 'Error loading bookings',
+        description: error.message,
         variant: 'destructive',
       });
-      navigate('/auth');
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchBookings = async (email: string) => {
-    try {
-      // @ts-ignore - Supabase type inference issue
-      const response = await supabase
-        .from('bookings')
-        .select('id, event_date, start_time, end_time, package_type, email, phone, status, created_at')
-        .eq('email', email)
-        .order('event_date', { ascending: false });
-
-      if (response.error) throw response.error;
-
-      setBookings((response.data as unknown as Booking[]) || []);
-    } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch bookings',
-        variant: 'destructive',
-      });
-    }
-  };
-
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    navigate('/auth');
+    navigate('/');
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-purple-900 flex items-center justify-center">
-        <Loader2 className="h-12 w-12 text-white animate-spin" />
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-purple-900 flex items-center justify-center p-4">
+        <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
       </div>
     );
   }
@@ -93,10 +88,7 @@ export default function MyBookings() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">My Bookings</h1>
-            <p className="text-purple-200 flex items-center gap-2">
-              <Mail className="h-4 w-4" />
-              {userEmail}
-            </p>
+            <p className="text-purple-200">{userEmail}</p>
           </div>
           <Button onClick={handleSignOut} variant="outline">
             <LogOut className="mr-2 h-4 w-4" />
@@ -107,14 +99,14 @@ export default function MyBookings() {
         {bookings.length === 0 ? (
           <Card>
             <CardHeader>
-              <CardTitle>No Bookings Found</CardTitle>
+              <CardTitle>No Bookings Yet</CardTitle>
               <CardDescription>
-                You don't have any bookings yet. Ready to book a service?
+                You haven't made any bookings. Ready to book an event?
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Button onClick={() => navigate('/booking')}>
-                Book Now
+                Create Your First Booking
               </Button>
             </CardContent>
           </Card>
@@ -125,37 +117,66 @@ export default function MyBookings() {
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <div>
-                      <CardTitle className="capitalize">
-                        {booking.package_type.replace(/-/g, ' ')}
-                      </CardTitle>
-                      <CardDescription className="flex items-center gap-2 mt-2">
-                        <Calendar className="h-4 w-4" />
-                        {format(new Date(booking.event_date), 'MMMM d, yyyy')}
-                      </CardDescription>
+                      <CardTitle>{booking.event_type}</CardTitle>
+                      <CardDescription>{booking.service_tier}</CardDescription>
                     </div>
-                    <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      booking.status === 'confirmed' 
-                        ? 'bg-green-100 text-green-800'
-                        : booking.status === 'pending'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {booking.status}
-                    </div>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        booking.status === 'confirmed'
+                          ? 'bg-green-100 text-green-800'
+                          : booking.status === 'pending'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      {booking.status.toUpperCase()}
+                    </span>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Clock className="h-4 w-4" />
-                      {booking.start_time} - {booking.end_time}
+                <CardContent className="space-y-3">
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <Calendar className="mr-2 h-4 w-4" />
+                    <span>
+                      {new Date(booking.event_date).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })}
+                    </span>
+                  </div>
+
+                  {booking.start_time && booking.end_time && (
+                    <div className="text-sm text-muted-foreground">
+                      ⏰ {booking.start_time} - {booking.end_time}
                     </div>
-                    <div className="text-muted-foreground">
-                      Phone: {booking.phone}
+                  )}
+
+                  {(booking.venue_name || booking.street_address) && (
+                    <div className="flex items-start text-sm text-muted-foreground">
+                      <MapPin className="mr-2 h-4 w-4 mt-0.5 flex-shrink-0" />
+                      <div>
+                        {booking.venue_name && <div>{booking.venue_name}</div>}
+                        {booking.street_address && (
+                          <div>
+                            {booking.street_address}
+                            {booking.city && `, ${booking.city}`}
+                            {booking.state && `, ${booking.state}`}
+                            {booking.zip_code && ` ${booking.zip_code}`}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div className="text-xs text-muted-foreground pt-2 border-t">
-                      Booked on {format(new Date(booking.created_at), 'MMM d, yyyy')}
+                  )}
+
+                  {booking.notes && (
+                    <div className="bg-muted p-3 rounded-md text-sm">
+                      <strong>Notes:</strong> {booking.notes}
                     </div>
+                  )}
+
+                  <div className="text-xs text-muted-foreground pt-2 border-t">
+                    Booked on {new Date(booking.created_at).toLocaleDateString()}
                   </div>
                 </CardContent>
               </Card>
