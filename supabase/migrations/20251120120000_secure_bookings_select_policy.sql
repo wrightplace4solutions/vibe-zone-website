@@ -1,15 +1,13 @@
--- Harden SELECT access to bookings table to prevent public data exposure by
--- replacing the permissive SELECT policy with a scoped email match and trusted roles
+-- Drop the old insecure policy
+DROP POLICY IF EXISTS "Anyone can view their own bookings by email" ON bookings;
 
-DROP POLICY IF EXISTS "Anyone can view their own bookings by email" ON public.bookings;
-
-CREATE POLICY "Customers can read their bookings"
-ON public.bookings
+-- Create new secure policy that requires authentication
+CREATE POLICY "Authenticated users can view their own bookings"
+ON bookings
 FOR SELECT
-USING (
-  coalesce(jsonb_extract_path_text(auth.jwt(), 'role'), '') IN ('service_role', 'supabase_admin')
-  OR (
-    coalesce(jsonb_extract_path_text(auth.jwt(), 'role'), '') = 'authenticated'
-    AND lower(customer_email) = lower(coalesce(jsonb_extract_path_text(auth.jwt(), 'email'), ''))
-  )
-);
+TO authenticated
+USING (auth.jwt()->>'email' = customer_email);
+
+-- Optional: Keep the existing INSERT policy or update it
+-- The current "Anyone can create bookings" policy is fine for the initial booking flow
+-- since customers aren't authenticated yet when they first book
