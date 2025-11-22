@@ -55,6 +55,7 @@ export default function MyBookings() {
 
   const fetchBookings = async (email: string) => {
     try {
+      // @ts-ignore - Supabase type inference issue
       const response = await supabase
         .from('bookings')
         .select('id, event_date, start_time, end_time, package_type, email, phone, status, created_at')
