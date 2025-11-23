@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import vibeZoneLogo from "@/assets/vibe-zone-logo.png";
+import { Link } from "react-router-dom";
 export const Hero = () => {
   return <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-gradient-hero pt-20">
       {/* Animated background grid */}
@@ -21,11 +22,20 @@ export const Hero = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg px-8 py-6 glow-neon transition-all hover:scale-105">
-              Book DJ Def Stef
+            <Button
+              asChild
+              size="lg"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg px-8 py-6 glow-neon transition-all hover:scale-105"
+            >
+              <Link to="/booking">Book DJ Def Stef</Link>
             </Button>
-            <Button size="lg" variant="outline" className="border-2 border-accent text-accent hover:bg-accent hover:text-accent-foreground font-bold text-lg px-8 py-6 transition-all hover:scale-105">
-              Explore Vibe Que App
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="border-2 border-accent text-accent hover:bg-accent hover:text-accent-foreground font-bold text-lg px-8 py-6 transition-all hover:scale-105"
+            >
+              <Link to="/vibeque">Explore Vibe Que App</Link>
             </Button>
           </div>
         </div>
