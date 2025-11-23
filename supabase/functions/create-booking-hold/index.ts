@@ -203,6 +203,23 @@ serve(async (req) => {
       }
     }
 
+    // Check date availability
+    const { data: existingBookings, error: availabilityError } = await supabase
+      .from("bookings")
+      .select("id")
+      .eq("event_date", eventDetails.date)
+      .in("status", ["pending", "confirmed"])
+      .limit(1);
+
+    if (availabilityError) {
+      console.error("Availability check failed", availabilityError);
+      return sendError("Unable to verify date availability. Please try again.", 503);
+    }
+
+    if (existingBookings && existingBookings.length > 0) {
+      return sendError("This date is already booked. Please select another date.", 409);
+    }
+
     const addOns = sanitizeAddOns(payload.selectedAddOns);
     const addOnsTotal = addOns.reduce((sum, name) => sum + (ADD_ON_PRICING.get(name) || 0), 0);
     const totalAmount = packageConfig.basePrice + addOnsTotal;
