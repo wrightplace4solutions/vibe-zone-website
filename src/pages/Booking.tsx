@@ -291,8 +291,22 @@ const Booking = () => {
   };
 
   const handleSubmit = async () => {
-    if (!validateStep(3)) return;
+    // Validate all fields before submission
+    try {
+      bookingSchema.parse(formData);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const firstError = error.errors[0];
+        toast({
+          title: "Validation Error",
+          description: firstError.message,
+          variant: "destructive",
+        });
+      }
+      return;
+    }
 
+    // Honeypot check (already validated by schema)
     if (formData.honeypot.trim().length > 0) {
       toast({
         title: "Submission blocked",
@@ -302,6 +316,7 @@ const Booking = () => {
       return;
     }
 
+    // Time-on-form check
     const timeOnForm = Date.now() - formStartRef.current;
     if (timeOnForm < MIN_FORM_COMPLETION_MS) {
       toast({
