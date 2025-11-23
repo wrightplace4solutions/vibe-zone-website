@@ -1,6 +1,7 @@
 // @ts-nocheck - Edge function executed in Deno runtime
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.76.1";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
@@ -28,31 +29,70 @@ const ADD_ON_PRICING = new Map([
   ["Extra Hour", 125],
 ]);
 
-interface CustomerDetails {
-  name: string;
-  email: string;
-  phone: string;
-}
+// Validation Schema
+const customerSchema = z.object({
+  name: z.string()
+    .trim()
+    .min(1, "Name is required")
+    .max(100, "Name too long")
+    .regex(/^[a-zA-Z\s\-.']+$/, "Invalid name format"),
+  email: z.string()
+    .trim()
+    .email("Invalid email")
+    .max(255, "Email too long")
+    .toLowerCase(),
+  phone: z.string()
+    .trim()
+    .min(10, "Phone too short")
+    .max(15, "Phone too long")
+    .regex(/^[\d\s\-()]+$/, "Invalid phone format"),
+});
 
-interface EventDetails {
-  date: string;
-  startTime: string;
-  endTime: string;
-  venueName: string;
-  streetAddress: string;
-  city: string;
-  state: string;
-  zipCode: string;
-}
+const eventSchema = z.object({
+  date: z.string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format")
+    .refine((date) => {
+      const eventDate = new Date(date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return eventDate >= today;
+    }, "Event date must be in the future"),
+  startTime: z.string()
+    .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid start time"),
+  endTime: z.string()
+    .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid end time"),
+  venueName: z.string()
+    .trim()
+    .min(1, "Venue name required")
+    .max(200, "Venue name too long"),
+  streetAddress: z.string()
+    .trim()
+    .min(1, "Address required")
+    .max(200, "Address too long"),
+  city: z.string()
+    .trim()
+    .min(1, "City required")
+    .max(100, "City too long")
+    .regex(/^[a-zA-Z\s\-.']+$/, "Invalid city format"),
+  state: z.string()
+    .trim()
+    .length(2, "State must be 2 characters")
+    .regex(/^[A-Z]{2}$/, "Invalid state format"),
+  zipCode: z.string()
+    .trim()
+    .regex(/^\d{5}$/, "ZIP must be 5 digits"),
+});
 
-interface RequestBody {
-  packageType: string;
-  selectedAddOns?: string[];
-  customer?: CustomerDetails;
-  event?: EventDetails;
-  notes?: string;
-  honeypot?: string;
-}
+const requestSchema = z.object({
+  packageType: z.enum(["essentialVibe", "premiumExperience", "vzPartyStarter", "ultimateExperience"], {
+    errorMap: () => ({ message: "Invalid package type" }),
+  }),
+  selectedAddOns: z.array(z.string()).optional().default([]),
+  customer: customerSchema,
+  event: eventSchema,
+  notes: z.string().max(1000, "Notes too long").optional().default(""),
+  honeypot: z.string().max(0, "Suspicious submission").optional().default(""),
+});
 
 const hashIdentifier = async (value: string) => {
   const encoder = new TextEncoder();
@@ -88,7 +128,16 @@ serve(async (req) => {
   }
 
   try {
-    const payload: RequestBody = await req.json();
+    const rawPayload = await req.json();
+
+    // Validate with Zod
+    const validationResult = requestSchema.safeParse(rawPayload);
+    if (!validationResult.success) {
+      const firstError = validationResult.error.errors[0];
+      return sendError(firstError.message, 400);
+    }
+
+    const payload = validationResult.data;
 
     if (payload.honeypot && payload.honeypot.trim().length > 0) {
       return sendError("Suspicious submission.", 400);
@@ -98,22 +147,7 @@ serve(async (req) => {
     const eventDetails = payload.event;
     const packageConfig = PACKAGES[payload.packageType];
 
-    if (!customer || !eventDetails || !packageConfig) {
-      return sendError("Missing booking details.");
-    }
-
-    const normalizedEmail = (customer.email || "").trim().toLowerCase();
-    if (!normalizedEmail) {
-      return sendError("Email is required.");
-    }
-
-    if (!customer.name || !customer.phone) {
-      return sendError("Name and phone are required.");
-    }
-
-    if (!eventDetails.date || !eventDetails.startTime || !eventDetails.endTime) {
-      return sendError("Event date and times are required.");
-    }
+    const normalizedEmail = customer.email;
 
     const ipAddress = getClientIp(req.headers);
     let ipHash: string | null = null;
