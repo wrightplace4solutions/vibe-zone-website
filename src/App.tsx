@@ -8,6 +8,7 @@ import { Footer } from "@/components/Footer";
 import { ChatInterface } from "@/components/ChatInterface";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { MAINTENANCE_MODE as HARDCODED_MAINTENANCE } from "@/config/maintenance";
 
 const Index = lazy(() => import("./pages/Index"));
 const Pricing = lazy(() => import("./pages/Pricing"));
@@ -26,7 +27,8 @@ const Maintenance = lazy(() => import("./pages/Maintenance"));
 const queryClient = new QueryClient();
 
 const App = () => {
-  const [maintenanceMode, setMaintenanceMode] = useState<boolean | null>(null);
+  const [maintenanceMode, setMaintenanceMode] = useState<boolean>(HARDCODED_MAINTENANCE);
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
     checkMaintenanceMode();
@@ -41,21 +43,25 @@ const App = () => {
         .single();
 
       if (error) {
-        console.error("Error checking maintenance mode:", error);
-        // Fallback to false if there's an error
-        setMaintenanceMode(false);
+        // Table doesn't exist yet or other error - use hardcoded value
+        console.log("Using hardcoded maintenance mode:", HARDCODED_MAINTENANCE);
+        setMaintenanceMode(HARDCODED_MAINTENANCE);
+        setIsChecking(false);
         return;
       }
 
       setMaintenanceMode(data.value === "true");
+      setIsChecking(false);
     } catch (error) {
-      console.error("Error checking maintenance mode:", error);
-      setMaintenanceMode(false);
+      // Use hardcoded value on error
+      console.log("Using hardcoded maintenance mode:", HARDCODED_MAINTENANCE);
+      setMaintenanceMode(HARDCODED_MAINTENANCE);
+      setIsChecking(false);
     }
   };
 
-  // Show loading while checking maintenance mode
-  if (maintenanceMode === null) {
+  // Show brief loading while checking database
+  if (isChecking) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
         <div>Loading…</div>
