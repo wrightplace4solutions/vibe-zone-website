@@ -153,6 +153,38 @@ serve(async (req) => {
   }
 
   try {
+    // Verify authentication
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      console.error("Missing authorization header");
+      throw new Error("Authentication required");
+    }
+
+    // Extract and verify user from JWT
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+    if (authError || !user) {
+      console.error("Invalid authentication:", authError);
+      throw new Error("Invalid authentication");
+    }
+
+    // Check if user has admin role
+    const { data: roleData, error: roleError } = await supabase
+      .rpc('has_role', { _user_id: user.id, _role: 'admin' });
+
+    if (roleError) {
+      console.error("Error checking admin role:", roleError);
+      throw new Error("Authorization check failed");
+    }
+
+    if (!roleData) {
+      console.error("User does not have admin role:", user.email);
+      throw new Error("Unauthorized: Admin access required");
+    }
+
+    console.log("Admin user authenticated:", user.email);
+
     const { bookingId } = await req.json();
 
     if (!bookingId) {
