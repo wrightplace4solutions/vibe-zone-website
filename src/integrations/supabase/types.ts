@@ -98,6 +98,27 @@ export type Database = {
         }
         Relationships: []
       }
+      demo_requests: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          user_type: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          user_type?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          user_type?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
