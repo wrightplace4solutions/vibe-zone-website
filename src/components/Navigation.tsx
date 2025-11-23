@@ -16,7 +16,7 @@ export const Navigation = () => {
     { path: "/refunds", label: "Refunds" },
     { path: "/contact", label: "Contact" },
     { path: "/vibeque", label: "VibeQue" },
-    { path: "/my-bookings", label: "My Bookings" },
+    { path: "/auth", label: "My Bookings" },
   ];
 
   const isActive = (path: string) => location.pathname === path;
