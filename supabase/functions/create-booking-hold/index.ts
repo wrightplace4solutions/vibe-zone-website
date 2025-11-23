@@ -128,26 +128,38 @@ serve(async (req) => {
   }
 
   try {
+    // Parse and validate request body
     const rawPayload = await req.json();
-
+    
     // Validate with Zod
     const validationResult = requestSchema.safeParse(rawPayload);
+    
     if (!validationResult.success) {
       const firstError = validationResult.error.errors[0];
       return sendError(firstError.message, 400);
     }
-
+    
     const payload = validationResult.data;
 
+    // Honeypot check
     if (payload.honeypot && payload.honeypot.trim().length > 0) {
       return sendError("Suspicious submission.", 400);
+    }
+
+    // Additional validation: End time must be after start time
+    if (payload.event.startTime >= payload.event.endTime) {
+      return sendError("End time must be after start time", 400);
     }
 
     const customer = payload.customer;
     const eventDetails = payload.event;
     const packageConfig = PACKAGES[payload.packageType];
 
-    const normalizedEmail = customer.email;
+    if (!packageConfig) {
+      return sendError("Invalid package type.");
+    }
+
+    const normalizedEmail = customer.email; // Already lowercased by schema
 
     const ipAddress = getClientIp(req.headers);
     let ipHash: string | null = null;
@@ -254,6 +266,13 @@ Selected Add-ons: ${addOnSummary}`.trim();
     );
   } catch (error) {
     console.error("create-booking-hold error", error);
+    
+    // Handle Zod validation errors specifically
+    if (error instanceof z.ZodError) {
+      const firstError = error.errors[0];
+      return sendError(firstError.message, 400);
+    }
+    
     const message = error?.message || "Unexpected error";
     return sendError(message, error?.status || 400);
   }
