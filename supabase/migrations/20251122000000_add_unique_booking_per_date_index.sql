@@ -17,7 +17,7 @@ WITH duplicates AS (
 )
 UPDATE bookings
 SET status = 'cancelled',
-    notes = COALESCE(notes || E'\n\n', '') || 'Automatically cancelled due to duplicate booking on same date.'
+    notes = COALESCE(notes || chr(10) || chr(10), '') || 'Automatically cancelled due to duplicate booking on same date.'
 WHERE id IN (
   SELECT id FROM duplicates WHERE rn > 1
 );
