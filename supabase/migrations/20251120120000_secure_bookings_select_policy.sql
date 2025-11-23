@@ -1,12 +1,14 @@
 -- Drop the old insecure policy
-DROP POLICY IF EXISTS "Anyone can view their own bookings by email" ON bookings;
+DROP POLICY IF EXISTS "Anyone can view their own bookings by email" ON public.bookings;
 
 -- Create new secure policy that requires authentication
 CREATE POLICY "Authenticated users can view their own bookings"
-  ON bookings
+  ON public.bookings
   FOR SELECT
   USING (
-    (auth.uid() IS NOT NULL) AND (auth.email() = customer_email)
+    auth.uid() IS NOT NULL 
+    AND 
+    auth.jwt() ->> 'email' = customer_email
   );
 
 -- Optional: Keep the existing INSERT policy or update it
