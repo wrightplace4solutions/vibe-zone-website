@@ -11,7 +11,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "@/hooks/use-toast";
 import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
-import { format } from "date-fns";
+import { format, isSameDay } from "date-fns";
 import { cn } from "@/lib/utils";
 import { STRIPE_LINKS, CASHAPP_LINKS, ZELLE_INFO, TZ, PACKAGES, ADD_ONS } from "@/config/booking";
 import { Link, useSearchParams } from "react-router-dom";
@@ -136,8 +136,25 @@ const Booking = () => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
   const [activeBookingId, setActiveBookingId] = useState<string | null>(null);
+  const [unavailableDates, setUnavailableDates] = useState<Date[]>([]);
   const startTimeRef = useRef<HTMLInputElement>(null);
   const formStartRef = useRef<number>(Date.now());
+
+  // Fetch unavailable dates on component mount
+  useEffect(() => {
+    const fetchUnavailableDates = async () => {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data } = await supabase
+        .from("bookings")
+        .select("event_date")
+        .in("status", ["pending", "confirmed"]);
+      
+      if (data) {
+        setUnavailableDates(data.map(b => new Date(b.event_date)));
+      }
+    };
+    fetchUnavailableDates();
+  }, []);
 
   // Check for payment status from URL params and verify booking
   useEffect(() => {
@@ -449,7 +466,10 @@ const Booking = () => {
                           }, 150);
                         }
                       }}
-                      disabled={(date) => date < new Date()}
+                      disabled={(date) => 
+                        date < new Date() || // Past dates
+                        unavailableDates.some(d => isSameDay(d, date)) // Booked dates
+                      }
                       initialFocus
                     />
                   </PopoverContent>
