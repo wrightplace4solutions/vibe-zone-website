@@ -22,6 +22,9 @@ WHERE id IN (
   SELECT id FROM duplicates WHERE rn > 1
 );
 
+-- Drop the index if it exists
+DROP INDEX IF EXISTS idx_one_booking_per_date;
+
 -- Now create the unique index
 CREATE UNIQUE INDEX idx_one_booking_per_date 
 ON bookings (event_date) 
