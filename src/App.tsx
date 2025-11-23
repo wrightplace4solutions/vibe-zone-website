@@ -7,6 +7,7 @@ import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { ChatInterface } from "@/components/ChatInterface";
 import { lazy, Suspense } from "react";
+import { MAINTENANCE_MODE } from "@/config/maintenance";
 
 const Index = lazy(() => import("./pages/Index"));
 const Pricing = lazy(() => import("./pages/Pricing"));
@@ -19,37 +20,61 @@ const Contact = lazy(() => import("./pages/Contact"));
 const Auth = lazy(() => import("./pages/Auth")); // NEW
 const MyBookings = lazy(() => import("./pages/MyBookings")); // NEW
 const NotFound = lazy(() => import("./pages/NotFound"));
+const Maintenance = lazy(() => import("./pages/Maintenance"));
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Navigation />
-        <Suspense fallback={<div className="p-6 text-foreground">Loading…</div>}>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/booking" element={<Booking />} />
-            <Route path="/booking/success" element={<BookingSuccess />} />
-            <Route path="/auth" element={<Auth />} /> {/* NEW */}
-            <Route path="/my-bookings" element={<MyBookings />} /> {/* NEW */}
-            <Route path="/vibeque" element={<VibeQue />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/refunds" element={<Refunds />} />
-            <Route path="/contact" element={<Contact />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-        <ChatInterface />
-        <Footer />
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  if (MAINTENANCE_MODE) {
+    // Show only maintenance landing while flag is enabled.
+    return (
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Navigation />
+            <Suspense fallback={<div className="p-6 text-foreground">Loading…</div>}>
+              <Routes>
+                <Route path="/" element={<Maintenance />} />
+                <Route path="*" element={<Maintenance />} />
+              </Routes>
+            </Suspense>
+            <Footer />
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    );
+  }
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Navigation />
+          <Suspense fallback={<div className="p-6 text-foreground">Loading…</div>}>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/booking" element={<Booking />} />
+              <Route path="/booking/success" element={<BookingSuccess />} />
+              <Route path="/auth" element={<Auth />} /> {/* NEW */}
+              <Route path="/my-bookings" element={<MyBookings />} /> {/* NEW */}
+              <Route path="/vibeque" element={<VibeQue />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/refunds" element={<Refunds />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+          <ChatInterface />
+          <Footer />
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
