@@ -20,7 +20,89 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { z } from 'zod';
 
+// Comprehensive validation schema
+const bookingSchema = z.object({
+  // Event Details
+  date: z.date({
+    required_error: "Event date is required",
+    invalid_type_error: "Please select a valid date",
+  }),
+  startTime: z.string()
+    .min(1, "Start time is required")
+    .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format"),
+  endTime: z.string()
+    .min(1, "End time is required")
+    .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format"),
+  
+  // Venue Details
+  venueName: z.string()
+    .trim()
+    .min(1, "Venue name is required")
+    .max(200, "Venue name must be less than 200 characters")
+    .regex(/^[a-zA-Z0-9\s\-.,&'()]+$/, "Venue name contains invalid characters"),
+  streetAddress: z.string()
+    .trim()
+    .min(1, "Street address is required")
+    .max(200, "Street address must be less than 200 characters"),
+  city: z.string()
+    .trim()
+    .min(1, "City is required")
+    .max(100, "City must be less than 100 characters")
+    .regex(/^[a-zA-Z\s\-.']+$/, "City contains invalid characters"),
+  state: z.string()
+    .trim()
+    .length(2, "State must be 2 characters")
+    .regex(/^[A-Z]{2}$/, "State must be 2 uppercase letters (e.g., TX, CA)")
+    .refine((val) => {
+      // Validate against actual US state codes
+      const validStates = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY","DC"];
+      return validStates.includes(val);
+    }, "Invalid US state code"),
+  zipCode: z.string()
+    .trim()
+    .regex(/^\d{5}$/, "ZIP code must be exactly 5 digits"),
+  
+  // Package & Add-ons
+  package: z.enum(["essentialVibe", "premiumExperience", "vzPartyStarter", "ultimateExperience"], {
+    errorMap: () => ({ message: "Please select a valid package" }),
+  }),
+  selectedAddOns: z.array(z.string()).default([]),
+  
+  // Contact Details
+  name: z.string()
+    .trim()
+    .min(1, "Name is required")
+    .max(100, "Name must be less than 100 characters")
+    .regex(/^[a-zA-Z\s\-.']+$/, "Name can only contain letters, spaces, hyphens, apostrophes, and periods"),
+  email: z.string()
+    .trim()
+    .min(1, "Email is required")
+    .email("Please enter a valid email address")
+    .max(255, "Email must be less than 255 characters")
+    .toLowerCase(),
+  phone: z.string()
+    .trim()
+    .min(1, "Phone number is required")
+    .regex(/^[\d\s\-()]+$/, "Phone number contains invalid characters")
+    .transform((val) => val.replace(/\D/g, '')) // Remove non-digits
+    .refine((val) => val.length >= 10, "Phone number must be at least 10 digits")
+    .refine((val) => val.length <= 15, "Phone number must be less than 15 digits"),
+  
+  // Notes & Terms
+  notes: z.string()
+    .trim()
+    .max(1000, "Notes must be less than 1000 characters")
+    .default(""),
+  agreedToTerms: z.boolean().refine((val) => val === true, {
+    message: "You must agree to the Terms and Refund Policy",
+  }),
+  honeypot: z.string().max(0, "Suspicious submission").default(""),
+});
+
+// Type inference from schema
+type BookingFormData = z.infer<typeof bookingSchema>;
 
 type PackageType = "essentialVibe" | "premiumExperience" | "vzPartyStarter" | "ultimateExperience";
 
@@ -124,35 +206,58 @@ const Booking = () => {
   });
 
   const validateStep = (stepNum: number): boolean => {
-    if (stepNum === 1) {
-      if (!formData.date || !formData.startTime || !formData.endTime || !formData.venueName || !formData.streetAddress || !formData.city || !formData.state || !formData.zipCode) {
+    try {
+      if (stepNum === 1) {
+        // Validate Step 1 fields
+        const step1Schema = bookingSchema.pick({
+          date: true,
+          startTime: true,
+          endTime: true,
+          venueName: true,
+          streetAddress: true,
+          city: true,
+          state: true,
+          zipCode: true,
+        });
+        
+        step1Schema.parse(formData);
+        
+        // Additional validation: End time must be after start time
+        if (formData.startTime >= formData.endTime) {
+          toast({
+            title: "Invalid Times",
+            description: "End time must be after start time",
+            variant: "destructive",
+          });
+          return false;
+        }
+      }
+      
+      if (stepNum === 3) {
+        // Validate Step 3 fields
+        const step3Schema = bookingSchema.pick({
+          name: true,
+          email: true,
+          phone: true,
+          agreedToTerms: true,
+        });
+        
+        step3Schema.parse(formData);
+      }
+      
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        // Show the first validation error to the user
+        const firstError = error.errors[0];
         toast({
-          title: "Missing Information",
-          description: "Please fill out all event details and address fields",
+          title: "Validation Error",
+          description: firstError.message,
           variant: "destructive",
         });
-        return false;
       }
+      return false;
     }
-    if (stepNum === 3) {
-      if (!formData.name || !formData.email || !formData.phone) {
-        toast({
-          title: "Missing Information",
-          description: "Please fill out all contact fields",
-          variant: "destructive",
-        });
-        return false;
-      }
-      if (!formData.agreedToTerms) {
-        toast({
-          title: "Terms Required",
-          description: "Please agree to the Terms and Refund Policy",
-          variant: "destructive",
-        });
-        return false;
-      }
-    }
-    return true;
   };
 
   const handleNext = () => {
