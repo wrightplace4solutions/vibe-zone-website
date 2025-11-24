@@ -146,10 +146,8 @@ serve(async (req) => {
       return sendError("Suspicious submission.", 400);
     }
 
-    // Additional validation: End time must be after start time
-    if (payload.event.startTime >= payload.event.endTime) {
-      return sendError("End time must be after start time", 400);
-    }
+    // Note: Events can span midnight (e.g., 10:00 PM to 1:00 AM next day)
+    // Both start and end times are validated by schema, no comparison needed
 
     const customer = payload.customer;
     const eventDetails = payload.event;

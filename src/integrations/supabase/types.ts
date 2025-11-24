@@ -140,60 +140,6 @@ export type Database = {
         }
         Relationships: []
       }
-      site_settings: {
-        Row: {
-          id: string
-          key: string
-          value: string
-          updated_at: string | null
-          updated_by: string | null
-        }
-        Insert: {
-          id?: string
-          key: string
-          value: string
-          updated_at?: string | null
-          updated_by?: string | null
-        }
-        Update: {
-          id?: string
-          key?: string
-          value?: string
-          updated_at?: string | null
-          updated_by?: string | null
-        }
-        Relationships: []
-      }
-      leads: {
-        Row: {
-          id: string
-          name: string
-          email: string
-          phone: string | null
-          message: string | null
-          source: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          name: string
-          email: string
-          phone?: string | null
-          message?: string | null
-          source?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          name?: string
-          email?: string
-          phone?: string | null
-          message?: string | null
-          source?: string | null
-          created_at?: string
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
