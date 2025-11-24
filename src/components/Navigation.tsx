@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Home, DollarSign, Calendar, FileText, RefreshCw, Mail, Music, BookOpen } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import vibeZoneLogo from "@/assets/vibe-zone-logo.png";
@@ -9,14 +9,14 @@ export const Navigation = () => {
   const location = useLocation();
 
   const links = [
-    { path: "/", label: "Home" },
-    { path: "/pricing", label: "Pricing" },
-    { path: "/booking", label: "Booking" },
-    { path: "/terms", label: "Terms" },
-    { path: "/refunds", label: "Refunds" },
-    { path: "/contact", label: "Contact" },
-    { path: "/vibeque", label: "VibeQue" },
-    { path: "/auth", label: "My Bookings" },
+    { path: "/", label: "Home", icon: Home },
+    { path: "/pricing", label: "Pricing", icon: DollarSign },
+    { path: "/booking", label: "Booking", icon: Calendar },
+    { path: "/terms", label: "Terms", icon: FileText },
+    { path: "/refunds", label: "Refunds", icon: RefreshCw },
+    { path: "/contact", label: "Contact", icon: Mail },
+    { path: "/vibeque", label: "VibeQue", icon: Music },
+    { path: "/auth", label: "My Bookings", icon: BookOpen },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -45,19 +45,23 @@ export const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
-            {links.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive(link.path)
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {links.map((link) => {
+              const Icon = link.icon;
+              return (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
+                    isActive(link.path)
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  {link.label}
+                </Link>
+              );
+            })}
           </div>
 
           {/* Spacer for mobile to keep logo centered */}
@@ -67,20 +71,24 @@ export const Navigation = () => {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden pb-4">
-            {links.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                onClick={() => setIsOpen(false)}
-                className={`block px-4 py-2 rounded-md text-sm font-medium ${
-                  isActive(link.path)
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {links.map((link) => {
+              const Icon = link.icon;
+              return (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  onClick={() => setIsOpen(false)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium ${
+                    isActive(link.path)
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  {link.label}
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>
