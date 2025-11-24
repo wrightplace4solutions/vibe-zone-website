@@ -13,8 +13,8 @@ const Pricing = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10"></div>
         <div className="container mx-auto max-w-5xl relative z-10">
           <div className="text-center space-y-6">
-            <Badge variant="secondary" className="mb-4">
-              <Sparkles className="w-4 h-4 mr-2" />
+            <Badge variant="secondary" className="mb-4 text-2xl px-6 py-2">
+              <Sparkles className="w-8 h-8 mr-2" />
               Professional DJ Services
             </Badge>
             <h1 className="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary animate-gradient">
