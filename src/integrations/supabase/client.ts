@@ -15,6 +15,7 @@ export const isSupabaseStub = !SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY;
 function createSupabaseOrStub() {
   if (isSupabaseStub) {
     console.error('[Supabase] VITE_SUPABASE_URL or VITE_SUPABASE_PUBLISHABLE_KEY is missing. Running in degraded mode.');
+    console.error('[Supabase] Please set these environment variables in your .env file or hosting platform.');
     const stub: any = {
       auth: {
         getSession: async () => ({ data: { session: null }, error: null }),
@@ -23,7 +24,16 @@ function createSupabaseOrStub() {
       },
       from: () => ({
         select: () => ({ eq: () => ({ single: async () => ({ data: null, error: new Error('Supabase disabled') }) }) })
-      })
+      }),
+      functions: {
+        invoke: async () => ({ 
+          data: null, 
+          error: { 
+            message: 'Supabase is not configured. Please check your environment variables (VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY).',
+            status: 500
+          } 
+        })
+      }
     };
     return stub;
   }

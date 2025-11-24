@@ -308,6 +308,17 @@ const Booking = () => {
   };
 
   const handleSubmit = async () => {
+    // Check if Supabase is configured
+    const { isSupabaseStub } = await import("@/integrations/supabase/client");
+    if (isSupabaseStub) {
+      toast({
+        title: "Configuration Error",
+        description: "Booking system is not configured. Please contact support at bookings@vzentertainment.fun",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     // Validate all fields before submission
     try {
       bookingSchema.parse(formData);
@@ -371,21 +382,30 @@ const Booking = () => {
       };
 
       const { supabase } = await import("@/integrations/supabase/client");
+      
+      console.log('Submitting booking request with payload:', payload);
+      
       const { data, error } = await supabase.functions.invoke("create-booking-hold", {
         body: payload,
       });
 
+      console.log('Booking response:', { data, error });
+
       if (error) {
+        console.error('Booking submission error:', error);
         const status = (error as { status?: number })?.status;
+        const errorMessage = error.message ?? "Unable to submit request. Please try again or contact us directly.";
+        
         toast({
-          title: status === 429 ? "Too many requests" : "Booking error",
-          description: error.message ?? "Unable to submit request. Please try again.",
+          title: status === 429 ? "Too many requests" : "Booking Error",
+          description: errorMessage,
           variant: "destructive",
         });
         return;
       }
 
       if (!data?.booking?.id) {
+        console.error('Invalid booking response - missing booking ID:', data);
         throw new Error("Missing booking response");
       }
 
@@ -397,10 +417,28 @@ const Booking = () => {
         description: "Check your email and complete the deposit to confirm.",
       });
     } catch (error) {
-      console.error("Booking error:", error);
+      console.error("Booking submission error:", error);
+      
+      let errorMessage = "Unable to submit request. Please try again or contact us directly.";
+      let errorTitle = "Booking Error";
+      
+      // Check for network errors
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        errorMessage = "Network error. Please check your internet connection and try again.";
+        errorTitle = "Connection Error";
+      }
+      // Check for other common errors
+      else if (error instanceof Error) {
+        if (error.message.includes("Missing booking response")) {
+          errorMessage = "Booking was created but we couldn't confirm it. Please contact support.";
+        } else {
+          errorMessage = error.message || errorMessage;
+        }
+      }
+      
       toast({
-        title: "Error",
-        description: "Unable to submit request. Please try again or contact us directly.",
+        title: errorTitle,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
