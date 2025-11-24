@@ -1,8 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Use the guarded supabase client so missing env vars don't crash the app.
+import { supabase } from '@/integrations/supabase/client';
 
 export async function handleStripeSuccess(sessionId: string, bookingId: string) {
   try {
