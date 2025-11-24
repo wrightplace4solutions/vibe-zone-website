@@ -23,7 +23,10 @@ function createSupabaseOrStub() {
         signInWithOtp: async () => ({ data: null, error: new Error('Supabase disabled: missing env vars') }),
       },
       from: () => ({
-        select: () => ({ eq: () => ({ single: async () => ({ data: null, error: new Error('Supabase disabled') }) }) })
+        select: () => ({ 
+          eq: () => ({ single: async () => ({ data: null, error: new Error('Supabase disabled') }) }),
+          in: () => ({ single: async () => ({ data: null, error: new Error('Supabase disabled') }) })
+        })
       }),
       functions: {
         invoke: async () => ({ 
