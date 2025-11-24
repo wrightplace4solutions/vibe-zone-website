@@ -1,6 +1,5 @@
 const Refunds = () => {
-  return (
-    <div className="min-h-screen bg-background py-12">
+  return <div className="min-h-screen bg-background py-12">
       <div className="container mx-auto px-4 max-w-4xl">
         <h1 className="text-4xl font-bold mb-6">Refund & Deposit Policy</h1>
         <p className="text-muted-foreground mb-8">
@@ -25,8 +24,8 @@ const Refunds = () => {
                 A deposit is required to secure your event date and guarantee our services. Deposit amounts vary by package:
               </p>
               <ul className="list-disc pl-6 space-y-2">
-                <li><strong>Plug-and-Play Package:</strong> $100 deposit required</li>
-                <li><strong>Full Setup + Rentals Package:</strong> $150 deposit required</li>
+                <li><strong>Plug-and-Play Package:</strong>Plug-and-Play Package: $250 deposit required</li>
+                <li><strong>Full Setup + Rentals Package:</strong>Full Setup + Rentals Package: $350 deposit required</li>
               </ul>
               <p>
                 Your date is <strong>not confirmed</strong> until the deposit is received. Once paid, your deposit 
@@ -197,8 +196,6 @@ const Refunds = () => {
           </section>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Refunds;
