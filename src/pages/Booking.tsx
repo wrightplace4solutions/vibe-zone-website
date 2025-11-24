@@ -365,6 +365,13 @@ const Booking = () => {
 
       const { supabase } = await import("@/integrations/supabase/client");
       
+        // Debug: Check if environment variables are loaded
+        console.log('Environment check:', {
+          hasSupabaseUrl: !!import.meta.env.VITE_SUPABASE_URL,
+          hasSupabaseKey: !!import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
+        });
+      
       console.log('Submitting booking request with payload:', payload);
       
       const { data, error } = await supabase.functions.invoke("create-booking-hold", {
