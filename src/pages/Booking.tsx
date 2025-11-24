@@ -301,17 +301,6 @@ const Booking = () => {
   };
 
   const handleSubmit = async () => {
-    // Check if Supabase is configured
-    const { isSupabaseStub } = await import("@/integrations/supabase/client");
-    if (isSupabaseStub) {
-      toast({
-        title: "Configuration Error",
-        description: "Booking system is not configured. Please contact support at bookings@vzentertainment.fun",
-        variant: "destructive",
-      });
-      return;
-    }
-    
     // Validate all fields before submission
     try {
       bookingSchema.parse(formData);
