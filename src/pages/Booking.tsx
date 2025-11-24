@@ -239,15 +239,8 @@ const Booking = () => {
         
         step1Schema.parse(formData);
         
-        // Additional validation: End time must be after start time
-        if (formData.startTime >= formData.endTime) {
-          toast({
-            title: "Invalid Times",
-            description: "End time must be after start time",
-            variant: "destructive",
-          });
-          return false;
-        }
+        // Note: Events can span midnight (e.g., 10:00 PM to 1:00 AM next day)
+        // No additional time validation needed - both times are validated by schema
       }
       
       if (stepNum === 3) {
