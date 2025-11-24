@@ -7,7 +7,7 @@ import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { ChatInterface } from "@/components/ChatInterface";
 import { lazy, Suspense, useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, isSupabaseStub } from "@/integrations/supabase/client";
 import { MAINTENANCE_MODE as HARDCODED_MAINTENANCE } from "@/config/maintenance";
 
 const Index = lazy(() => import("./pages/Index"));
@@ -25,6 +25,15 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const Maintenance = lazy(() => import("./pages/Maintenance"));
 
 const queryClient = new QueryClient();
+
+const SupabaseEnvBanner = ({ stub }: { stub: boolean }) => {
+  if (!stub) return null;
+  return (
+    <div className="w-full bg-yellow-500 text-black text-xs md:text-sm text-center py-2 z-50">
+      Supabase environment variables are missing. Running in limited mode (no data persistence).
+    </div>
+  );
+};
 
 const App = () => {
   const [maintenanceMode, setMaintenanceMode] = useState<boolean>(HARDCODED_MAINTENANCE);
@@ -77,6 +86,7 @@ const App = () => {
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <SupabaseEnvBanner stub={isSupabaseStub} />
             <Navigation />
             <Suspense fallback={<div className="p-6 text-foreground">Loading…</div>}>
               <Routes>
@@ -101,6 +111,7 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <SupabaseEnvBanner stub={isSupabaseStub} />
           <Navigation />
           <Suspense fallback={<div className="p-6 text-foreground">Loading…</div>}>
             <Routes>
