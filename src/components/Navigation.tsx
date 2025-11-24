@@ -12,9 +12,9 @@ export const Navigation = () => {
     { path: "/", label: "Home", icon: Home },
     { path: "/pricing", label: "Pricing", icon: DollarSign },
     { path: "/booking", label: "Booking", icon: Calendar },
+    { path: "/contact", label: "Contact", icon: Mail },
     { path: "/terms", label: "Terms", icon: FileText },
     { path: "/refunds", label: "Refunds", icon: RefreshCw },
-    { path: "/contact", label: "Contact", icon: Mail },
     { path: "/vibeque", label: "VibeQue", icon: Music },
     { path: "/auth", label: "My Bookings", icon: BookOpen },
   ];
