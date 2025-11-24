@@ -4,7 +4,10 @@ project_id = "ffikkqixlmexusrcxaov"
 verify_jwt = false
 
 [functions.check-availability]
-verify_jwt = false
+verify_jwt = true
+
+[functions.create-checkout-session]
+verify_jwt = true
 
 [functions.sync-booking-to-calendar]
 verify_jwt = true
