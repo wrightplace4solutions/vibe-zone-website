@@ -2,6 +2,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.14.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.76.1";
+import { z } from 'npm:zod@3.22.4';
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
   apiVersion: "2024-10-28.acacia",
@@ -35,6 +36,25 @@ interface RequestBody {
   notes?: string;
   bookingId?: string;
 }
+
+const requestSchema = z.object({
+  customerEmail: z.string().email(),
+  customerName: z.string().max(100),
+  customerPhone: z.string().regex(/^\d{10,15}$/),
+  packageType: z.string(),
+  eventDate: z.string(),
+  eventDetails: z.object({
+    venueName: z.string(),
+    streetAddress: z.string(),
+    city: z.string(),
+    state: z.string(),
+    zipCode: z.string(),
+    startTime: z.string(),
+    endTime: z.string(),
+  }).optional(),
+  notes: z.string().optional(),
+  bookingId: z.string().optional(),
+});
 
 const PACKAGES = {
   option1: {
@@ -76,6 +96,9 @@ serve(async (req) => {
   }
 
   try {
+    const rawData = await req.json();
+    const validatedData = requestSchema.parse(rawData);
+    
     const {
       packageType,
       customerEmail,
@@ -85,7 +108,7 @@ serve(async (req) => {
       eventDetails,
       notes,
       bookingId,
-    }: RequestBody = await req.json();
+    } = validatedData;
 
     let selectedPackage = PACKAGES[packageType as keyof typeof PACKAGES];
     const origin = req.headers.get("origin") || "https://vzentertainment.fun";
