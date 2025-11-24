@@ -26,7 +26,8 @@ export const PACKAGES = {
     includes: [
       "1 Wireless microphone",
       "15-minute pre-event music consultation call",
-      "Line dance and trail ride music specialty"
+      "Line dance and trail ride music specialty",
+      "Vibe Que Interactive DJ App access"
     ],
     bestFor: "Intimate gatherings at venues, small corporate events, church gatherings (up to 50 guests)"
   },
@@ -40,7 +41,8 @@ export const PACKAGES = {
     includes: [
       "1 Wireless microphone",
       "Dedicated planning session (virtually or in-person)",
-      "Line dance and trail ride music specialty"
+      "Line dance and trail ride music specialty",
+      "Vibe Que Interactive DJ App access"
     ],
     bestFor: "Medium-sized events at various venues, longer celebrations, church events (50-100 guests)"
   },
