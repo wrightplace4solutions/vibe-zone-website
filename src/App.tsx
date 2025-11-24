@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { ChatInterface } from "@/components/ChatInterface";
@@ -25,6 +25,17 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const Maintenance = lazy(() => import("./pages/Maintenance"));
 
 const queryClient = new QueryClient();
+
+// Component to scroll to top on route change
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+};
 
 const SupabaseEnvBanner = ({ stub }: { stub: boolean }) => {
   if (!stub) return null;
@@ -86,6 +97,7 @@ const App = () => {
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <ScrollToTop />
             <SupabaseEnvBanner stub={isSupabaseStub} />
             <Navigation />
             <Suspense fallback={<div className="p-6 text-foreground">Loading…</div>}>
@@ -111,6 +123,7 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop />
           <SupabaseEnvBanner stub={isSupabaseStub} />
           <Navigation />
           <Suspense fallback={<div className="p-6 text-foreground">Loading…</div>}>

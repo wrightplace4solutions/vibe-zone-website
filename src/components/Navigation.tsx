@@ -25,6 +25,16 @@ export const Navigation = () => {
     <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
+          {/* Mobile Menu Button - Left Side */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </Button>
+
           <Link to="/" className="flex items-center space-x-2">
             <img 
               src={vibeZoneLogo} 
@@ -50,15 +60,8 @@ export const Navigation = () => {
             ))}
           </div>
 
-          {/* Mobile Menu Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </Button>
+          {/* Spacer for mobile to keep logo centered */}
+          <div className="w-10 md:hidden"></div>
         </div>
 
         {/* Mobile Navigation */}
