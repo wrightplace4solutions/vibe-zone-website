@@ -61,10 +61,7 @@ serve(async (req) => {
         // TODO: Send notification emails to both client and business owner
         // This would typically use a service like SendGrid, Resend, or AWS SES
         // For now, we'll just log the notification
-        console.log(`Notification needed for expired booking ${booking.id}:`);
-        console.log(`  - Client: ${booking.customer_name} (${booking.customer_email})`);
-        console.log(`  - Event: ${booking.event_type} on ${booking.event_date}`);
-        console.log(`  - Created: ${booking.created_at}`);
+        console.log(`Notification needed for expired booking: booking_id=${booking.id}, event_date=${booking.event_date}, status=expired`);
 
         // Here you would send emails:
         // await sendEmailToClient(booking);
@@ -73,8 +70,8 @@ serve(async (req) => {
         results.push({
           booking_id: booking.id,
           success: true,
-          customer_email: booking.customer_email,
           event_date: booking.event_date,
+          status: 'expired',
         });
       } catch (error) {
         console.error(`Error processing booking ${booking.id}:`, error);

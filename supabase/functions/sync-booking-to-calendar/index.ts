@@ -179,11 +179,11 @@ serve(async (req) => {
     }
 
     if (!roleData) {
-      console.error("User does not have admin role:", user.email);
+      console.error("User does not have admin role: user_id:", user.id);
       throw new Error("Unauthorized: Admin access required");
     }
 
-    console.log("Admin user authenticated:", user.email);
+    console.log("Admin user authenticated: user_id:", user.id);
 
     const { bookingId } = await req.json();
 
