@@ -2,7 +2,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.14.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.76.1";
-import { z } from 'npm:zod@3.22.4';
+import { z } from "https://esm.sh/zod@3.22.4";
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
   apiVersion: "2024-10-28.acacia",
