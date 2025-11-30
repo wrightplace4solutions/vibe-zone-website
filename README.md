@@ -64,6 +64,19 @@ This project is built with:
 
 Simply open [Lovable](https://lovable.dev/projects/503cec89-12da-47b7-b65c-89d7a16c70a0) and click on Share -> Publish.
 
+## Environment Variables
+
+For local development and external hosting (e.g. Vercel or Netlify) you must provide Supabase and any feature keys. Copy `.env.example` to `.env` and fill in real values:
+
+```
+VITE_SUPABASE_URL=https://<project-ref>.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+VITE_PUBLIC_SITE_URL=https://vzentertainment.fun
+VITE_STRIPE_PUBLISHABLE_KEY=pk_test_or_live_key (optional)
+```
+
+Do not commit real secrets (service role key, Stripe secret, Google credentials). Those stay in hosting platform or Supabase secrets.
+
 ## Can I connect a custom domain to my Lovable project?
 
 Yes, you can!
