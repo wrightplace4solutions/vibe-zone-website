@@ -184,7 +184,8 @@ export default function MyBookings() {
                     <div className="pt-2">
                       <SpecialRequestForm 
                         bookingId={booking.id} 
-                        userId={booking.user_id} 
+                        userId={booking.user_id}
+                        eventDate={booking.event_date}
                       />
                     </div>
                   )}

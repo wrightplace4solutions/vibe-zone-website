@@ -29,6 +29,7 @@ CREATE POLICY "Users can create requests for own bookings"
       SELECT 1 FROM public.bookings
       WHERE bookings.id = booking_requests.booking_id
       AND bookings.user_id = auth.uid()
+      AND bookings.event_date > (CURRENT_DATE + INTERVAL '14 days')
     )
   );
 

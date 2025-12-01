@@ -24,9 +24,10 @@ import { Loader2, MessageSquarePlus } from "lucide-react";
 interface SpecialRequestFormProps {
   bookingId: string;
   userId: string;
+  eventDate: string;
 }
 
-export const SpecialRequestForm = ({ bookingId, userId }: SpecialRequestFormProps) => {
+export const SpecialRequestForm = ({ bookingId, userId, eventDate }: SpecialRequestFormProps) => {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -35,8 +36,24 @@ export const SpecialRequestForm = ({ bookingId, userId }: SpecialRequestFormProp
     description: "",
   });
 
+  // Check if event is more than 14 days away
+  const eventDateObj = new Date(eventDate);
+  const today = new Date();
+  const daysUntilEvent = Math.ceil((eventDateObj.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  const canAddRequest = daysUntilEvent > 14;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!canAddRequest) {
+      toast({
+        title: "Request Deadline Passed",
+        description: "Special requests must be submitted at least 14 days before the event.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -60,15 +77,30 @@ export const SpecialRequestForm = ({ bookingId, userId }: SpecialRequestFormProp
       setOpen(false);
     } catch (error: any) {
       console.error("Error submitting request:", error);
+      
+      let errorMessage = "Failed to submit request. Please try again.";
+      if (error.message?.includes("event_date")) {
+        errorMessage = "Special requests must be submitted at least 14 days before the event.";
+      }
+      
       toast({
         title: "Error",
-        description: error.message || "Failed to submit request. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
       setLoading(false);
     }
   };
+
+  if (!canAddRequest) {
+    return (
+      <Button variant="outline" size="sm" disabled>
+        <MessageSquarePlus className="mr-2 h-4 w-4" />
+        Request Deadline Passed
+      </Button>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -83,6 +115,7 @@ export const SpecialRequestForm = ({ bookingId, userId }: SpecialRequestFormProp
           <DialogTitle>Add Special Request</DialogTitle>
           <DialogDescription>
             Submit song requests, equipment needs, or other special requests for your event.
+            Must be submitted at least 14 days before your event date.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
