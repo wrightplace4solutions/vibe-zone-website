@@ -24,3 +24,9 @@ verify_jwt = true
 
 [functions.check-expired-holds]
 verify_jwt = true
+
+[functions.send-reminders]
+# Temporarily disable JWT verification for easier testing of reminder processing.
+# WARNING: This makes the function publicly callable; consider re-enabling or
+# adding a shared secret header before production use.
+verify_jwt = false
