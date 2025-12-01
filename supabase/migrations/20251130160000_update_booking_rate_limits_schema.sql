@@ -16,18 +16,13 @@ create index idx_rate_limits_ip on public.booking_rate_limits (ip_hash, created_
 alter table public.booking_rate_limits enable row level security;
 
 -- Allow service role to manage (edge functions use service role key)
-do $$
-begin
-  if not exists (
-    select 1 from pg_policies 
-    where policyname = 'Service role can manage rate limits'
-      and schemaname = 'public' 
-      and tablename = 'booking_rate_limits'
-  ) then
-    create policy "Service role can manage rate limits"
-      on public.booking_rate_limits
-      for all
-      using (true)
-      with check (true);
-  end if;
-end $$;
+-- Drop existing policy if it exists
+drop policy if exists "Service role can manage rate limits" on public.booking_rate_limits;
+
+-- Create policy that only allows service role access
+create policy "Service role can manage rate limits"
+  on public.booking_rate_limits
+  for all
+  to service_role
+  using (true)
+  with check (true);
