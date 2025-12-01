@@ -60,7 +60,18 @@ serve(async (req) => {
       .lte("scheduled_for", new Date().toISOString())
       .limit(50);
 
-    if (fetchError) throw fetchError;
+    if (fetchError) {
+      console.error("Reminders fetch error", fetchError);
+      return new Response(
+        JSON.stringify({
+          debug: true,
+          stage: "fetch_reminders",
+          error: fetchError.message,
+          details: fetchError
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+      );
+    }
 
     if (!reminders || reminders.length === 0) {
       return new Response(
@@ -156,8 +167,9 @@ serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {
+    console.error("Unhandled send-reminders error", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error.message, stack: error.stack }),
       { 
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" }
