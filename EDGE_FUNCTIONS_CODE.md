@@ -26,8 +26,29 @@ const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
 
 const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET") || "";
 
-const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
-const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+---
+
+## Testing Cron Guard
+
+Use `curl` to verify the guard:
+
+```bash
+# Unauthorized (no header)
+curl -i https://<project-ref>.functions.supabase.co/check-expired-holds
+
+# Authorized with header
+curl -i \
+  -H "x-cron-secret: $CRON_SECRET" \
+  https://<project-ref>.functions.supabase.co/check-expired-holds
+
+# For send-reminders
+curl -i \
+  -H "x-cron-secret: $CRON_SECRET" \
+  https://<project-ref>.functions.supabase.co/send-reminders
+```
+
+Replace `<project-ref>` with your Supabase project ref.
+
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 serve(async (req) => {
