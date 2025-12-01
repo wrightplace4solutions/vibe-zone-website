@@ -35,6 +35,11 @@ serve(async (req) => {
   }
 
   try {
+    const CRON_SECRET = Deno.env.get('CRON_SECRET');
+    const authHeader = req.headers.get('x-cron-secret');
+    if (CRON_SECRET && authHeader !== CRON_SECRET) {
+      return new Response('Unauthorized', { status: 401 });
+    }
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     // Get pending reminders that are due
