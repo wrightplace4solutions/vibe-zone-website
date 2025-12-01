@@ -1,3 +1,8 @@
+// @ts-nocheck
+// This edge function runs on Deno in Supabase. VS Code's default TypeScript
+// checker (configured for the Vite/Node project) doesn't understand Deno URL
+// imports or the global `Deno` type. The directive above disables TS checking
+// for this file in the editor while keeping deploys working via the Supabase CLI.
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { SmtpClient } from "https://deno.land/x/smtp@v0.7.0/mod.ts";
