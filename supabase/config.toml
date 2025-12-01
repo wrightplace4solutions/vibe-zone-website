@@ -1,21 +1,6 @@
 project_id = "gvxkuawokdamfytfoiqy"
 
-# Default CORS for all functions
-[cors]
-allowed_origins = [
-	"https://vzentertainment.fun",
-	"https://www.vzentertainment.fun",
-	"http://localhost:5173"
-]
-allowed_headers = [
-	"authorization",
-	"content-type",
-	"x-client-info",
-	"x-requested-with"
-]
-methods = ["GET", "POST", "OPTIONS"]
-max_age = 86400
-
+# Function-level JWT verification settings
 [functions.chat]
 verify_jwt = true
 
@@ -30,9 +15,6 @@ verify_jwt = true
 
 [functions.stripe-webhook]
 verify_jwt = false
-[functions.stripe-webhook.cors]
-allowed_origins = ["*"]
-methods = ["POST", "OPTIONS"]
 
 [functions.create-booking-hold]
 verify_jwt = true
