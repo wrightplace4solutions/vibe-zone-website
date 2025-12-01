@@ -60,6 +60,11 @@ Your Edge Functions are ready to go when Supabase enables deployment:
 - ✅ All secrets configured in Supabase
 - ✅ Stripe webhook endpoint created
 
+### Checklist Updates
+- ✅ `CRON_SECRET` set in Supabase Secrets
+- ✅ Scheduler calls include header `x-cron-secret: <your CRON_SECRET>`
+- ✅ Database migration applied for `booking_rate_limits` table, indexes, and RLS policy
+
 ---
 
 ## Next Steps - Choose One:
