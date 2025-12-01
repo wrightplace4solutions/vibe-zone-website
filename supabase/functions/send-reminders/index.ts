@@ -1,8 +1,17 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { SmtpClient } from "https://deno.land/x/smtp@v0.7.0/mod.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+// SMTP / Email environment variables (Zoho or other provider)
+const SMTP_HOST = Deno.env.get("SMTP_HOST");
+const SMTP_PORT = Deno.env.get("SMTP_PORT"); // string, will parse to number
+const SMTP_USER = Deno.env.get("SMTP_USER");
+const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD");
+const EMAIL_FROM = Deno.env.get("EMAIL_FROM") || SMTP_USER; // fallback
+const EMAIL_REPLY_TO = Deno.env.get("EMAIL_REPLY_TO") || EMAIL_FROM;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -55,7 +64,7 @@ serve(async (req) => {
       );
     }
 
-    const results = [];
+    const results: Array<Record<string, unknown>> = [];
 
     for (const reminder of reminders) {
       try {
@@ -80,22 +89,42 @@ serve(async (req) => {
           user
         );
 
-        // Here you would integrate with your email service (SendGrid, Resend, etc.)
-        // For now, we'll mark as sent and log
-        console.log("Sending email:", emailContent);
+        let sendStatus: 'sent' | 'skipped' | 'failed' = 'sent';
+        let errorMessage: string | null = null;
+
+        if (SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASSWORD && EMAIL_FROM) {
+          try {
+            await sendEmailViaSMTP({
+              to: emailContent.to,
+              subject: emailContent.subject,
+              html: emailContent.html,
+            });
+          } catch (sendErr: any) {
+            console.error("SMTP send error:", sendErr);
+            sendStatus = 'failed';
+            errorMessage = sendErr?.message || 'SMTP send failed';
+          }
+        } else {
+          // Missing SMTP config, mark as skipped (still update reminder?)
+          console.warn("SMTP env vars missing; marking reminder as skipped.");
+          sendStatus = 'skipped';
+          errorMessage = 'SMTP configuration missing';
+        }
 
         await supabase
           .from("reminders")
           .update({ 
-            status: "sent", 
-            sent_at: new Date().toISOString() 
+            status: sendStatus === 'sent' ? 'sent' : 'failed', 
+            sent_at: sendStatus === 'sent' ? new Date().toISOString() : null,
+            error_message: sendStatus === 'failed' ? errorMessage : null
           })
           .eq("id", reminder.id);
 
         results.push({ 
           reminderId: reminder.id, 
-          status: "sent", 
-          email 
+          status: sendStatus, 
+          email,
+          error: errorMessage
         });
       } catch (error: any) {
         await supabase
@@ -151,68 +180,90 @@ function generateEmailContent(
       return {
         to: user.email,
         subject: "Your Event is in 3 Days! 🎵",
-        html: `
-          <h2>Hi ${name}!</h2>
-          <p>Just a friendly reminder that your event is coming up in 3 days.</p>
-          <p><strong>Event Details:</strong></p>
+        html: `<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;line-height:1.5;">
+          <h2 style="color:#6d28d9;">Hi ${name}!</h2>
+          <p>Just a friendly reminder that your event is coming up in <strong>3 days</strong>.</p>
+          <p style="margin-top:16px;font-weight:bold;">Event Details:</p>
           <ul>
-            <li>Date: ${eventDate}</li>
-            <li>Time: ${eventTime}</li>
-            <li>Type: ${booking.event_type}</li>
+            <li><strong>Date:</strong> ${eventDate}</li>
+            <li><strong>Time:</strong> ${eventTime}</li>
+            <li><strong>Type:</strong> ${booking.event_type}</li>
           </ul>
           <p>If you have any special requests or changes, please let us know ASAP!</p>
-          <p>See you soon! #LETSWORK</p>
-        `,
+          <p style="margin-top:24px;">See you soon! <em>#LETSWORK</em></p>
+        </body></html>`,
       };
 
     case "24h_before":
       return {
         to: user.email,
         subject: "Tomorrow's the Big Day! 🎉",
-        html: `
-          <h2>Hi ${name}!</h2>
-          <p>Your event is tomorrow! We're excited to make it unforgettable.</p>
-          <p><strong>Event Details:</strong></p>
+        html: `<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;line-height:1.5;">
+          <h2 style="color:#6d28d9;">Hi ${name}!</h2>
+          <p>Your event is <strong>tomorrow</strong>! We're excited to make it unforgettable.</p>
+          <p style="margin-top:16px;font-weight:bold;">Event Details:</p>
           <ul>
-            <li>Date: ${eventDate}</li>
-            <li>Time: ${eventTime}</li>
-            <li>Type: ${booking.event_type}</li>
+            <li><strong>Date:</strong> ${eventDate}</li>
+            <li><strong>Time:</strong> ${eventTime}</li>
+            <li><strong>Type:</strong> ${booking.event_type}</li>
           </ul>
           <p>We'll see you tomorrow! Get ready to party! 🎊</p>
-        `,
+        </body></html>`,
       };
 
     case "day_of":
       return {
         to: user.email,
         subject: "Today's the Day! 🎵",
-        html: `
-          <h2>Hi ${name}!</h2>
+        html: `<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;line-height:1.5;">
+          <h2 style="color:#6d28d9;">Hi ${name}!</h2>
           <p>Good morning! Today's your event!</p>
-          <p><strong>Event Details:</strong></p>
+          <p style="margin-top:16px;font-weight:bold;">Event Details:</p>
           <ul>
-            <li>Date: ${eventDate}</li>
-            <li>Time: ${eventTime}</li>
-            <li>Type: ${booking.event_type}</li>
+            <li><strong>Date:</strong> ${eventDate}</li>
+            <li><strong>Time:</strong> ${eventTime}</li>
+            <li><strong>Type:</strong> ${booking.event_type}</li>
           </ul>
           <p>We're all set and ready to make this amazing. See you soon!</p>
-        `,
+        </body></html>`,
       };
 
     default:
       return {
         to: user.email,
         subject: "Event Reminder from VZ Entertainment",
-        html: `
-          <h2>Hi ${name}!</h2>
+        html: `<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;line-height:1.5;">
+          <h2 style="color:#6d28d9;">Hi ${name}!</h2>
           <p>This is a reminder about your upcoming event.</p>
-          <p><strong>Event Details:</strong></p>
+          <p style="margin-top:16px;font-weight:bold;">Event Details:</p>
           <ul>
-            <li>Date: ${eventDate}</li>
-            <li>Time: ${eventTime}</li>
-            <li>Type: ${booking.event_type}</li>
+            <li><strong>Date:</strong> ${eventDate}</li>
+            <li><strong>Time:</strong> ${eventTime}</li>
+            <li><strong>Type:</strong> ${booking.event_type}</li>
           </ul>
-        `,
+        </body></html>`,
       };
   }
+}
+
+async function sendEmailViaSMTP({ to, subject, html }: { to: string; subject: string; html: string }) {
+  if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASSWORD || !EMAIL_FROM) {
+    throw new Error('Missing SMTP configuration');
+  }
+  const port = Number(SMTP_PORT);
+  const client = new SmtpClient();
+  // Prefer STARTTLS on 587; if using 465 use connectTLS
+  if (port === 465) {
+    await client.connectTLS({ hostname: SMTP_HOST, port, username: SMTP_USER, password: SMTP_PASSWORD });
+  } else {
+    await client.connect({ hostname: SMTP_HOST, port, username: SMTP_USER, password: SMTP_PASSWORD });
+  }
+  await client.send({
+    from: EMAIL_FROM,
+    to,
+    subject,
+    content: html,
+    headers: EMAIL_REPLY_TO ? { 'Reply-To': EMAIL_REPLY_TO } : undefined,
+  });
+  await client.close();
 }
