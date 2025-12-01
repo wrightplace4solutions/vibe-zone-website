@@ -31,7 +31,14 @@ const AdminDashboard = () => {
       return;
     }
 
-    const isAdminUser = user.user_metadata?.is_admin === true;
+    const { data: roleData } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
+      .single();
+
+    const isAdminUser = !!roleData;
     setIsAdmin(isAdminUser);
 
     if (!isAdminUser) {
