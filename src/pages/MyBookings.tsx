@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Loader2, Calendar, MapPin, LogOut } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { SpecialRequestForm } from '@/components/SpecialRequestForm';
 
 interface Booking {
   id: string;
@@ -22,6 +23,7 @@ interface Booking {
   created_at: string;
   customer_name: string;
   notes?: string;
+  user_id?: string;
 }
 
 export default function MyBookings() {
@@ -49,6 +51,8 @@ export default function MyBookings() {
 
   const loadBookings = async (email: string) => {
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
       const { data, error } = await supabase
         .from('bookings')
         .select('*')
@@ -172,6 +176,16 @@ export default function MyBookings() {
                   {booking.notes && (
                     <div className="bg-muted p-3 rounded-md text-sm">
                       <strong>Notes:</strong> {booking.notes}
+                    </div>
+                  )}
+
+                  {/* Special Request Button */}
+                  {booking.user_id && booking.status !== 'cancelled' && (
+                    <div className="pt-2">
+                      <SpecialRequestForm 
+                        bookingId={booking.id} 
+                        userId={booking.user_id} 
+                      />
                     </div>
                   )}
 
