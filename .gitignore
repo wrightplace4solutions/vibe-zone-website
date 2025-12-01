@@ -12,6 +12,12 @@ dist
 dist-ssr
 *.local
 
+# Supabase temp artifacts (CLI)
+supabase/.temp/
+
+# Supabase function build outputs (if any local build cache)
+supabase/functions/**/dist/
+
 # Environment variables
 .env
 .env.local
