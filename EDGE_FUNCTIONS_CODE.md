@@ -145,6 +145,20 @@ const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 serve(async (req) => {
+  const CRON_SECRET = Deno.env.get('CRON_SECRET');
+  const authHeader = req.headers.get('x-cron-secret');
+  if (CRON_SECRET && authHeader !== CRON_SECRET) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  const CRON_SECRET = Deno.env.get('CRON_SECRET');
+  const authHeader = req.headers.get('x-cron-secret');
+  if (CRON_SECRET && authHeader !== CRON_SECRET) {
+    return new Response('Unauthorized', { status: 401 });
+  }
   try {
     console.log("Checking for expired booking holds...");
 

@@ -85,6 +85,50 @@ After deployment, you need to update your Stripe checkout to redirect to your li
 
 ---
 
+## 🔐 Supabase Secrets
+
+Add the following secrets in Supabase → Project Settings → Secrets (server-side for edge functions):
+
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `GOOGLE_CALENDAR_CLIENT_ID`
+- `GOOGLE_CALENDAR_CLIENT_SECRET`
+- `GOOGLE_CALENDAR_REFRESH_TOKEN`
+- `CRON_SECRET` (required by scheduled edge functions; pass as `x-cron-secret` header)
+
+---
+
+## 🗄️ Database Migrations
+
+Run migrations to create tables and policies:
+
+```powershell
+cd "vibe-zone-website/supabase"
+supabase db push
+```
+
+Key additions:
+
+- `booking_rate_limits` table with indexes on `(email, created_at)` and `(ip_hash, created_at)` and RLS enabled.
+- Policy: "Service role can manage rate limits" for `booking_rate_limits`.
+
+---
+
+## ⏱️ Scheduled Jobs
+
+Configure scheduled invocations for:
+
+- `check-expired-holds`
+- `send-reminders`
+
+Add header `x-cron-secret: <your CRON_SECRET>` to each scheduled request so functions authorize the call.
+
+If using external cron, point to the Supabase function endpoint URLs.
+
+---
+
 ## 📋 Testing Checklist
 
 After deployment, test these:

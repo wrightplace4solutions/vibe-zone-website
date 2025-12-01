@@ -80,6 +80,7 @@ supabase secrets set GOOGLE_CALENDAR_CLIENT_ID=your_google_client_id
 supabase secrets set GOOGLE_CALENDAR_CLIENT_SECRET=your_google_client_secret
 supabase secrets set GOOGLE_CALENDAR_REFRESH_TOKEN=your_google_refresh_token
 
+# CRON_SECRET (used by scheduled edge functions; send as `x-cron-secret`)
 # Verify secrets are set
 supabase secrets list
 ```
@@ -94,6 +95,15 @@ VITE_SUPABASE_PUBLISHABLE_KEY=your_anon_public_key
 VITE_SUPABASE_PROJECT_ID=your_project_ref
 ```
 
+### Booking Rate Limits
+
+This project includes a `booking_rate_limits` table used to track booking attempts for rate limiting:
+
+- Table: `public.booking_rate_limits`
+- Indexes: `idx_rate_limits_email (email, created_at)`, `idx_rate_limits_ip (ip_hash, created_at)`
+- RLS enabled, with policy: "Service role can manage rate limits"
+
+Client-side booking submission logs a non-blocking insert into this table with the user's email and a SHA-256 fingerprint of `navigator.userAgent` as `ip_hash`. For stronger security, consider server-side logging in the `create-booking-hold` function using the request IP.
 Get these from: Supabase Dashboard → Settings → API
 
 ### 7. Set Up Stripe Webhook
