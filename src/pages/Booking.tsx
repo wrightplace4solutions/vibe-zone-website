@@ -340,6 +340,27 @@ const Booking = () => {
     setIsSubmitting(true);
 
     try {
+      // Non-blocking: log booking attempt for rate limiting
+      try {
+        const emailForRateLimit = formData.email || "";
+        const encoder = new TextEncoder();
+        const fingerprintSource = `${navigator.userAgent}`;
+        const digest = await crypto.subtle.digest(
+          "SHA-256",
+          encoder.encode(fingerprintSource)
+        );
+        const hashArray = Array.from(new Uint8Array(digest));
+        const ipHash = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+
+        if (emailForRateLimit) {
+          const { supabase } = await import("@/integrations/supabase/client");
+          await supabase
+            .from("booking_rate_limits")
+            .insert({ email: emailForRateLimit, ip_hash: ipHash });
+        }
+      } catch (e) {
+        console.warn("Rate limit logging failed (non-blocking):", e);
+      }
       const eventDate = formData.date ? format(formData.date, "yyyy-MM-dd") : "";
       const payload = {
         packageType: formData.package,
