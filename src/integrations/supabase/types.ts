@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      booking_rate_limits: {
+        Row: {
+          created_at: string
+          id: string
+          identifier: string
+          request_count: number
+          window_start: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          identifier: string
+          request_count?: number
+          window_start?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          identifier?: string
+          request_count?: number
+          window_start?: string
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           city: string | null
