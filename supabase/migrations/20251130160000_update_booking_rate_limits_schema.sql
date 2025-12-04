@@ -1,3 +1,4 @@
+-- language: postgresql
 -- Update booking_rate_limits table schema
 -- This migration ensures proper RLS policies for edge function access
 
