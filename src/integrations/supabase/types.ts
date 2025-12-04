@@ -60,6 +60,7 @@ export type Database = {
           id: string
           notes: string | null
           package_type: string | null
+          reminder_sent_at: string | null
           service_tier: string
           start_time: string | null
           state: string | null
@@ -87,6 +88,7 @@ export type Database = {
           id?: string
           notes?: string | null
           package_type?: string | null
+          reminder_sent_at?: string | null
           service_tier: string
           start_time?: string | null
           state?: string | null
@@ -114,6 +116,7 @@ export type Database = {
           id?: string
           notes?: string | null
           package_type?: string | null
+          reminder_sent_at?: string | null
           service_tier?: string
           start_time?: string | null
           state?: string | null
