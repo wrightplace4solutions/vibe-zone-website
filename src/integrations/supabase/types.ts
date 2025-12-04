@@ -17,22 +17,28 @@ export type Database = {
       booking_rate_limits: {
         Row: {
           created_at: string
+          email: string | null
           id: string
           identifier: string
+          ip_hash: string | null
           request_count: number
           window_start: string
         }
         Insert: {
           created_at?: string
+          email?: string | null
           id?: string
           identifier: string
+          ip_hash?: string | null
           request_count?: number
           window_start?: string
         }
         Update: {
           created_at?: string
+          email?: string | null
           id?: string
           identifier?: string
+          ip_hash?: string | null
           request_count?: number
           window_start?: string
         }
