@@ -21,6 +21,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { z } from 'zod';
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 
 // Comprehensive validation schema
 const bookingSchema = z.object({
@@ -588,17 +589,28 @@ const Booking = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="streetAddress">Street Address *</Label>
-                <Input
-                  ref={streetAddressRef}
+                <AddressAutocomplete
                   id="streetAddress"
-                  placeholder="e.g., 123 Main Street"
+                  placeholder="Start typing an address..."
                   value={formData.streetAddress}
-                  onChange={(e) => setFormData({ ...formData, streetAddress: e.target.value })}
-                  onBlur={(e) => {
-                    if (e.target.value.trim()) focusNext(cityRef);
+                  onChange={(value) => setFormData({ ...formData, streetAddress: value })}
+                  onAddressSelect={(components) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      streetAddress: components.streetAddress,
+                      city: components.city,
+                      state: components.state,
+                      zipCode: components.zipCode,
+                    }));
+                    // Auto-focus next field after address selection
+                    if (components.streetAddress) {
+                      setTimeout(() => nameRef.current?.focus(), 100);
+                    }
                   }}
-                  className="w-full"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Select an address from the dropdown to auto-fill city, state, and ZIP
+                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -645,7 +657,6 @@ const Booking = () => {
                   onChange={(e) => {
                     const val = e.target.value.replace(/\D/g, '');
                     setFormData({ ...formData, zipCode: val });
-                    // ZIP complete - user can click Next
                   }}
                   className="w-full"
                 />
