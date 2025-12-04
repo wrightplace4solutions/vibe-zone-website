@@ -273,11 +273,13 @@ const Booking = () => {
   const handleNext = () => {
     if (validateStep(step)) {
       setStep(step + 1);
+      window.scrollTo(0, 0);
     }
   };
 
   const handleBack = () => {
     setStep(step - 1);
+    window.scrollTo(0, 0);
   };
 
   const formatTimeTo12Hour = (time24: string): string => {
