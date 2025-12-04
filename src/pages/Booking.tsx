@@ -630,10 +630,10 @@ const Booking = () => {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="state">State *</Label>
-                  <Input
+                <Input
                     ref={stateRef}
                     id="state"
-                    placeholder="TX"
+                    placeholder="e.g., VA"
                     maxLength={2}
                     value={formData.state}
                     onChange={(e) => {
