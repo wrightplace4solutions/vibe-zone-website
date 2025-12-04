@@ -577,7 +577,7 @@ const Booking = () => {
                 <Input
                   ref={venueNameRef}
                   id="venueName"
-                  placeholder="e.g., Community Center, Smith Residence"
+                  placeholder="e.g., Church, Community Center, Business Name"
                   value={formData.venueName}
                   onChange={(e) => setFormData({ ...formData, venueName: e.target.value })}
                   onBlur={(e) => {
