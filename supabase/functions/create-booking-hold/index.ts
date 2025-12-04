@@ -1,11 +1,15 @@
 // @ts-nocheck - Edge function executed in Deno runtime
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.76.1";
+import { Resend } from "https://esm.sh/resend@2.0.0";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const BUSINESS_EMAIL = "dcn8tve2@yahoo.com";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -121,6 +125,161 @@ const sendError = (message: string, status = 400) =>
     headers: { ...corsHeaders, "Content-Type": "application/json" },
     status,
   });
+
+const formatTimeDisplay = (time: string) => {
+  if (!time) return "TBD";
+  const [hours, minutes] = time.split(":");
+  const hour = parseInt(hours);
+  const ampm = hour >= 12 ? "PM" : "AM";
+  const displayHour = hour % 12 || 12;
+  return `${displayHour}:${minutes} ${ampm}`;
+};
+
+const formatDateDisplay = (dateStr: string) => {
+  const date = new Date(dateStr + "T00:00:00");
+  return date.toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
+
+const sendHoldEmails = async (booking: any, packageName: string) => {
+  const expirationDate = new Date();
+  expirationDate.setHours(expirationDate.getHours() + 72);
+  const expirationStr = expirationDate.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+
+  const customerEmailHtml = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+        .details { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .warning { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; }
+        .cta { text-align: center; margin: 30px 0; }
+        .button { background: #f59e0b; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; }
+        .footer { text-align: center; color: #666; font-size: 12px; margin-top: 30px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>🎵 Your Date is Reserved!</h1>
+          <p>VZ Entertainment DJ Services</p>
+        </div>
+        <div class="content">
+          <p>Hi ${booking.customer_name},</p>
+          <p>Great news! We've reserved <strong>${formatDateDisplay(booking.event_date)}</strong> for your event. Your reservation is being held for the next <strong>72 hours</strong>.</p>
+          
+          <div class="warning">
+            <strong>⏰ Important:</strong> This reservation will expire on <strong>${expirationStr}</strong> if payment is not received. Complete your deposit payment to confirm your booking.
+          </div>
+          
+          <div class="details">
+            <h3>Reservation Details</h3>
+            <div class="detail-row"><span>Event Date:</span><strong>${formatDateDisplay(booking.event_date)}</strong></div>
+            <div class="detail-row"><span>Time:</span><strong>${formatTimeDisplay(booking.start_time)} - ${formatTimeDisplay(booking.end_time)}</strong></div>
+            <div class="detail-row"><span>Venue:</span><strong>${booking.venue_name}</strong></div>
+            <div class="detail-row"><span>Address:</span><strong>${booking.street_address}, ${booking.city}, ${booking.state} ${booking.zip_code}</strong></div>
+            <div class="detail-row"><span>Package:</span><strong>${packageName}</strong></div>
+            <div class="detail-row"><span>Total:</span><strong>$${booking.total_amount}</strong></div>
+            <div class="detail-row"><span>Deposit Due:</span><strong>$${booking.deposit_amount}</strong></div>
+          </div>
+          
+          <p>Once your deposit is received, your event will be automatically added to our calendar and you'll receive a confirmation email.</p>
+          
+          <div class="footer">
+            <p>Questions? Reply to this email or visit vzentertainment.fun</p>
+            <p>© ${new Date().getFullYear()} VZ Entertainment. All rights reserved.</p>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const businessEmailHtml = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #1f2937; color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+        .details { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .status { background: #fef3c7; color: #92400e; padding: 10px 20px; border-radius: 20px; display: inline-block; font-weight: bold; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>New Booking Hold</h1>
+          <span class="status">⏳ Awaiting Payment</span>
+        </div>
+        <div class="content">
+          <p>A new reservation has been submitted and is awaiting payment.</p>
+          
+          <div class="details">
+            <h3>Customer Information</h3>
+            <p><strong>Name:</strong> ${booking.customer_name}</p>
+            <p><strong>Email:</strong> ${booking.customer_email}</p>
+            <p><strong>Phone:</strong> ${booking.customer_phone}</p>
+          </div>
+          
+          <div class="details">
+            <h3>Event Details</h3>
+            <p><strong>Date:</strong> ${formatDateDisplay(booking.event_date)}</p>
+            <p><strong>Time:</strong> ${formatTimeDisplay(booking.start_time)} - ${formatTimeDisplay(booking.end_time)}</p>
+            <p><strong>Venue:</strong> ${booking.venue_name}</p>
+            <p><strong>Address:</strong> ${booking.street_address}, ${booking.city}, ${booking.state} ${booking.zip_code}</p>
+            <p><strong>Package:</strong> ${packageName}</p>
+            <p><strong>Total:</strong> $${booking.total_amount}</p>
+            <p><strong>Deposit:</strong> $${booking.deposit_amount}</p>
+            ${booking.notes ? `<p><strong>Notes:</strong> ${booking.notes}</p>` : ""}
+          </div>
+          
+          <p><strong>Expires:</strong> ${expirationStr}</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  try {
+    // Send to customer
+    await resend.emails.send({
+      from: "VZ Entertainment <onboarding@resend.dev>",
+      to: [booking.customer_email],
+      subject: `🎵 Your Date is Reserved - ${formatDateDisplay(booking.event_date)}`,
+      html: customerEmailHtml,
+    });
+
+    // Send to business
+    await resend.emails.send({
+      from: "VZ Entertainment <onboarding@resend.dev>",
+      to: [BUSINESS_EMAIL],
+      subject: `New Hold: ${booking.customer_name} - ${formatDateDisplay(booking.event_date)}`,
+      html: businessEmailHtml,
+    });
+
+    console.log("Hold confirmation emails sent successfully");
+  } catch (error) {
+    console.error("Error sending hold emails:", error);
+  }
+};
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -261,6 +420,9 @@ Selected Add-ons: ${addOnSummary}`.trim();
     await supabase
       .from("booking_rate_limits")
       .insert({ email: normalizedEmail, ip_hash: ipHash });
+
+    // Send hold confirmation emails (non-blocking)
+    EdgeRuntime.waitUntil(sendHoldEmails(booking, packageConfig.name));
 
     const attemptsUsed = Math.max(emailCount || 0, ipCount) + 1;
     const attemptsRemaining = Math.max(RATE_LIMIT_MAX_ATTEMPTS - attemptsUsed, 0);
