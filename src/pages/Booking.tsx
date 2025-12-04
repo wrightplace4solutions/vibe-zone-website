@@ -601,6 +601,10 @@ const Booking = () => {
                   </Select>
                 </div>
               </div>
+              
+              <p className="text-xs text-muted-foreground bg-muted/50 px-3 py-2 rounded-md">
+                Note: The DJ will need access to the venue 1 hour before the event start time for setup.
+              </p>
 
               <div className="space-y-2">
                 <Label htmlFor="venueName">Venue Name *</Label>
