@@ -138,7 +138,21 @@ const Booking = () => {
   const [activeBookingId, setActiveBookingId] = useState<string | null>(null);
   const [unavailableDates, setUnavailableDates] = useState<Date[]>([]);
   const startTimeRef = useRef<HTMLInputElement>(null);
+  const endTimeRef = useRef<HTMLInputElement>(null);
+  const venueNameRef = useRef<HTMLInputElement>(null);
+  const streetAddressRef = useRef<HTMLInputElement>(null);
+  const cityRef = useRef<HTMLInputElement>(null);
+  const stateRef = useRef<HTMLInputElement>(null);
+  const zipCodeRef = useRef<HTMLInputElement>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
   const formStartRef = useRef<number>(Date.now());
+
+  // Auto-tab helper function
+  const focusNext = (nextRef: React.RefObject<HTMLInputElement>) => {
+    setTimeout(() => nextRef.current?.focus(), 50);
+  };
 
   // Fetch unavailable dates on component mount
   useEffect(() => {
@@ -534,17 +548,24 @@ const Booking = () => {
                     id="startTime"
                     type="time"
                     value={formData.startTime}
-                    onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+                    onChange={(e) => {
+                      setFormData({ ...formData, startTime: e.target.value });
+                      if (e.target.value) focusNext(endTimeRef);
+                    }}
                     className="w-full"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="endTime">End Time *</Label>
                   <Input
+                    ref={endTimeRef}
                     id="endTime"
                     type="time"
                     value={formData.endTime}
-                    onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+                    onChange={(e) => {
+                      setFormData({ ...formData, endTime: e.target.value });
+                      if (e.target.value) focusNext(venueNameRef);
+                    }}
                     className="w-full"
                   />
                 </div>
@@ -553,10 +574,14 @@ const Booking = () => {
               <div className="space-y-2">
                 <Label htmlFor="venueName">Venue Name *</Label>
                 <Input
+                  ref={venueNameRef}
                   id="venueName"
                   placeholder="e.g., Community Center, Smith Residence"
                   value={formData.venueName}
                   onChange={(e) => setFormData({ ...formData, venueName: e.target.value })}
+                  onBlur={(e) => {
+                    if (e.target.value.trim()) focusNext(streetAddressRef);
+                  }}
                   className="w-full"
                 />
               </div>
@@ -564,10 +589,14 @@ const Booking = () => {
               <div className="space-y-2">
                 <Label htmlFor="streetAddress">Street Address *</Label>
                 <Input
+                  ref={streetAddressRef}
                   id="streetAddress"
                   placeholder="e.g., 123 Main Street"
                   value={formData.streetAddress}
                   onChange={(e) => setFormData({ ...formData, streetAddress: e.target.value })}
+                  onBlur={(e) => {
+                    if (e.target.value.trim()) focusNext(cityRef);
+                  }}
                   className="w-full"
                 />
               </div>
@@ -576,21 +605,30 @@ const Booking = () => {
                 <div className="space-y-2">
                   <Label htmlFor="city">City *</Label>
                   <Input
+                    ref={cityRef}
                     id="city"
                     placeholder="City"
                     value={formData.city}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    onBlur={(e) => {
+                      if (e.target.value.trim()) focusNext(stateRef);
+                    }}
                     className="w-full"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="state">State *</Label>
                   <Input
+                    ref={stateRef}
                     id="state"
-                    placeholder="State"
+                    placeholder="TX"
                     maxLength={2}
                     value={formData.state}
-                    onChange={(e) => setFormData({ ...formData, state: e.target.value.toUpperCase() })}
+                    onChange={(e) => {
+                      const val = e.target.value.toUpperCase();
+                      setFormData({ ...formData, state: val });
+                      if (val.length === 2) focusNext(zipCodeRef);
+                    }}
                     className="w-full"
                   />
                 </div>
@@ -599,11 +637,16 @@ const Booking = () => {
               <div className="space-y-2">
                 <Label htmlFor="zipCode">ZIP Code *</Label>
                 <Input
+                  ref={zipCodeRef}
                   id="zipCode"
                   placeholder="ZIP Code"
                   maxLength={5}
                   value={formData.zipCode}
-                  onChange={(e) => setFormData({ ...formData, zipCode: e.target.value.replace(/\D/g, '') })}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '');
+                    setFormData({ ...formData, zipCode: val });
+                    // ZIP complete - user can click Next
+                  }}
                   className="w-full"
                 />
               </div>
@@ -751,27 +794,36 @@ const Booking = () => {
               <div>
                 <Label htmlFor="name">Full Name *</Label>
                 <Input
+                  ref={nameRef}
                   id="name"
                   placeholder="Your name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onBlur={(e) => {
+                    if (e.target.value.trim()) focusNext(emailRef);
+                  }}
                 />
               </div>
 
               <div>
                 <Label htmlFor="email">Email *</Label>
                 <Input
+                  ref={emailRef}
                   id="email"
                   type="email"
                   placeholder="your@email.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onBlur={(e) => {
+                    if (e.target.value.trim()) focusNext(phoneRef);
+                  }}
                 />
               </div>
 
               <div>
                 <Label htmlFor="phone">Phone Number *</Label>
                 <Input
+                  ref={phoneRef}
                   id="phone"
                   type="tel"
                   placeholder="(555) 123-4567"
