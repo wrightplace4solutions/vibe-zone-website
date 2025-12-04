@@ -11,7 +11,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { CalendarIcon, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { format, isSameDay } from "date-fns";
 import { cn } from "@/lib/utils";
 import { STRIPE_LINKS, CASHAPP_LINKS, ZELLE_INFO, TZ, PACKAGES, ADD_ONS } from "@/config/booking";
@@ -602,9 +602,12 @@ const Booking = () => {
                 </div>
               </div>
               
-              <p className="text-xs text-muted-foreground bg-muted/50 px-3 py-2 rounded-md">
-                Note: The DJ will need access to the venue 1 hour before the event start time for setup.
-              </p>
+              <div className="flex items-start gap-2 text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 px-4 py-3 rounded-lg">
+                <Clock className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                <p>
+                  <span className="font-medium">Setup Note:</span> The DJ will need access to the venue 1 hour before the event start time.
+                </p>
+              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="venueName">Venue Name *</Label>
