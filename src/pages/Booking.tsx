@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { format, isSameDay } from "date-fns";
@@ -22,6 +23,27 @@ import {
 } from "@/components/ui/collapsible";
 import { z } from 'zod';
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
+
+// Generate time options in 30-minute intervals
+const generateTimeOptions = () => {
+  const options = [];
+  for (let hour = 0; hour < 24; hour++) {
+    for (let minute = 0; minute < 60; minute += 30) {
+      const h24 = hour.toString().padStart(2, '0');
+      const m = minute.toString().padStart(2, '0');
+      const value = `${h24}:${m}`;
+      
+      const h12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+      const ampm = hour < 12 ? 'AM' : 'PM';
+      const label = `${h12}:${m} ${ampm}`;
+      
+      options.push({ value, label });
+    }
+  }
+  return options;
+};
+
+const timeOptions = generateTimeOptions();
 
 // Comprehensive validation schema
 const bookingSchema = z.object({
@@ -138,8 +160,7 @@ const Booking = () => {
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
   const [activeBookingId, setActiveBookingId] = useState<string | null>(null);
   const [unavailableDates, setUnavailableDates] = useState<Date[]>([]);
-  const startTimeRef = useRef<HTMLInputElement>(null);
-  const endTimeRef = useRef<HTMLInputElement>(null);
+  const endTimeRef = useRef<HTMLButtonElement>(null);
   const venueNameRef = useRef<HTMLInputElement>(null);
   const streetAddressRef = useRef<HTMLInputElement>(null);
   const cityRef = useRef<HTMLInputElement>(null);
@@ -524,11 +545,6 @@ const Booking = () => {
                         if (date) {
                           setFormData({ ...formData, date });
                           setIsCalendarOpen(false);
-                          // Focus on start time after a short delay to allow popover to close
-                          setTimeout(() => {
-                            startTimeRef.current?.focus();
-                            startTimeRef.current?.showPicker?.();
-                          }, 150);
                         }
                       }}
                       disabled={(date) => 
@@ -544,31 +560,45 @@ const Booking = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="startTime">Start Time *</Label>
-                  <Input
-                    ref={startTimeRef}
-                    id="startTime"
-                    type="time"
+                  <Select
                     value={formData.startTime}
-                    onChange={(e) => {
-                      setFormData({ ...formData, startTime: e.target.value });
-                      if (e.target.value) focusNext(endTimeRef);
+                    onValueChange={(value) => {
+                      setFormData({ ...formData, startTime: value });
+                      setTimeout(() => endTimeRef.current?.focus(), 100);
                     }}
-                    className="w-full"
-                  />
+                  >
+                    <SelectTrigger id="startTime" className="w-full">
+                      <SelectValue placeholder="Select start time" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-60">
+                      {timeOptions.map((time) => (
+                        <SelectItem key={time.value} value={time.value}>
+                          {time.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="endTime">End Time *</Label>
-                  <Input
-                    ref={endTimeRef}
-                    id="endTime"
-                    type="time"
+                  <Select
                     value={formData.endTime}
-                    onChange={(e) => {
-                      setFormData({ ...formData, endTime: e.target.value });
-                      if (e.target.value) focusNext(venueNameRef);
+                    onValueChange={(value) => {
+                      setFormData({ ...formData, endTime: value });
+                      setTimeout(() => venueNameRef.current?.focus(), 100);
                     }}
-                    className="w-full"
-                  />
+                  >
+                    <SelectTrigger ref={endTimeRef} id="endTime" className="w-full">
+                      <SelectValue placeholder="Select end time" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-60">
+                      {timeOptions.map((time) => (
+                        <SelectItem key={time.value} value={time.value}>
+                          {time.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
