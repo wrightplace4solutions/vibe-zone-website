@@ -497,22 +497,22 @@ const Booking = () => {
   const progress = (step / 4) * 100;
 
   return (
-    <div className="min-h-screen bg-background py-12">
-      <div className="container mx-auto px-4 max-w-3xl">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Thank you for reserving our DJ services.</h1>
-          <p className="text-muted-foreground">We are looking forward to helping to make your event unforgettable! #LETSWORK!!</p>
+    <div className="min-h-screen bg-background py-8 sm:py-12">
+      <div className="container mx-auto px-3 sm:px-4 max-w-3xl">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 sm:mb-2">Thank you for reserving our DJ services.</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">We are looking forward to helping to make your event unforgettable! #LETSWORK!!</p>
         </div>
 
-        <Progress value={progress} className="mb-8" />
+        <Progress value={progress} className="mb-6 sm:mb-8" />
 
         {step === 1 && (
           <Card>
-            <CardHeader>
-              <CardTitle>Step 1: Event Details</CardTitle>
-              <CardDescription>Tell us about your event</CardDescription>
+            <CardHeader className="pb-2 sm:pb-4">
+              <CardTitle className="text-lg sm:text-xl">Step 1: Event Details</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">Tell us about your event</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3 sm:space-y-4">
               <input
                 type="text"
                 value={formData.honeypot}
@@ -522,18 +522,18 @@ const Booking = () => {
                 className="hidden"
                 aria-hidden="true"
               />
-              <div className="space-y-2">
-                <Label htmlFor="date">Event Date *</Label>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="date" className="text-sm">Event Date *</Label>
                 <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-full justify-start text-left font-normal",
+                        "w-full justify-start text-left font-normal text-sm",
                         !formData.date && "text-muted-foreground"
                       )}
                     >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      <CalendarIcon className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                       {formData.date ? format(formData.date, "PPP") : "Pick a date"}
                     </Button>
                   </PopoverTrigger>
@@ -557,9 +557,9 @@ const Booking = () => {
                 </Popover>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="startTime">Start Time *</Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="startTime" className="text-sm">Start Time *</Label>
                   <Select
                     value={formData.startTime}
                     onValueChange={(value) => {
@@ -579,8 +579,8 @@ const Booking = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="endTime">End Time *</Label>
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="endTime" className="text-sm">End Time *</Label>
                   <Select
                     value={formData.endTime}
                     onValueChange={(value) => {
@@ -602,15 +602,15 @@ const Booking = () => {
                 </div>
               </div>
               
-              <div className="flex items-start gap-2 text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 px-4 py-3 rounded-lg">
-                <Clock className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <div className="flex items-start gap-2 text-xs sm:text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 px-3 sm:px-4 py-2 sm:py-3 rounded-lg">
+                <Clock className="h-3 w-3 sm:h-4 sm:w-4 mt-0.5 flex-shrink-0" />
                 <p>
                   <span className="font-medium">Setup Note:</span> The DJ will need access to the venue 1 hour before the event start time.
                 </p>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="venueName">Venue Name *</Label>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="venueName" className="text-sm">Venue Name *</Label>
                 <Input
                   ref={venueNameRef}
                   id="venueName"
@@ -624,8 +624,8 @@ const Booking = () => {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="streetAddress">Street Address *</Label>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="streetAddress" className="text-sm">Street Address *</Label>
                 <AddressAutocomplete
                   id="streetAddress"
                   placeholder="Start typing an address..."
@@ -650,9 +650,9 @@ const Booking = () => {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="city">City *</Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="city" className="text-sm">City *</Label>
                   <Input
                     ref={cityRef}
                     id="city"
@@ -665,8 +665,8 @@ const Booking = () => {
                     className="w-full"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="state">State *</Label>
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="state" className="text-sm">State *</Label>
                 <Input
                     ref={stateRef}
                     id="state"
@@ -683,8 +683,8 @@ const Booking = () => {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="zipCode">ZIP Code *</Label>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="zipCode" className="text-sm">ZIP Code *</Label>
                 <Input
                   ref={zipCodeRef}
                   id="zipCode"
@@ -699,9 +699,9 @@ const Booking = () => {
                 />
               </div>
 
-              <div className="flex justify-end">
-                <Button onClick={handleNext}>
-                  Next <ChevronRight className="ml-2 h-4 w-4" />
+              <div className="flex justify-end pt-2">
+                <Button onClick={handleNext} size="sm" className="text-sm">
+                  Next <ChevronRight className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </div>
             </CardContent>
@@ -710,26 +710,26 @@ const Booking = () => {
 
         {step === 2 && (
           <Card>
-            <CardHeader>
-              <CardTitle>Step 2: Choose Your Package</CardTitle>
-              <CardDescription>Select the option that fits your vibe</CardDescription>
+            <CardHeader className="pb-2 sm:pb-4">
+              <CardTitle className="text-lg sm:text-xl">Step 2: Choose Your Package</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">Select the option that fits your vibe</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-4 sm:space-y-6">
               <RadioGroup
                 value={formData.package}
                 onValueChange={(value) => setFormData({ ...formData, package: value as PackageType })}
               >
                 {Object.entries(PACKAGES).map(([key, pkg]) => (
-                  <div key={key} className="flex items-start space-x-3 p-4 border rounded-lg hover:border-primary/50 transition-all">
-                    <RadioGroupItem value={key} id={key} />
-                    <div className="flex-1">
-                      <Label htmlFor={key} className="text-base font-semibold cursor-pointer">
+                  <div key={key} className="flex items-start space-x-2 sm:space-x-3 p-3 sm:p-4 border rounded-lg hover:border-primary/50 transition-all">
+                    <RadioGroupItem value={key} id={key} className="mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <Label htmlFor={key} className="text-sm sm:text-base font-semibold cursor-pointer">
                         {pkg.name} — ${pkg.basePrice}
                       </Label>
-                      <p className="text-sm text-muted-foreground mt-1">
+                      <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                         {pkg.duration} • {pkg.description}
                       </p>
-                      <p className="text-xs text-muted-foreground mt-2">
+                      <p className="text-xs text-muted-foreground mt-1 sm:mt-2">
                         {pkg.bestFor}
                       </p>
                     </div>
@@ -737,14 +737,14 @@ const Booking = () => {
                 ))}
               </RadioGroup>
 
-              <div className="border-t pt-4">
-                <h3 className="font-medium mb-3">Add-Ons (Optional)</h3>
-                <p className="text-sm text-muted-foreground mb-4">
+              <div className="border-t pt-3 sm:pt-4">
+                <h3 className="font-medium text-sm sm:text-base mb-2 sm:mb-3">Add-Ons (Optional)</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
                   Select any add-ons to see real-time pricing updates
                 </p>
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   {ADD_ONS.map((addon) => (
-                    <div key={addon.name} className="flex items-start space-x-3 p-3 border rounded-lg">
+                    <div key={addon.name} className="flex items-start space-x-2 sm:space-x-3 p-2 sm:p-3 border rounded-lg">
                       <Checkbox
                         id={addon.name}
                         checked={formData.selectedAddOns.includes(addon.name)}
@@ -761,14 +761,15 @@ const Booking = () => {
                             });
                           }
                         }}
+                        className="mt-0.5"
                       />
-                      <div className="flex-1">
-                        <Label htmlFor={addon.name} className="cursor-pointer font-medium">
+                      <div className="flex-1 min-w-0">
+                        <Label htmlFor={addon.name} className="cursor-pointer font-medium text-sm">
                           {addon.name}
                         </Label>
-                        <p className="text-sm text-muted-foreground">{addon.description}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">{addon.description}</p>
                       </div>
-                      <span className="font-semibold text-primary">${addon.price}</span>
+                      <span className="font-semibold text-primary text-sm">${addon.price}</span>
                     </div>
                   ))}
                 </div>
@@ -777,18 +778,18 @@ const Booking = () => {
               {(() => {
                 const { basePrice, addOnsTotal, totalAmount, depositAmount } = calculateTotals();
                 return (
-                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 space-y-2">
-                    <div className="flex justify-between text-sm">
+                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 sm:p-4 space-y-1.5 sm:space-y-2">
+                    <div className="flex justify-between text-xs sm:text-sm">
                       <span>Package: {PACKAGES[formData.package].name}</span>
                       <span>${basePrice}</span>
                     </div>
                     {formData.selectedAddOns.length > 0 && (
                       <>
-                        <div className="text-sm font-medium">Selected Add-ons:</div>
+                        <div className="text-xs sm:text-sm font-medium">Selected Add-ons:</div>
                         {formData.selectedAddOns.map(addonName => {
                           const addon = ADD_ONS.find(a => a.name === addonName);
                           return (
-                            <div key={addonName} className="flex justify-between text-sm pl-4">
+                            <div key={addonName} className="flex justify-between text-xs sm:text-sm pl-3 sm:pl-4">
                               <span className="text-muted-foreground">{addonName}</span>
                               <span>${addon?.price}</span>
                             </div>
@@ -796,22 +797,22 @@ const Booking = () => {
                         })}
                       </>
                     )}
-                    <div className="border-t pt-2 mt-2">
-                      <div className="flex justify-between text-sm">
+                    <div className="border-t pt-1.5 sm:pt-2 mt-1.5 sm:mt-2">
+                      <div className="flex justify-between text-xs sm:text-sm">
                         <span>Subtotal:</span>
                         <span>${basePrice}</span>
                       </div>
-                      <div className="flex justify-between text-sm">
+                      <div className="flex justify-between text-xs sm:text-sm">
                         <span>Add-ons Total:</span>
                         <span>${addOnsTotal}</span>
                       </div>
                     </div>
-                    <div className="border-t pt-2 mt-2">
-                      <div className="flex justify-between font-bold text-lg">
+                    <div className="border-t pt-1.5 sm:pt-2 mt-1.5 sm:mt-2">
+                      <div className="flex justify-between font-bold text-base sm:text-lg">
                         <span>Total Amount:</span>
                         <span className="text-primary">${totalAmount}</span>
                       </div>
-                      <div className="flex justify-between font-semibold text-base mt-1">
+                      <div className="flex justify-between font-semibold text-sm sm:text-base mt-1">
                         <span>Deposit Due Now (50%):</span>
                         <span className="text-accent">${depositAmount}</span>
                       </div>
@@ -820,12 +821,12 @@ const Booking = () => {
                 );
               })()}
 
-              <div className="flex justify-between">
-                <Button variant="outline" onClick={handleBack}>
-                  <ChevronLeft className="mr-2 h-4 w-4" /> Back
+              <div className="flex justify-between pt-2">
+                <Button variant="outline" onClick={handleBack} size="sm" className="text-sm">
+                  <ChevronLeft className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" /> Back
                 </Button>
-                <Button onClick={handleNext}>
-                  Next <ChevronRight className="ml-2 h-4 w-4" />
+                <Button onClick={handleNext} size="sm" className="text-sm">
+                  Next <ChevronRight className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </div>
             </CardContent>
@@ -834,13 +835,13 @@ const Booking = () => {
 
         {step === 3 && (
           <Card>
-            <CardHeader>
-              <CardTitle>Step 3: Contact & Agreement</CardTitle>
-              <CardDescription>How can we reach you?</CardDescription>
+            <CardHeader className="pb-2 sm:pb-4">
+              <CardTitle className="text-lg sm:text-xl">Step 3: Contact & Agreement</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">How can we reach you?</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3 sm:space-y-4">
               <div>
-                <Label htmlFor="name">Full Name *</Label>
+                <Label htmlFor="name" className="text-sm">Full Name *</Label>
                 <Input
                   ref={nameRef}
                   id="name"
@@ -854,7 +855,7 @@ const Booking = () => {
               </div>
 
               <div>
-                <Label htmlFor="email">Email *</Label>
+                <Label htmlFor="email" className="text-sm">Email *</Label>
                 <Input
                   ref={emailRef}
                   id="email"
@@ -865,11 +866,12 @@ const Booking = () => {
                   onBlur={(e) => {
                     if (e.target.value.trim()) focusNext(phoneRef);
                   }}
+                  className="text-sm"
                 />
               </div>
 
               <div>
-                <Label htmlFor="phone">Phone Number *</Label>
+                <Label htmlFor="phone" className="text-sm">Phone Number *</Label>
                 <Input
                   ref={phoneRef}
                   id="phone"
@@ -877,11 +879,12 @@ const Booking = () => {
                   placeholder="(555) 123-4567"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  className="text-sm"
                 />
               </div>
 
               <div>
-                <Label htmlFor="notes">Additional Notes</Label>
+                <Label htmlFor="notes" className="text-sm">Additional Notes</Label>
                 <Textarea
                   id="notes"
                   placeholder="Tell us about your event, music preferences, add-ons you're interested in, etc."
@@ -891,16 +894,17 @@ const Booking = () => {
                 />
               </div>
 
-              <div className="flex items-start space-x-2 p-4 border rounded-lg bg-muted/50">
+              <div className="flex items-start space-x-2 p-3 sm:p-4 border rounded-lg bg-muted/50">
                 <Checkbox
                   id="terms"
                   checked={formData.agreedToTerms}
                   onCheckedChange={(checked) =>
                     setFormData({ ...formData, agreedToTerms: checked as boolean })
                   }
+                  className="mt-0.5"
                 />
                 <div className="flex-1">
-                  <Label htmlFor="terms" className="text-sm cursor-pointer">
+                  <Label htmlFor="terms" className="text-xs sm:text-sm cursor-pointer">
                     I agree to the{" "}
                     <Link to="/terms" target="_blank" className="text-primary hover:underline">
                       Terms of Service
@@ -913,11 +917,11 @@ const Booking = () => {
                 </div>
               </div>
 
-              <div className="flex justify-between pt-4">
-                <Button variant="outline" onClick={handleBack}>
-                  <ChevronLeft className="mr-2 h-4 w-4" /> Back
+              <div className="flex justify-between pt-2 sm:pt-4">
+                <Button variant="outline" onClick={handleBack} size="sm" className="text-sm">
+                  <ChevronLeft className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" /> Back
                 </Button>
-                <Button onClick={handleSubmit} disabled={isSubmitting}>
+                <Button onClick={handleSubmit} disabled={isSubmitting} size="sm" className="text-sm">
                   {isSubmitting ? "Submitting..." : "Request Hold"}
                 </Button>
               </div>
@@ -927,16 +931,16 @@ const Booking = () => {
 
         {step === 4 && holdConfirmed && (
           <Card className="border-primary">
-            <CardHeader>
-              <CardTitle className="text-primary">Hold Requested Successfully!</CardTitle>
-              <CardDescription>
+            <CardHeader className="pb-2 sm:pb-4">
+              <CardTitle className="text-primary text-lg sm:text-xl">Hold Requested Successfully!</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
                 We've placed a temporary 48-HOUR HOLD on your date under "{formData.name} - {formData.date && format(formData.date, "MMM d, yyyy")}". Complete the deposit within 48 hours to confirm your booking.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 p-4 rounded-lg">
-                <p className="text-sm font-semibold text-amber-900 dark:text-amber-100 mb-2">⏰ Important: 48-Hour Hold Policy</p>
-                <p className="text-sm text-amber-800 dark:text-amber-200">
+            <CardContent className="space-y-3 sm:space-y-4">
+              <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 p-3 sm:p-4 rounded-lg">
+                <p className="text-xs sm:text-sm font-semibold text-amber-900 dark:text-amber-100 mb-1 sm:mb-2">⏰ Important: 48-Hour Hold Policy</p>
+                <p className="text-xs sm:text-sm text-amber-800 dark:text-amber-200">
                   Your booking hold expires in 48 hours. If payment is not received by then, the hold will be automatically 
                   released and both you and our team will be notified. Pay now to secure your date immediately!
                 </p>
@@ -945,18 +949,18 @@ const Booking = () => {
               {(() => {
                 const { basePrice, addOnsTotal, totalAmount, depositAmount } = calculateTotals();
                 return (
-                  <div className="bg-muted p-4 rounded-lg space-y-2">
-                    <p className="font-medium">Your Details:</p>
-                    <p className="text-sm">Client Name: {formData.name}</p>
-                    <p className="text-sm">Date: {formData.date && format(formData.date, "PPP")}</p>
-                    <p className="text-sm">Time: {formatTimeTo12Hour(formData.startTime)} - {formatTimeTo12Hour(formData.endTime)}</p>
-                    <p className="text-sm">Package: {PACKAGES[formData.package].name}</p>
+                  <div className="bg-muted p-3 sm:p-4 rounded-lg space-y-1.5 sm:space-y-2">
+                    <p className="font-medium text-sm">Your Details:</p>
+                    <p className="text-xs sm:text-sm">Client Name: {formData.name}</p>
+                    <p className="text-xs sm:text-sm">Date: {formData.date && format(formData.date, "PPP")}</p>
+                    <p className="text-xs sm:text-sm">Time: {formatTimeTo12Hour(formData.startTime)} - {formatTimeTo12Hour(formData.endTime)}</p>
+                    <p className="text-xs sm:text-sm">Package: {PACKAGES[formData.package].name}</p>
                     {formData.selectedAddOns.length > 0 && (
-                      <p className="text-sm">Add-ons: {formData.selectedAddOns.join(", ")}</p>
+                      <p className="text-xs sm:text-sm">Add-ons: {formData.selectedAddOns.join(", ")}</p>
                     )}
-                    <div className="border-t pt-2 mt-2">
-                      <p className="text-sm">Total: ${totalAmount}</p>
-                      <p className="text-sm text-primary font-semibold">
+                    <div className="border-t pt-1.5 sm:pt-2 mt-1.5 sm:mt-2">
+                      <p className="text-xs sm:text-sm">Total: ${totalAmount}</p>
+                      <p className="text-xs sm:text-sm text-primary font-semibold">
                         Deposit Required (50%): ${depositAmount}
                       </p>
                     </div>
@@ -964,14 +968,14 @@ const Booking = () => {
                 );
               })()}
 
-              <p className="text-sm text-muted-foreground mb-4">
+              <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
                 Choose your preferred payment method to complete your ${calculateTotals().depositAmount} deposit:
               </p>
 
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 <Button
-                  size="lg"
-                  className="w-full"
+                  size="default"
+                  className="w-full text-sm"
                   onClick={async () => {
                     try {
                       if (!activeBookingId) {
@@ -1021,22 +1025,22 @@ const Booking = () => {
                   Pay Deposit with Stripe - ${calculateTotals().depositAmount}
                 </Button>
 
-                <div className="border rounded-lg p-4 bg-muted/50">
-                  <p className="font-medium mb-2">Pay with Zelle:</p>
-                  <div className="text-sm space-y-1">
-                    <p>Email: <span className="font-mono text-primary">{ZELLE_INFO.email}</span></p>
+                <div className="border rounded-lg p-3 sm:p-4 bg-muted/50">
+                  <p className="font-medium text-sm mb-1.5 sm:mb-2">Pay with Zelle:</p>
+                  <div className="text-xs sm:text-sm space-y-1">
+                    <p>Email: <span className="font-mono text-primary break-all">{ZELLE_INFO.email}</span></p>
                     <p>Phone: <span className="font-mono text-primary">{ZELLE_INFO.phone}</span></p>
-                    <p className="text-muted-foreground mt-2">Amount: ${calculateTotals().depositAmount}</p>
-                    <p className="text-xs text-muted-foreground mt-2">
+                    <p className="text-muted-foreground mt-1.5 sm:mt-2">Amount: ${calculateTotals().depositAmount}</p>
+                    <p className="text-xs text-muted-foreground mt-1.5 sm:mt-2">
                       After sending, reply to your confirmation email with the transaction ID
                     </p>
                   </div>
                 </div>
               </div>
 
-              <p className="text-xs text-center text-muted-foreground mt-4">
+              <p className="text-xs text-center text-muted-foreground mt-3 sm:mt-4">
                 Need help? Email us at{" "}
-                <a href="mailto:bookings@vzentertainment.fun" className="text-primary hover:underline">
+                <a href="mailto:bookings@vzentertainment.fun" className="text-primary hover:underline break-all">
                   bookings@vzentertainment.fun
                 </a>
               </p>
@@ -1046,47 +1050,47 @@ const Booking = () => {
 
         {step === 5 && bookingConfirmed && (
           <Card className="border-green-500 bg-green-50 dark:bg-green-950">
-            <CardHeader>
-              <CardTitle className="text-green-600 dark:text-green-400 flex items-center gap-2">
-                <span className="text-3xl">✓</span> Booking Confirmed!
+            <CardHeader className="pb-2 sm:pb-4">
+              <CardTitle className="text-green-600 dark:text-green-400 flex items-center gap-2 text-lg sm:text-xl">
+                <span className="text-2xl sm:text-3xl">✓</span> Booking Confirmed!
               </CardTitle>
-              <CardDescription className="text-green-700 dark:text-green-300">
+              <CardDescription className="text-green-700 dark:text-green-300 text-xs sm:text-sm">
                 Your payment has been processed and your booking is confirmed.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3 sm:space-y-4">
               {(() => {
                 const { totalAmount, depositAmount } = calculateTotals();
                 return (
-                  <div className="bg-white dark:bg-gray-900 p-4 rounded-lg space-y-2 border border-green-200 dark:border-green-800">
-                    <p className="font-medium text-green-800 dark:text-green-200">Your Confirmed Event:</p>
-                    <p className="text-sm"><strong>Date:</strong> {formData.date && format(formData.date, "PPP")}</p>
-                    <p className="text-sm"><strong>Time:</strong> {formatTimeTo12Hour(formData.startTime)} - {formatTimeTo12Hour(formData.endTime)}</p>
-                    <p className="text-sm"><strong>Venue:</strong> {formData.venueName}</p>
-                    <p className="text-sm"><strong>Package:</strong> {PACKAGES[formData.package].name}</p>
+                  <div className="bg-white dark:bg-gray-900 p-3 sm:p-4 rounded-lg space-y-1.5 sm:space-y-2 border border-green-200 dark:border-green-800">
+                    <p className="font-medium text-green-800 dark:text-green-200 text-sm">Your Confirmed Event:</p>
+                    <p className="text-xs sm:text-sm"><strong>Date:</strong> {formData.date && format(formData.date, "PPP")}</p>
+                    <p className="text-xs sm:text-sm"><strong>Time:</strong> {formatTimeTo12Hour(formData.startTime)} - {formatTimeTo12Hour(formData.endTime)}</p>
+                    <p className="text-xs sm:text-sm"><strong>Venue:</strong> {formData.venueName}</p>
+                    <p className="text-xs sm:text-sm"><strong>Package:</strong> {PACKAGES[formData.package].name}</p>
                     {formData.selectedAddOns.length > 0 && (
-                      <p className="text-sm"><strong>Add-ons:</strong> {formData.selectedAddOns.join(", ")}</p>
+                      <p className="text-xs sm:text-sm"><strong>Add-ons:</strong> {formData.selectedAddOns.join(", ")}</p>
                     )}
-                    <p className="text-sm"><strong>Total Amount:</strong> ${totalAmount}</p>
-                    <p className="text-sm text-green-600 dark:text-green-400 font-semibold">
+                    <p className="text-xs sm:text-sm"><strong>Total Amount:</strong> ${totalAmount}</p>
+                    <p className="text-xs sm:text-sm text-green-600 dark:text-green-400 font-semibold">
                       <strong>Deposit Paid:</strong> ${depositAmount}
                     </p>
                   </div>
                 );
               })()}
 
-              <div className="bg-muted p-4 rounded-lg">
-                <p className="text-sm font-medium mb-2">What's Next?</p>
-                <ul className="text-sm space-y-1 list-disc list-inside text-muted-foreground">
+              <div className="bg-muted p-3 sm:p-4 rounded-lg">
+                <p className="text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">What's Next?</p>
+                <ul className="text-xs sm:text-sm space-y-1 list-disc list-inside text-muted-foreground">
                   <li>You'll receive a confirmation email shortly</li>
                   <li>We'll contact you 1-2 weeks before your event to finalize details</li>
                   <li>The remaining balance is due on the day of the event</li>
                 </ul>
               </div>
 
-              <p className="text-sm text-center text-muted-foreground">
+              <p className="text-xs sm:text-sm text-center text-muted-foreground">
                 Questions? Email us at{" "}
-                <a href="mailto:bookings@vzentertainment.fun" className="text-primary hover:underline">
+                <a href="mailto:bookings@vzentertainment.fun" className="text-primary hover:underline break-all">
                   bookings@vzentertainment.fun
                 </a>
               </p>

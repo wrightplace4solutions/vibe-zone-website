@@ -80,52 +80,52 @@ export default function MyBookings() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-purple-900 flex items-center justify-center p-4">
-        <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-purple-900 flex items-center justify-center p-3 sm:p-4">
+        <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-purple-500" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-purple-900 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-purple-900 py-8 sm:py-12 px-3 sm:px-4">
       <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">My Bookings</h1>
-            <p className="text-purple-200">{userEmail}</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">My Bookings</h1>
+            <p className="text-purple-200 text-sm sm:text-base truncate">{userEmail}</p>
           </div>
-          <Button onClick={handleSignOut} variant="outline">
-            <LogOut className="mr-2 h-4 w-4" />
+          <Button onClick={handleSignOut} variant="outline" size="sm" className="self-start sm:self-center">
+            <LogOut className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
             Sign Out
           </Button>
         </div>
 
         {bookings.length === 0 ? (
           <Card>
-            <CardHeader>
-              <CardTitle>No Bookings Yet</CardTitle>
-              <CardDescription>
+            <CardHeader className="pb-2 sm:pb-4">
+              <CardTitle className="text-lg sm:text-xl">No Bookings Yet</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
                 You haven't made any bookings. Ready to book an event?
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button onClick={() => navigate('/booking')}>
+              <Button onClick={() => navigate('/booking')} size="sm" className="text-sm">
                 Create Your First Booking
               </Button>
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {bookings.map((booking) => (
               <Card key={booking.id}>
-                <CardHeader>
-                  <div className="flex justify-between items-start">
+                <CardHeader className="pb-2 sm:pb-4">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
                     <div>
-                      <CardTitle>{booking.event_type}</CardTitle>
-                      <CardDescription>{booking.service_tier}</CardDescription>
+                      <CardTitle className="text-base sm:text-lg">{booking.event_type}</CardTitle>
+                      <CardDescription className="text-xs sm:text-sm">{booking.service_tier}</CardDescription>
                     </div>
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      className={`px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-xs font-semibold self-start ${
                         booking.status === 'confirmed'
                           ? 'bg-green-100 text-green-800'
                           : booking.status === 'pending'
@@ -137,32 +137,32 @@ export default function MyBookings() {
                     </span>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <Calendar className="mr-2 h-4 w-4" />
+                <CardContent className="space-y-2 sm:space-y-3">
+                  <div className="flex items-center text-xs sm:text-sm text-muted-foreground">
+                    <Calendar className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                     <span>
                       {new Date(booking.event_date).toLocaleDateString('en-US', {
-                        weekday: 'long',
+                        weekday: 'short',
                         year: 'numeric',
-                        month: 'long',
+                        month: 'short',
                         day: 'numeric',
                       })}
                     </span>
                   </div>
 
                   {booking.start_time && booking.end_time && (
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-xs sm:text-sm text-muted-foreground">
                       ⏰ {booking.start_time} - {booking.end_time}
                     </div>
                   )}
 
                   {(booking.venue_name || booking.street_address) && (
-                    <div className="flex items-start text-sm text-muted-foreground">
-                      <MapPin className="mr-2 h-4 w-4 mt-0.5 flex-shrink-0" />
+                    <div className="flex items-start text-xs sm:text-sm text-muted-foreground">
+                      <MapPin className="mr-2 h-3 w-3 sm:h-4 sm:w-4 mt-0.5 flex-shrink-0" />
                       <div>
                         {booking.venue_name && <div>{booking.venue_name}</div>}
                         {booking.street_address && (
-                          <div>
+                          <div className="break-words">
                             {booking.street_address}
                             {booking.city && `, ${booking.city}`}
                             {booking.state && `, ${booking.state}`}
@@ -174,14 +174,14 @@ export default function MyBookings() {
                   )}
 
                   {booking.notes && (
-                    <div className="bg-muted p-3 rounded-md text-sm">
+                    <div className="bg-muted p-2 sm:p-3 rounded-md text-xs sm:text-sm">
                       <strong>Notes:</strong> {booking.notes}
                     </div>
                   )}
 
                   {/* Special Request Button */}
                   {booking.user_id && booking.status !== 'cancelled' && (
-                    <div className="pt-2">
+                    <div className="pt-1 sm:pt-2">
                       <SpecialRequestForm 
                         bookingId={booking.id} 
                         userId={booking.user_id}
@@ -190,7 +190,7 @@ export default function MyBookings() {
                     </div>
                   )}
 
-                  <div className="text-xs text-muted-foreground pt-2 border-t">
+                  <div className="text-xs text-muted-foreground pt-1 sm:pt-2 border-t">
                     Booked on {new Date(booking.created_at).toLocaleDateString()}
                   </div>
                 </CardContent>
