@@ -62,20 +62,28 @@ This project is built with:
 
 ## How can I deploy this project?
 
-Simply open [Lovable](https://lovable.dev/projects/503cec89-12da-47b7-b65c-89d7a16c70a0) and click on Share -> Publish.
+This project is configured for **Vercel** deployment:
+
+1. Import the repository at [vercel.com](https://vercel.com)
+2. Add environment variables (see below)
+3. Deploy!
+
+See `FINAL_DEPLOYMENT_GUIDE.md` for detailed instructions.
 
 ## Environment Variables
 
-For local development and external hosting (e.g. Vercel or Netlify) you must provide Supabase and any feature keys. Copy `.env.example` to `.env` and fill in real values:
+For local development and external hosting (Vercel) you must provide Supabase and any feature keys. Copy `.env.example` to `.env` and fill in real values:
 
 ```
 VITE_SUPABASE_URL=https://<project-ref>.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
+VITE_SUPABASE_PUBLISHABLE_KEY=your-anon-key
 VITE_PUBLIC_SITE_URL=https://vzentertainment.fun
-VITE_STRIPE_PUBLISHABLE_KEY=pk_test_or_live_key (optional)
+VITE_STRIPE_PUBLISHABLE_KEY=pk_test_or_live_key
 ```
 
-Do not commit real secrets (service role key, Stripe secret, Google credentials). Those stay in hosting platform or Supabase secrets.
+**Important:** Add these same variables in Vercel Dashboard → Settings → Environment Variables.
+
+Do not commit real secrets (service role key, Stripe secret, Google credentials). Those stay in Supabase secrets.
 
 ## Can I connect a custom domain to my Lovable project?
 

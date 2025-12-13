@@ -16,61 +16,58 @@ Your website is **100% ready for deployment** with full automation!
 
 ## 🚀 Deployment Steps
 
-### Option 1: Deploy to Netlify (Recommended)
+### Option 1: Deploy to Vercel (Recommended)
 
 1. **Push your code to GitHub** ✅ (Already done!)
 
-2. **Go to Netlify**:
+2. **Go to Vercel**:
+   - Visit: https://vercel.com
+   - Click **"Add New Project"**
+   - Import from GitHub: `wrightplace4solutions/vibe-zone-website`
+
+3. **Configure Build Settings**:
+   - Framework: Vite (auto-detected from `vercel.json`)
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
+
+4. **Add Environment Variables** (Critical!):
+   Click **"Settings"** → **"Environment Variables"** → **"Add"**
+   
+   Add these **exactly as shown**:
+   ```
+   VITE_SUPABASE_URL=https://gvxkuawokdamfytfoiqy.supabase.co
+   VITE_SUPABASE_PUBLISHABLE_KEY=<your-anon-key>
+   VITE_STRIPE_PUBLISHABLE_KEY=pk_test_<your-key>
+   ```
+
+5. **Deploy**:
+   - Click **"Deploy"**
+   - Wait 2-3 minutes
+   - Your site will be live! 🎉
+
+6. **Set Custom Domain** (Optional):
+   - Go to **"Settings"** → **"Domains"**
+   - Add your domain: `vzentertainment.fun`
+   - Follow DNS configuration instructions
+
+---
+
+### Option 2: Deploy to Netlify
+
+1. **Go to Netlify**:
    - Visit: https://app.netlify.com
    - Click **"Add new site"** → **"Import an existing project"**
    - Connect to GitHub
    - Select: `wrightplace4solutions/vibe-zone-website`
 
-3. **Configure Build Settings**:
+2. **Configure Build Settings**:
    - Build command: `npm run build`
    - Publish directory: `dist`
    - (Netlify will auto-detect from `netlify.toml`)
 
-4. **Add Environment Variables** (Critical!):
-   Click **"Site settings"** → **"Environment variables"** → **"Add a variable"**
-   
-   Add these **exactly as shown**:
-   ```
-   VITE_SUPABASE_URL=https://gvxkuawokdamfytfoiqy.supabase.co
-   VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2eGt1YXdva2RhbWZ5dGZvaXF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4NTMzNjIsImV4cCI6MjA3NzQyOTM2Mn0.K0w-b7EfWmQhpLY9W5OmVXxoJ_sYZHNRDqNxCdGZ8fY
-   VITE_STRIPE_PUBLISHABLE_KEY=pk_test_51SMnlIHxuR4qyFmi9rjTzXPwzs2pRvZLQzXB3LRSvkWwTSGZJoOSGZYlG5ymVJxGCGdDLvSKOGOoqQJ3yAIqJA7D00p7VvVQWu
-   GOOGLE_CALENDAR_CLIENT_ID=1025490265919-0vn7hg2259ndgsdan674ossq83aco9js.apps.googleusercontent.com
-   GOOGLE_CALENDAR_CLIENT_SECRET=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
-   GOOGLE_CALENDAR_REFRESH_TOKEN=L9IrWjBt9Rc2OM8HaZ7oyIV0divBxMp4YbYa1DUBqTYoCVSb8SXGWinUhVtKniqkuiLUcOk
-   ```
+3. **Add Environment Variables** (same as Vercel above)
 
-5. **Deploy**:
-   - Click **"Deploy site"**
-   - Wait 2-3 minutes
-   - Your site will be live! 🎉
-
-6. **Update Stripe Webhook URL**:
-   - After deployment, get your Netlify URL (e.g., `https://your-site.netlify.app`)
-   - Go to Stripe Dashboard → Webhooks
-   - Update your webhook URL to: `https://your-site.netlify.app/api/add-to-calendar`
-
----
-
-### Option 2: Deploy to Vercel
-
-1. **Go to Vercel**:
-   - Visit: https://vercel.com
-   - Click **"Add New Project"**
-   - Import from GitHub: `wrightplace4solutions/vibe-zone-website`
-
-2. **Configure**:
-   - Framework: Vite
-   - Build Command: `npm run build`
-   - Output Directory: `dist`
-
-3. **Add Environment Variables** (same as Netlify above)
-
-4. **Deploy** and update Stripe webhook URL
+4. **Deploy**
 
 ---
 
@@ -81,7 +78,7 @@ Your website is **100% ready for deployment** with full automation!
 After deployment, you need to update your Stripe checkout to redirect to your live site:
 
 1. In your code, update the success URL in the booking page
-2. Change from `http://localhost:5173/booking/success` to `https://your-site.netlify.app/booking/success`
+2. Change from `http://localhost:5173/booking/success` to `https://vzentertainment.fun/booking/success` (or your Vercel domain)
 
 ---
 
@@ -152,7 +149,8 @@ When ready for real customers:
 
 1. **Switch Stripe to Live Mode**:
    - Get your live publishable key from Stripe
-   - Update `VITE_STRIPE_PUBLISHABLE_KEY` in Netlify
+   - Update `VITE_STRIPE_PUBLISHABLE_KEY` in Vercel Environment Variables
+   - Update Supabase secrets with live Stripe keys
    - Update webhook to use live mode
 
 2. **Test Everything Again** with real (small) transactions
@@ -168,17 +166,17 @@ When ready for real customers:
 
 ### Booking not appearing in database
 - Check browser console for errors
-- Verify Supabase credentials in Netlify env vars
+- Verify Supabase credentials in Vercel env vars
 - Check Supabase logs
 
 ### Payment succeeds but not confirmed
 - Check success page URL is correct
 - Verify booking ID is being passed
-- Check Supabase logs
+- Check Supabase Edge Function logs
 
 ### Google Calendar not working
-- Check Netlify function logs
-- Verify Google Calendar credentials
+- Check Supabase Edge Function logs
+- Verify Google Calendar credentials in Supabase secrets
 - Make sure refresh token is valid
 
 ---
@@ -187,8 +185,8 @@ When ready for real customers:
 
 If you encounter issues:
 1. Check browser DevTools → Console
-2. Check Netlify → Functions logs
-3. Check Supabase → Logs
+2. Check Vercel → Deployments → Build Logs
+3. Check Supabase → Logs → Edge Functions
 4. Check Stripe → Webhooks → View attempts
 
 ---
