@@ -30,22 +30,22 @@ const services = [
 
 export const Services = () => {
   return (
-    <section className="py-24 px-4 relative overflow-hidden">
+    <section className="py-12 md:py-16 px-4 relative overflow-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-card/50 to-background"></div>
       
       <div className="container mx-auto relative z-10">
-        <div className="text-center mb-16 animate-fade-in">
-          <h2 className="text-4xl md:text-6xl font-bold mb-4">
+        <div className="text-center mb-8 animate-fade-in">
+          <h2 className="text-2xl md:text-3xl font-bold mb-2">
             <span className="text-neon-cyan">Our</span>{" "}
             <span className="text-neon-orange">Services</span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-sm md:text-base text-muted-foreground max-w-xl mx-auto">
             Professional DJ entertainment tailored for line dance and trail ride enthusiasts
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           {services.map((service, index) => {
             const Icon = service.icon;
             return (
@@ -54,12 +54,12 @@ export const Services = () => {
                 className="bg-card/50 backdrop-blur border-border transition-all duration-300 group animate-fade-in"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
-                <CardContent className="p-6 text-center">
-                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-background mb-4 ${service.color} group-hover:glow-neon transition-all`}>
-                    <Icon className="w-8 h-8" />
+                <CardContent className="p-3 md:p-4 text-center">
+                  <div className={`inline-flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-background mb-2 ${service.color} group-hover:glow-neon transition-all`}>
+                    <Icon className="w-5 h-5 md:w-6 md:h-6" />
                   </div>
-                  <h3 className="text-xl font-bold mb-2 text-foreground">{service.title}</h3>
-                  <p className="text-muted-foreground">{service.description}</p>
+                  <h3 className="text-sm md:text-base font-bold mb-1 text-foreground">{service.title}</h3>
+                  <p className="text-xs md:text-sm text-muted-foreground">{service.description}</p>
                 </CardContent>
               </Card>
             );
