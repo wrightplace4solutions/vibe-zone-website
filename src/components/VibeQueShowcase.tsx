@@ -27,51 +27,51 @@ const features = [
 
 export const VibeQueShowcase = () => {
   return (
-    <section className="py-16 px-4 relative overflow-hidden">
+    <section className="py-10 md:py-12 px-4 relative overflow-hidden">
       {/* Gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10"></div>
       
       <div className="container mx-auto relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-6 md:gap-8 items-center">
           {/* Left side - Content */}
           <div className="animate-fade-in">
-            <h2 className="text-2xl md:text-4xl font-bold mb-6">
+            <h2 className="text-xl md:text-2xl font-bold mb-3">
               <span className="text-neon-cyan">Vibe Que</span>
               <br />
               <span className="text-neon-orange">Interactive DJ App</span>
             </h2>
-            <p className="text-xl text-muted-foreground mb-8">
+            <p className="text-sm md:text-base text-muted-foreground mb-4">
               Revolutionize your event with our cutting-edge interactive DJ app. 
               Guests can request songs, vote on tracks, and stay connected with the music all night long.
             </p>
             
-            <div className="space-y-4 mb-8">
+            <div className="space-y-2 mb-4">
               {features.map((feature, index) => {
                 const Icon = feature.icon;
                 return (
                   <div 
                     key={index}
-                    className="flex items-start gap-4 p-4 rounded-lg bg-card/50 backdrop-blur border border-border hover:border-primary/50 transition-all animate-fade-in"
+                    className="flex items-start gap-3 p-2 md:p-3 rounded-lg bg-card/50 backdrop-blur border border-border hover:border-primary/50 transition-all animate-fade-in"
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     <div className="flex-shrink-0">
-                      <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                        <Icon className="w-6 h-6 text-primary" />
+                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                        <Icon className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                       </div>
                     </div>
                     <div>
-                      <h3 className="font-bold text-lg mb-1 text-foreground">{feature.title}</h3>
-                      <p className="text-muted-foreground">{feature.description}</p>
+                      <h3 className="font-bold text-sm md:text-base mb-0.5 text-foreground">{feature.title}</h3>
+                      <p className="text-xs md:text-sm text-muted-foreground">{feature.description}</p>
                     </div>
                   </div>
                 );
               })}
             </div>
             
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-2">
               <Button 
-                size="lg"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg px-8 py-6 transition-all hover:scale-105"
+                size="sm"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs md:text-sm px-4 py-3 transition-all hover:scale-105"
                 asChild
               >
                 <a href="#" target="_blank" rel="noopener noreferrer">
@@ -80,9 +80,9 @@ export const VibeQueShowcase = () => {
               </Button>
               
               <Button 
-                size="lg"
+                size="sm"
                 variant="outline"
-                className="font-bold text-lg px-8 py-6 transition-all hover:scale-105"
+                className="font-bold text-xs md:text-sm px-4 py-3 transition-all hover:scale-105"
                 asChild
               >
                 <Link to="/vibeque">
@@ -93,19 +93,19 @@ export const VibeQueShowcase = () => {
           </div>
           
           {/* Right side - Visual */}
-          <div className="relative animate-fade-in" style={{ animationDelay: "0.2s" }}>
-            <div className="relative aspect-square max-w-md mx-auto">
+          <div className="relative animate-fade-in hidden md:block" style={{ animationDelay: "0.2s" }}>
+            <div className="relative aspect-square max-w-[200px] mx-auto">
               {/* Phone mockup placeholder with glow effect */}
-              <div className="absolute inset-0 bg-gradient-neon rounded-3xl opacity-20 blur-3xl animate-glow-pulse"></div>
-              <div className="relative bg-card border-2 border-primary/50 rounded-3xl p-8 glow-neon">
-                <div className="space-y-4">
-                  <div className="h-12 bg-primary/20 rounded-lg animate-glow-pulse"></div>
-                  <div className="h-32 bg-accent/20 rounded-lg animate-glow-pulse" style={{ animationDelay: "0.5s" }}></div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="h-20 bg-primary/20 rounded-lg animate-glow-pulse" style={{ animationDelay: "1s" }}></div>
-                    <div className="h-20 bg-accent/20 rounded-lg animate-glow-pulse" style={{ animationDelay: "1.5s" }}></div>
+              <div className="absolute inset-0 bg-gradient-neon rounded-2xl opacity-20 blur-2xl animate-glow-pulse"></div>
+              <div className="relative bg-card border-2 border-primary/50 rounded-2xl p-4 glow-neon">
+                <div className="space-y-2">
+                  <div className="h-6 bg-primary/20 rounded-lg animate-glow-pulse"></div>
+                  <div className="h-16 bg-accent/20 rounded-lg animate-glow-pulse" style={{ animationDelay: "0.5s" }}></div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="h-10 bg-primary/20 rounded-lg animate-glow-pulse" style={{ animationDelay: "1s" }}></div>
+                    <div className="h-10 bg-accent/20 rounded-lg animate-glow-pulse" style={{ animationDelay: "1.5s" }}></div>
                   </div>
-                  <div className="h-16 bg-primary/20 rounded-lg animate-glow-pulse" style={{ animationDelay: "2s" }}></div>
+                  <div className="h-8 bg-primary/20 rounded-lg animate-glow-pulse" style={{ animationDelay: "2s" }}></div>
                 </div>
               </div>
             </div>
