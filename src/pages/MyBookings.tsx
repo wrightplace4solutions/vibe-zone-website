@@ -185,12 +185,11 @@ export default function MyBookings() {
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         body: {
           bookingId: booking.id,
-          amount: booking.deposit_amount || 250,
+          packageType: booking.package_type || 'essentialVibe',
           customerEmail: booking.customer_email,
           customerName: booking.customer_name,
+          customerPhone: booking.customer_phone,
           eventDate: booking.event_date,
-          eventType: booking.event_type,
-          serviceTier: booking.service_tier,
         },
       });
 
