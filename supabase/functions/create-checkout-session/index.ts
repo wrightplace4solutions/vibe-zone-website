@@ -69,22 +69,22 @@ const PACKAGES = {
   },
   essentialVibe: {
     name: "Essential Vibe",
-    deposit: 250,
+    deposit: 225,
     description: "Plug-and-play option when the client provides the system",
   },
   premiumExperience: {
     name: "Premium Experience",
-    deposit: 350,
+    deposit: 325,
     description: "Extended plug-and-play coverage with planning support",
   },
   vzPartyStarter: {
     name: "VZ Party Starter",
-    deposit: 550,
+    deposit: 438,
     description: "Full entertainment setup with professional sound and DJ gear",
   },
   ultimateExperience: {
     name: "Ultimate Entertainment Experience",
-    deposit: 750,
+    deposit: 575,
     description: "Largest package for all-day or large venue productions",
   },
 };

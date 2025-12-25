@@ -20,10 +20,10 @@ const RATE_LIMIT_WINDOW_MINUTES = 10;
 const RATE_LIMIT_MAX_ATTEMPTS = 3;
 
 const PACKAGES = {
-  essentialVibe: { name: "Essential Vibe", basePrice: 495 },
-  premiumExperience: { name: "Premium Experience", basePrice: 695 },
-  vzPartyStarter: { name: "VZ Party Starter", basePrice: 1095 },
-  ultimateExperience: { name: "Ultimate Entertainment Experience", basePrice: 1495 },
+  essentialVibe: { name: "Essential Vibe", basePrice: 450 },
+  premiumExperience: { name: "Premium Experience", basePrice: 650 },
+  vzPartyStarter: { name: "VZ Party Starter", basePrice: 875 },
+  ultimateExperience: { name: "Ultimate Entertainment Experience", basePrice: 1150 },
 };
 
 const ADD_ON_PRICING = new Map([

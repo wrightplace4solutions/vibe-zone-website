@@ -19,8 +19,8 @@ export const PACKAGES = {
   essentialVibe: {
     name: "Essential Vibe",
     category: "Plug-and-Play Options",
-    basePrice: 495,
-    deposit: 250,
+    basePrice: 450,
+    deposit: 225,
     duration: "3 hours",
     description: "Customer provides sound system",
     includes: [
@@ -34,8 +34,8 @@ export const PACKAGES = {
   premiumExperience: {
     name: "Premium Experience",
     category: "Plug-and-Play Options",
-    basePrice: 695,
-    deposit: 350,
+    basePrice: 650,
+    deposit: 325,
     duration: "5 hours",
     description: "Customer provides sound system",
     includes: [
@@ -49,8 +49,8 @@ export const PACKAGES = {
   vzPartyStarter: {
     name: "VZ Party Starter",
     category: "Complete Entertainment Setups",
-    basePrice: 1095,
-    deposit: 550,
+    basePrice: 875,
+    deposit: 438,
     duration: "4 hours",
     description: "DJ provides full equipment",
     includes: [
@@ -66,8 +66,8 @@ export const PACKAGES = {
   ultimateExperience: {
     name: "Ultimate Entertainment Experience",
     category: "Complete Entertainment Setups",
-    basePrice: 1495,
-    deposit: 750,
+    basePrice: 1150,
+    deposit: 575,
     duration: "6 hours",
     description: "DJ provides full equipment",
     includes: [
