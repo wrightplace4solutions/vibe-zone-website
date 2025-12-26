@@ -200,6 +200,12 @@ const sendHoldEmails = async (booking: any, packageName: string) => {
           
           <p>Once your deposit is received, your event will be automatically added to our calendar and you'll receive a confirmation email.</p>
           
+          <div class="cta">
+            <a href="https://vzentertainment.fun/auth?email=${encodeURIComponent(booking.customer_email)}" class="button" style="background: #7c3aed; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">View My Booking</a>
+          </div>
+          
+          <p style="font-size: 12px; color: #666; margin-top: 15px;">Click the button above to access your booking details. You'll receive a secure magic link to sign in.</p>
+          
           <div class="footer">
             <p>Questions? Reply to this email or visit vzentertainment.fun</p>
             <p>© ${new Date().getFullYear()} VZ Entertainment. All rights reserved.</p>

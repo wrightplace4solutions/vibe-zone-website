@@ -10,12 +10,12 @@ import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
 
 export default function Auth() {
-  const [email, setEmail] = useState('');
+  const [searchParams] = useSearchParams();
+  const [email, setEmail] = useState(searchParams.get('email') || '');
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
 
   // Check if user is already logged in
   useEffect(() => {

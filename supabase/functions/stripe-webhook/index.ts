@@ -226,6 +226,14 @@ async function sendConfirmationEmails(booking: any): Promise<void> {
           A calendar invite has been sent to your email. If you have any questions or need to make changes, please don't hesitate to reach out!
         </p>
         
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="https://vzentertainment.fun/auth?email=${encodeURIComponent(booking.customer_email)}" style="background: #7c3aed; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">View My Booking</a>
+        </div>
+        
+        <p style="font-size: 12px; color: #666; text-align: center;">
+          Click the button above to access your booking anytime. You'll receive a secure magic link to sign in.
+        </p>
+        
         <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
           <p style="color: #888; font-size: 14px;">
             Vibe Zone Entertainment<br>

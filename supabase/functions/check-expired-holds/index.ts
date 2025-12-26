@@ -75,6 +75,12 @@ const send24HourReminderEmail = async (booking: any) => {
             <a href="${booking.stripe_session_id ? `https://checkout.stripe.com/c/pay/${booking.stripe_session_id}` : 'https://vzentertainment.fun/booking'}" class="button">Complete Payment Now</a>
           </div>
           
+          <div style="text-align: center; margin: 20px 0;">
+            <a href="https://vzentertainment.fun/auth?email=${encodeURIComponent(booking.customer_email)}" style="background: #7c3aed; color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">View My Booking Details</a>
+          </div>
+          
+          <p style="font-size: 12px; color: #666; text-align: center;">Click the button above to view your booking details and pay your deposit. You'll receive a secure magic link to sign in.</p>
+          
           <p>Questions? Reply to this email or contact us directly.</p>
           
           <div class="footer">
