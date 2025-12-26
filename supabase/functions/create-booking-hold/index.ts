@@ -16,8 +16,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const RATE_LIMIT_WINDOW_MINUTES = 10;
-const RATE_LIMIT_MAX_ATTEMPTS = 3;
+const RATE_LIMIT_WINDOW_MINUTES = 15;
+const RATE_LIMIT_MAX_ATTEMPTS = 2;
 
 const PACKAGES = {
   essentialVibe: { name: "Essential Vibe", basePrice: 450 },
@@ -96,6 +96,7 @@ const requestSchema = z.object({
   event: eventSchema,
   notes: z.string().max(1000, "Notes too long").optional().default(""),
   honeypot: z.string().max(0, "Suspicious submission").optional().default(""),
+  formLoadedAt: z.number().optional(), // Timestamp when form was loaded (for time-based bot detection)
 });
 
 const hashIdentifier = async (value: string) => {
@@ -308,7 +309,18 @@ serve(async (req) => {
 
     // Honeypot check
     if (payload.honeypot && payload.honeypot.trim().length > 0) {
+      console.warn("Honeypot triggered - bot detected");
       return sendError("Suspicious submission.", 400);
+    }
+
+    // Time-based bot detection (form must take at least 3 seconds to fill)
+    const MIN_FORM_TIME_MS = 3000;
+    if (payload.formLoadedAt) {
+      const timeSpent = Date.now() - payload.formLoadedAt;
+      if (timeSpent < MIN_FORM_TIME_MS) {
+        console.warn(`Form submitted too fast: ${timeSpent}ms - bot detected`);
+        return sendError("Please take a moment to review your details.", 400);
+      }
     }
 
     // Note: Events can span midnight (e.g., 10:00 PM to 1:00 AM next day)

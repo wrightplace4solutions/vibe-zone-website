@@ -420,6 +420,7 @@ const Booking = () => {
         },
         notes: formData.notes,
         honeypot: formData.honeypot,
+        formLoadedAt: formStartRef.current, // Send form load timestamp for bot detection
       };
 
       const { supabase } = await import("@/integrations/supabase/client");
