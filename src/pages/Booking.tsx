@@ -146,6 +146,7 @@ interface FormData {
   notes: string;
   agreedToTerms: boolean;
   honeypot: string;
+  verificationCode: string;
 }
 
 const MIN_FORM_COMPLETION_MS = 5000;
@@ -160,6 +161,11 @@ const Booking = () => {
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
   const [activeBookingId, setActiveBookingId] = useState<string | null>(null);
   const [unavailableDates, setUnavailableDates] = useState<Date[]>([]);
+  const [emailVerified, setEmailVerified] = useState(false);
+  const [isSendingCode, setIsSendingCode] = useState(false);
+  const [isVerifyingCode, setIsVerifyingCode] = useState(false);
+  const [codeSent, setCodeSent] = useState(false);
+  const [codeExpiry, setCodeExpiry] = useState<Date | null>(null);
   const endTimeRef = useRef<HTMLButtonElement>(null);
   const venueNameRef = useRef<HTMLInputElement>(null);
   const streetAddressRef = useRef<HTMLInputElement>(null);
@@ -256,6 +262,7 @@ const Booking = () => {
     notes: "",
     agreedToTerms: false,
     honeypot: "",
+    verificationCode: "",
   });
 
   const validateStep = (stepNum: number): boolean => {
@@ -338,6 +345,99 @@ const Booking = () => {
     return { basePrice, addOnsTotal, totalAmount, depositAmount };
   };
 
+  // Send verification code to email
+  const handleSendVerificationCode = async () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email || !emailRegex.test(formData.email)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSendingCode(true);
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data, error } = await supabase.functions.invoke("send-verification-code", {
+        body: { email: formData.email.toLowerCase() },
+      });
+
+      if (error) {
+        throw new Error(error.message || "Failed to send verification code");
+      }
+
+      setCodeSent(true);
+      setCodeExpiry(new Date(Date.now() + (data.expiresIn || 600) * 1000));
+      toast({
+        title: "Code Sent!",
+        description: "Check your email for the 6-digit verification code.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send verification code. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSendingCode(false);
+    }
+  };
+
+  // Verify the code entered by user
+  const handleVerifyCode = async () => {
+    if (!formData.verificationCode || formData.verificationCode.length !== 6) {
+      toast({
+        title: "Invalid Code",
+        description: "Please enter the 6-digit code from your email.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsVerifyingCode(true);
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data, error } = await supabase.functions.invoke("verify-email-code", {
+        body: { 
+          email: formData.email.toLowerCase(),
+          code: formData.verificationCode,
+        },
+      });
+
+      if (error) {
+        throw new Error(error.message || "Invalid verification code");
+      }
+
+      if (data.verified) {
+        setEmailVerified(true);
+        toast({
+          title: "Email Verified!",
+          description: "You can now submit your booking request.",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Verification Failed",
+        description: error.message || "Invalid or expired code. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsVerifyingCode(false);
+    }
+  };
+
+  // Reset verification if email changes
+  const handleEmailChange = (newEmail: string) => {
+    setFormData({ ...formData, email: newEmail, verificationCode: "" });
+    if (emailVerified) {
+      setEmailVerified(false);
+      setCodeSent(false);
+      setCodeExpiry(null);
+    }
+  };
+
   const handleSubmit = async () => {
     // Validate all fields before submission
     try {
@@ -359,6 +459,16 @@ const Booking = () => {
       toast({
         title: "Submission blocked",
         description: "We could not verify your request. Please contact us directly.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Email verification check
+    if (!emailVerified) {
+      toast({
+        title: "Email Not Verified",
+        description: "Please verify your email address before submitting.",
         variant: "destructive",
       });
       return;
@@ -420,7 +530,8 @@ const Booking = () => {
         },
         notes: formData.notes,
         honeypot: formData.honeypot,
-        formLoadedAt: formStartRef.current, // Send form load timestamp for bot detection
+        formLoadedAt: formStartRef.current,
+        verificationCode: formData.verificationCode, // Include verification code
       };
 
       const { supabase } = await import("@/integrations/supabase/client");
@@ -855,20 +966,54 @@ const Booking = () => {
                 />
               </div>
 
-              <div>
-                <Label htmlFor="email" className="text-sm">Email *</Label>
-                <Input
-                  ref={emailRef}
-                  id="email"
-                  type="email"
-                  placeholder="your@email.com"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  onBlur={(e) => {
-                    if (e.target.value.trim()) focusNext(phoneRef);
-                  }}
-                  className="text-sm"
-                />
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm">Email * {emailVerified && <span className="text-green-600 text-xs ml-2">✓ Verified</span>}</Label>
+                <div className="flex gap-2">
+                  <Input
+                    ref={emailRef}
+                    id="email"
+                    type="email"
+                    placeholder="your@email.com"
+                    value={formData.email}
+                    onChange={(e) => handleEmailChange(e.target.value)}
+                    className="text-sm flex-1"
+                    disabled={emailVerified}
+                  />
+                  {!emailVerified && (
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleSendVerificationCode}
+                      disabled={isSendingCode || !formData.email}
+                    >
+                      {isSendingCode ? "Sending..." : codeSent ? "Resend" : "Verify"}
+                    </Button>
+                  )}
+                </div>
+                {codeSent && !emailVerified && (
+                  <div className="flex gap-2 mt-2">
+                    <Input
+                      type="text"
+                      placeholder="Enter 6-digit code"
+                      value={formData.verificationCode}
+                      onChange={(e) => setFormData({ ...formData, verificationCode: e.target.value.replace(/\D/g, '').slice(0, 6) })}
+                      className="text-sm flex-1"
+                      maxLength={6}
+                    />
+                    <Button 
+                      type="button" 
+                      size="sm"
+                      onClick={handleVerifyCode}
+                      disabled={isVerifyingCode || formData.verificationCode.length !== 6}
+                    >
+                      {isVerifyingCode ? "Verifying..." : "Confirm"}
+                    </Button>
+                  </div>
+                )}
+                {codeSent && !emailVerified && (
+                  <p className="text-xs text-muted-foreground">Check your email for the verification code (expires in 10 min)</p>
+                )}
               </div>
 
               <div>

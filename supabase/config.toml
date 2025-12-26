@@ -26,7 +26,10 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.send-reminders]
-# Temporarily disable JWT verification for easier testing of reminder processing.
-# WARNING: This makes the function publicly callable; consider re-enabling or
-# adding a shared secret header before production use.
+verify_jwt = false
+
+[functions.send-verification-code]
+verify_jwt = false
+
+[functions.verify-email-code]
 verify_jwt = false
