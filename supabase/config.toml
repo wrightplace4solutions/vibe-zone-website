@@ -17,7 +17,7 @@ verify_jwt = true
 verify_jwt = false
 
 [functions.create-booking-hold]
-verify_jwt = true
+verify_jwt = false
 
 [functions.get-booking-status]
 verify_jwt = true
