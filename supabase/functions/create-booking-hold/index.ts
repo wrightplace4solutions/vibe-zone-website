@@ -97,6 +97,7 @@ const requestSchema = z.object({
   notes: z.string().max(1000, "Notes too long").optional().default(""),
   honeypot: z.string().max(0, "Suspicious submission").optional().default(""),
   formLoadedAt: z.number().optional(), // Timestamp when form was loaded (for time-based bot detection)
+  verificationCode: z.string().length(6, "Verification code required").regex(/^\d{6}$/, "Invalid verification code"),
 });
 
 const hashIdentifier = async (value: string) => {
@@ -336,6 +337,37 @@ serve(async (req) => {
 
     const normalizedEmail = customer.email; // Already lowercased by schema
 
+    // Verify email verification code
+    const { data: verification, error: verifyError } = await supabase
+      .from("email_verifications")
+      .select("id, verified_at, used_at, expires_at")
+      .eq("email", normalizedEmail)
+      .eq("code", payload.verificationCode)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (verifyError) {
+      console.error("Email verification lookup failed:", verifyError);
+      return sendError("Unable to verify email. Please try again.", 503);
+    }
+
+    if (!verification) {
+      return sendError("Invalid verification code. Please verify your email first.", 400);
+    }
+
+    if (!verification.verified_at) {
+      return sendError("Email not verified. Please complete email verification first.", 400);
+    }
+
+    if (new Date(verification.expires_at) < new Date()) {
+      return sendError("Verification code has expired. Please request a new one.", 400);
+    }
+
+    if (verification.used_at) {
+      return sendError("This verification code has already been used. Please request a new one.", 400);
+    }
+
     const ipAddress = getClientIp(req.headers);
     let ipHash: string | null = null;
     if (ipAddress) {
@@ -434,6 +466,12 @@ Selected Add-ons: ${addOnSummary}`.trim();
       console.error("Booking insert failed", bookingError);
       return sendError("Unable to save booking. Please try again.", 500);
     }
+
+    // Mark verification code as used
+    await supabase
+      .from("email_verifications")
+      .update({ used_at: new Date().toISOString() })
+      .eq("id", verification.id);
 
     await supabase
       .from("booking_rate_limits")
