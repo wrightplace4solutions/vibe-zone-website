@@ -28,7 +28,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
-          identifier: string
+          identifier?: string
           ip_hash?: string | null
           request_count?: number
           window_start?: string
