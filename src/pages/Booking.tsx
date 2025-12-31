@@ -361,20 +361,33 @@ const Booking = () => {
     try {
       const { supabase, isSupabaseStub } = await import("@/integrations/supabase/client");
       
+      // Debug logging for production troubleshooting
+      console.log("[EmailVerification] Starting send-verification-code");
+      console.log("[EmailVerification] isSupabaseStub:", isSupabaseStub);
+      console.log("[EmailVerification] VITE_SUPABASE_URL exists:", !!import.meta.env.VITE_SUPABASE_URL);
+      console.log("[EmailVerification] VITE_SUPABASE_PUBLISHABLE_KEY exists:", !!import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY);
+      
       if (isSupabaseStub) {
-        throw new Error("Backend not configured. Please check environment variables.");
+        throw new Error("Backend not configured. Please check environment variables (VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY).");
       }
       
+      console.log("[EmailVerification] Calling supabase.functions.invoke...");
       const { data, error } = await supabase.functions.invoke("send-verification-code", {
         body: { email: formData.email.toLowerCase() },
       });
+      console.log("[EmailVerification] Response - data:", data, "error:", error);
 
       if (error) {
-        console.error("Verification code send error:", error);
+        console.error("[EmailVerification] Function returned error:", error);
+        // Check if this is the generic "Failed to send a request" error
+        if (error.message?.includes("Failed to send a request")) {
+          throw new Error("Unable to reach the server. Please check your internet connection and try again. If the problem persists, please contact support.");
+        }
         throw new Error(error.message || "Failed to send verification code");
       }
 
       if (!data?.success) {
+        console.error("[EmailVerification] Data indicates failure:", data);
         throw new Error(data?.error || "Failed to send verification code");
       }
 
@@ -385,7 +398,7 @@ const Booking = () => {
         description: "Check your email for the 6-digit verification code.",
       });
     } catch (error: any) {
-      console.error("Send verification code error:", error);
+      console.error("[EmailVerification] Error caught:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to send verification code. Please try again.",
