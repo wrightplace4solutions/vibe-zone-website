@@ -359,13 +359,23 @@ const Booking = () => {
 
     setIsSendingCode(true);
     try {
-      const { supabase } = await import("@/integrations/supabase/client");
+      const { supabase, isSupabaseStub } = await import("@/integrations/supabase/client");
+      
+      if (isSupabaseStub) {
+        throw new Error("Backend not configured. Please check environment variables.");
+      }
+      
       const { data, error } = await supabase.functions.invoke("send-verification-code", {
         body: { email: formData.email.toLowerCase() },
       });
 
       if (error) {
+        console.error("Verification code send error:", error);
         throw new Error(error.message || "Failed to send verification code");
+      }
+
+      if (!data?.success) {
+        throw new Error(data?.error || "Failed to send verification code");
       }
 
       setCodeSent(true);
@@ -375,6 +385,7 @@ const Booking = () => {
         description: "Check your email for the 6-digit verification code.",
       });
     } catch (error: any) {
+      console.error("Send verification code error:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to send verification code. Please try again.",
@@ -398,7 +409,12 @@ const Booking = () => {
 
     setIsVerifyingCode(true);
     try {
-      const { supabase } = await import("@/integrations/supabase/client");
+      const { supabase, isSupabaseStub } = await import("@/integrations/supabase/client");
+      
+      if (isSupabaseStub) {
+        throw new Error("Backend not configured. Please check environment variables.");
+      }
+      
       const { data, error } = await supabase.functions.invoke("verify-email-code", {
         body: { 
           email: formData.email.toLowerCase(),
@@ -407,17 +423,21 @@ const Booking = () => {
       });
 
       if (error) {
+        console.error("Verify code error:", error);
         throw new Error(error.message || "Invalid verification code");
       }
 
-      if (data.verified) {
+      if (data?.verified) {
         setEmailVerified(true);
         toast({
           title: "Email Verified!",
           description: "You can now submit your booking request.",
         });
+      } else if (data?.error) {
+        throw new Error(data.error);
       }
     } catch (error: any) {
+      console.error("Verify code error:", error);
       toast({
         title: "Verification Failed",
         description: error.message || "Invalid or expired code. Please try again.",
