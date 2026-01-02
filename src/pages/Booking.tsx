@@ -1020,32 +1020,38 @@ const Booking = () => {
                       onClick={handleSendVerificationCode}
                       disabled={isSendingCode || !formData.email}
                     >
-                      {isSendingCode ? "Sending..." : codeSent ? "Resend" : "Verify"}
+                      {isSendingCode ? "Sending..." : codeSent ? "Resend Code" : "Send Verification Code"}
                     </Button>
                   )}
                 </div>
+                
+                {/* OTP Input Section - Always visible after code is sent */}
                 {codeSent && !emailVerified && (
-                  <div className="flex gap-2 mt-2">
-                    <Input
-                      type="text"
-                      placeholder="Enter 6-digit code"
-                      value={formData.verificationCode}
-                      onChange={(e) => setFormData({ ...formData, verificationCode: e.target.value.replace(/\D/g, '').slice(0, 6) })}
-                      className="text-sm flex-1"
-                      maxLength={6}
-                    />
-                    <Button 
-                      type="button" 
-                      size="sm"
-                      onClick={handleVerifyCode}
-                      disabled={isVerifyingCode || formData.verificationCode.length !== 6}
-                    >
-                      {isVerifyingCode ? "Verifying..." : "Confirm"}
-                    </Button>
+                  <div className="space-y-3 mt-3 p-3 border rounded-lg bg-muted/30">
+                    <p className="text-sm font-medium text-foreground">Enter the 6-digit code sent to your email:</p>
+                    <div className="flex gap-2">
+                      <Input
+                        type="text"
+                        placeholder="000000"
+                        value={formData.verificationCode}
+                        onChange={(e) => setFormData({ ...formData, verificationCode: e.target.value.replace(/\D/g, '').slice(0, 6) })}
+                        className="text-sm flex-1 text-center tracking-widest font-mono text-lg"
+                        maxLength={6}
+                        autoFocus
+                      />
+                      <Button 
+                        type="button" 
+                        size="sm"
+                        onClick={handleVerifyCode}
+                        disabled={isVerifyingCode || formData.verificationCode.length !== 6}
+                      >
+                        {isVerifyingCode ? "Verifying..." : "Verify Code"}
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Code expires in 10 minutes. Didn't receive it? Check your spam folder or click "Resend Code".
+                    </p>
                   </div>
-                )}
-                {codeSent && !emailVerified && (
-                  <p className="text-xs text-muted-foreground">Check your email for the verification code (expires in 10 min)</p>
                 )}
               </div>
 
