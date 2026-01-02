@@ -17,10 +17,13 @@ verify_jwt = true
 verify_jwt = false
 
 [functions.create-booking-hold]
+# Disabled JWT verification to allow unauthenticated bookings
+# The function has its own rate limiting and validation
 verify_jwt = false
 
 [functions.get-booking-status]
-verify_jwt = true
+# Disabled JWT verification to allow checking booking status without login
+verify_jwt = false
 
 [functions.check-expired-holds]
 verify_jwt = true
