@@ -1166,17 +1166,26 @@ const Booking = () => {
         {step === 4 && holdConfirmed && (
           <Card className="border-primary">
             <CardHeader className="pb-2 sm:pb-4">
-              <CardTitle className="text-primary text-lg sm:text-xl">Hold Requested Successfully!</CardTitle>
+            <CardTitle className="text-primary text-lg sm:text-xl">Hold Requested Successfully!</CardTitle>
               <CardDescription className="text-xs sm:text-sm">
-                We've placed a temporary 48-HOUR HOLD on your date under "{formData.name} - {formData.date && format(formData.date, "MMM d, yyyy")}". Complete the deposit within 48 hours to confirm your booking.
+                We've placed a temporary 72-HOUR HOLD on your date under "{formData.name} - {formData.date && format(formData.date, "MMM d, yyyy")}". Complete the deposit within 72 hours to confirm your booking.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 sm:space-y-4">
               <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 p-3 sm:p-4 rounded-lg">
-                <p className="text-xs sm:text-sm font-semibold text-amber-900 dark:text-amber-100 mb-1 sm:mb-2">⏰ Important: 48-Hour Hold Policy</p>
+                <p className="text-xs sm:text-sm font-semibold text-amber-900 dark:text-amber-100 mb-1 sm:mb-2">⏰ Important: 72-Hour Hold Policy</p>
                 <p className="text-xs sm:text-sm text-amber-800 dark:text-amber-200">
-                  Your booking hold expires in 48 hours. If payment is not received by then, the hold will be automatically 
-                  released and both you and our team will be notified. Pay now to secure your date immediately!
+                  Your booking hold expires in 72 hours. You will receive reminder emails at 48 hours and 24 hours if deposit is not received. 
+                  If payment is not made within 72 hours, the hold will be automatically cancelled and you will be notified. Pay now to secure your date immediately!
+                </p>
+              </div>
+              
+              <div className="bg-muted/50 border border-border p-3 rounded-lg">
+                <p className="text-xs text-muted-foreground">
+                  📋 <strong>Policy Note:</strong> By submitting this booking request, you agree to our{" "}
+                  <a href="/terms" className="text-primary hover:underline">Terms of Service</a> and{" "}
+                  <a href="/refunds" className="text-primary hover:underline">Refund Policy</a>. 
+                  Deposits are non-refundable but may be transferred to a new date within the specified window.
                 </p>
               </div>
 

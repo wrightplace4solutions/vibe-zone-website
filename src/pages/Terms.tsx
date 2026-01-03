@@ -13,16 +13,20 @@ const Terms = () => {
             <div className="prose prose-sm sm:prose prose-slate dark:prose-invert">
               <p className="text-xs sm:text-sm">
                 <strong>Hold Requests:</strong> When you submit a booking request, we place a temporary HOLD on your 
-                selected date for 48 hours. This hold is reserved under your name and event details.
+                selected date for 72 hours. This hold is reserved under your name and event details and added to our calendar.
               </p>
               <p className="text-xs sm:text-sm">
-                <strong>48-Hour Payment Window:</strong> To confirm your booking, you must complete the deposit payment 
-                within 48 hours of submitting your booking request. If payment is made during the same session, your 
-                booking is immediately confirmed. If paying later, you have up to 48 hours from the time of booking.
+                <strong>72-Hour Payment Window:</strong> To confirm your booking, you must complete the deposit payment 
+                within 72 hours of submitting your booking request. If payment is made during the same session, your 
+                booking is immediately confirmed. If paying later, you have up to 72 hours from the time of booking.
               </p>
               <p className="text-xs sm:text-sm">
-                <strong>Expired Holds:</strong> If payment is not received within 48 hours, the hold will automatically 
-                be released and the date becomes available to other clients. Both you and Vibe Zone Entertainment will 
+                <strong>Payment Reminders:</strong> You will receive reminder emails at 48 hours and 24 hours before your 
+                hold expires if deposit has not been received.
+              </p>
+              <p className="text-xs sm:text-sm">
+                <strong>Expired Holds:</strong> If payment is not received within 72 hours, the hold will automatically 
+                be cancelled and the date becomes available to other clients. Both you and Vibe Zone Entertainment will 
                 receive a notification when a hold expires. You may submit a new booking request if the date is still available.
               </p>
               <p className="text-xs sm:text-sm">
