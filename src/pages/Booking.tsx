@@ -151,6 +151,52 @@ interface FormData {
 
 const MIN_FORM_COMPLETION_MS = 5000;
 
+// Countdown Timer Component
+const CountdownTimer = ({ expiryTime, onExpire }: { expiryTime: Date | null; onExpire: () => void }) => {
+  const [timeLeft, setTimeLeft] = useState<number>(0);
+
+  useEffect(() => {
+    if (!expiryTime) return;
+
+    const calculateTimeLeft = () => {
+      const now = new Date().getTime();
+      const expiry = expiryTime.getTime();
+      const difference = Math.max(0, Math.floor((expiry - now) / 1000));
+      return difference;
+    };
+
+    setTimeLeft(calculateTimeLeft());
+
+    const interval = setInterval(() => {
+      const remaining = calculateTimeLeft();
+      setTimeLeft(remaining);
+      if (remaining <= 0) {
+        clearInterval(interval);
+        onExpire();
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [expiryTime, onExpire]);
+
+  if (!expiryTime || timeLeft <= 0) {
+    return <span className="text-xs text-destructive font-medium">Code expired</span>;
+  }
+
+  const minutes = Math.floor(timeLeft / 60);
+  const seconds = timeLeft % 60;
+  const isLow = timeLeft <= 60;
+
+  return (
+    <span className={cn(
+      "text-xs font-mono font-medium px-2 py-1 rounded",
+      isLow ? "text-destructive bg-destructive/10" : "text-amber-600 bg-amber-50 dark:bg-amber-950/30 dark:text-amber-400"
+    )}>
+      {minutes}:{seconds.toString().padStart(2, '0')}
+    </span>
+  );
+};
+
 const Booking = () => {
   const [searchParams] = useSearchParams();
   const [step, setStep] = useState(1);
@@ -1028,7 +1074,10 @@ const Booking = () => {
                 {/* OTP Input Section - Always visible after code is sent */}
                 {codeSent && !emailVerified && (
                   <div className="space-y-3 mt-3 p-3 border rounded-lg bg-muted/30">
-                    <p className="text-sm font-medium text-foreground">Enter the 6-digit code sent to your email:</p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium text-foreground">Enter the 6-digit code sent to your email:</p>
+                      <CountdownTimer expiryTime={codeExpiry} onExpire={() => setCodeSent(false)} />
+                    </div>
                     <div className="flex gap-2">
                       <Input
                         type="text"
@@ -1049,7 +1098,7 @@ const Booking = () => {
                       </Button>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Code expires in 10 minutes. Didn't receive it? Check your spam folder or click "Resend Code".
+                      Didn't receive it? Check your spam folder or click "Resend Code".
                     </p>
                   </div>
                 )}
