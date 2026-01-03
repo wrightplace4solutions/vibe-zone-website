@@ -36,3 +36,6 @@ verify_jwt = false
 
 [functions.verify-email-code]
 verify_jwt = false
+
+[functions.test-calendar-sync]
+verify_jwt = false
