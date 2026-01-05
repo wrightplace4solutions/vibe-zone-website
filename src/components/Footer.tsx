@@ -39,6 +39,11 @@ export const Footer = () => {
                   Contact Us
                 </Link>
               </li>
+              <li>
+                <Link to="/admin" className="text-muted-foreground/50 hover:text-muted-foreground text-xs">
+                  Admin Access
+                </Link>
+              </li>
             </ul>
           </div>
 
