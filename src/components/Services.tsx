@@ -51,11 +51,11 @@ export const Services = () => {
             return (
               <Card 
                 key={index}
-                className="bg-card/50 backdrop-blur border-border transition-all duration-300 group animate-fade-in"
+                className="bg-card/50 backdrop-blur border-border animate-fade-in"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <CardContent className="p-3 md:p-4 text-center">
-                  <div className={`inline-flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-background mb-2 ${service.color} group-hover:glow-neon transition-all`}>
+                  <div className={`inline-flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-background mb-2 ${service.color}`}>
                     <Icon className="w-5 h-5 md:w-6 md:h-6" />
                   </div>
                   <h3 className="text-sm md:text-base font-bold mb-1 text-foreground">{service.title}</h3>
