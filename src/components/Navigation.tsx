@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Home, DollarSign, Calendar, FileText, RefreshCw, Mail, Music, BookOpen } from "lucide-react";
-import { useState } from "react";
+import { Menu, X, Home, DollarSign, Calendar, FileText, RefreshCw, Mail, Music, BookOpen, Shield } from "lucide-react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import vibeZoneLogo from "@/assets/vibe-zone-logo.png";
 
