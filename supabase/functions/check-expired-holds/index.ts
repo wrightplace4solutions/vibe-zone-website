@@ -9,6 +9,121 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 const BUSINESS_EMAIL = "dcn8tve2@yahoo.com";
 
+// Google Calendar configuration
+const GOOGLE_CLIENT_ID = Deno.env.get("GOOGLE_CALENDAR_CLIENT_ID") || "";
+const GOOGLE_CLIENT_SECRET = Deno.env.get("GOOGLE_CALENDAR_CLIENT_SECRET") || "";
+const GOOGLE_REFRESH_TOKEN = Deno.env.get("GOOGLE_CALENDAR_REFRESH_TOKEN") || "";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+// Get Google access token
+async function getGoogleAccessToken(): Promise<string> {
+  const response = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_id: GOOGLE_CLIENT_ID,
+      client_secret: GOOGLE_CLIENT_SECRET,
+      refresh_token: GOOGLE_REFRESH_TOKEN,
+      grant_type: "refresh_token",
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to get access token: ${await response.text()}`);
+  }
+
+  const data = await response.json();
+  return data.access_token;
+}
+
+// Update calendar event to show cancelled/expired
+async function updateCalendarEventAsCancelled(eventId: string, booking: any): Promise<boolean> {
+  try {
+    console.log("Updating calendar event as cancelled:", eventId);
+    const accessToken = await getGoogleAccessToken();
+
+    const eventDate = booking.event_date;
+    const startTime = booking.start_time || "18:00";
+    const endTime = booking.end_time || "22:00";
+
+    const locationParts = [
+      booking.venue_name,
+      booking.street_address,
+      booking.city,
+      booking.state,
+      booking.zip_code
+    ].filter(Boolean);
+    const location = locationParts.join(", ") || "TBD";
+
+    const description = `
+❌ CANCELLED - Deposit Not Received
+
+This booking has been automatically cancelled due to non-payment within the 72-hour hold period.
+
+Customer: ${booking.customer_name}
+Email: ${booking.customer_email}
+Phone: ${booking.customer_phone}
+
+Event Type: ${booking.event_type}
+Service Tier: ${booking.service_tier}
+Package: ${booking.package_type || "Standard"}
+
+Location: ${location}
+
+Total Amount: $${booking.total_amount}
+Deposit Required: $${booking.deposit_amount || "N/A"}
+
+Booking ID: ${booking.id}
+Created: ${booking.created_at}
+Expired: ${new Date().toISOString()}
+
+The date is now available for new bookings.
+`.trim();
+
+    const calendarEvent = {
+      summary: `[CANCELLED] Vibe Zone - ${booking.event_type} (${booking.customer_name})`,
+      description: description,
+      location: location,
+      start: {
+        dateTime: `${eventDate}T${startTime}:00`,
+        timeZone: "America/New_York",
+      },
+      end: {
+        dateTime: `${eventDate}T${endTime}:00`,
+        timeZone: "America/New_York",
+      },
+      colorId: "11", // Red for cancelled
+    };
+
+    const response = await fetch(
+      `https://www.googleapis.com/calendar/v3/calendars/primary/events/${eventId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Authorization": `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(calendarEvent),
+      }
+    );
+
+    if (!response.ok) {
+      console.error("Failed to update calendar event:", await response.text());
+      return false;
+    }
+
+    console.log("Calendar event updated as cancelled:", eventId);
+    return true;
+  } catch (error) {
+    console.error("Error updating calendar event:", error);
+    return false;
+  }
+}
+
 const formatTimeDisplay = (time: string) => {
   if (!time) return "TBD";
   const [hours, minutes] = time.split(":");
@@ -72,7 +187,7 @@ const send24HourReminderEmail = async (booking: any) => {
           <p>Don't miss out! If payment isn't received within 24 hours, your reservation will be released and the date will become available to other customers.</p>
           
           <div class="cta">
-            <a href="${booking.stripe_session_id ? `https://checkout.stripe.com/c/pay/${booking.stripe_session_id}` : 'https://vzentertainment.fun/booking'}" class="button">Complete Payment Now</a>
+            <a href="https://vzentertainment.fun/booking" class="button">Complete Payment Now</a>
           </div>
           
           <div style="text-align: center; margin: 20px 0;">
@@ -175,7 +290,7 @@ const sendCancellationEmails = async (booking: any) => {
     <body>
       <div class="container">
         <div class="header">
-          <h1>Reservation Expired</h1>
+          <h1>❌ Reservation Expired</h1>
           <p>VZ Entertainment DJ Services</p>
         </div>
         <div class="content">
@@ -264,7 +379,7 @@ const sendCancellationEmails = async (booking: any) => {
     await resend.emails.send({
       from: "VZ Entertainment <onboarding@resend.dev>",
       to: [booking.customer_email],
-      subject: `Reservation Expired - ${formatDateDisplay(booking.event_date)}`,
+      subject: `❌ Reservation Expired - ${formatDateDisplay(booking.event_date)}`,
       html: customerEmailHtml,
     });
 
@@ -276,17 +391,19 @@ const sendCancellationEmails = async (booking: any) => {
     });
 
     console.log(`Cancellation emails sent for booking ${booking.id}`);
+    return true;
   } catch (error) {
     console.error(`Error sending cancellation emails for booking ${booking.id}:`, error);
+    return false;
   }
 };
 
 serve(async (req) => {
-  const CRON_SECRET = Deno.env.get('CRON_SECRET');
-  const authHeader = req.headers.get('x-cron-secret');
-  if (CRON_SECRET && authHeader !== CRON_SECRET) {
-    return new Response('Unauthorized', { status: 401 });
+  // Handle CORS preflight
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
   }
+
   try {
     console.log("Checking for expired booking holds and sending reminders...");
 
@@ -314,7 +431,6 @@ serve(async (req) => {
       for (const booking of reminderBookings) {
         const sent = await send24HourReminderEmail(booking);
         if (sent) {
-          // Mark reminder as sent
           await supabase
             .from("bookings")
             .update({ reminder_sent_at: new Date().toISOString() })
@@ -340,8 +456,12 @@ serve(async (req) => {
     if (!expiredBookings || expiredBookings.length === 0) {
       console.log("No expired bookings found");
       return new Response(
-        JSON.stringify({ message: "No expired bookings found", count: 0 }),
-        { headers: { "Content-Type": "application/json" }, status: 200 }
+        JSON.stringify({ 
+          message: "No expired bookings found", 
+          reminders_sent: reminderBookings?.length || 0,
+          expired_count: 0 
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
       );
     }
 
@@ -350,6 +470,7 @@ serve(async (req) => {
     const results = [];
     for (const booking of expiredBookings) {
       try {
+        // Update booking status to expired
         const { error: updateError } = await supabase
           .from("bookings")
           .update({
@@ -368,15 +489,29 @@ serve(async (req) => {
           continue;
         }
 
-        await sendCancellationEmails(booking);
+        // Update Google Calendar event if it exists
+        let calendarUpdated = false;
+        if (booking.google_calendar_event_id) {
+          calendarUpdated = await updateCalendarEventAsCancelled(
+            booking.google_calendar_event_id, 
+            booking
+          );
+        }
+
+        // Send cancellation emails
+        const emailsSent = await sendCancellationEmails(booking);
 
         results.push({
           booking_id: booking.id,
           success: true,
           event_date: booking.event_date,
+          customer_name: booking.customer_name,
           status: 'expired',
-          emails_sent: true,
+          emails_sent: emailsSent,
+          calendar_updated: calendarUpdated,
         });
+
+        console.log(`Booking ${booking.id} expired successfully`);
       } catch (error) {
         console.error(`Error processing booking ${booking.id}:`, error);
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
@@ -391,11 +526,12 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         message: `Processed ${expiredBookings.length} expired booking(s)`,
-        count: expiredBookings.length,
+        reminders_sent: reminderBookings?.length || 0,
+        expired_count: expiredBookings.length,
         results: results,
       }),
       {
-        headers: { "Content-Type": "application/json" },
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
       }
     );
@@ -405,7 +541,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ error: errorMessage }),
       {
-        headers: { "Content-Type": "application/json" },
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500,
       }
     );
