@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, ShieldAlert, Database, Users } from "lucide-react";
+import { BookingManagement } from "@/components/admin/BookingManagement";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -112,7 +113,6 @@ const AdminDashboard = () => {
           : "Site is now fully accessible",
       });
 
-      // Refresh after 2 seconds to apply changes
       setTimeout(() => window.location.reload(), 2000);
     } catch (error) {
       console.error("Error updating maintenance mode:", error);
@@ -145,6 +145,9 @@ const AdminDashboard = () => {
           <ShieldAlert className="h-8 w-8 text-primary" />
           <h1 className="text-4xl font-bold">Admin Dashboard</h1>
         </div>
+
+        {/* Booking Management */}
+        <BookingManagement />
 
         {/* Maintenance Mode Control */}
         <Card>

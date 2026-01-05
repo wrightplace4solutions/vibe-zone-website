@@ -147,16 +147,36 @@ export default function MyBookings() {
 
   // Check if user can still pay deposit (72 hours from booking creation)
   const canPayDeposit = (booking: Booking): boolean => {
-    if (booking.status === 'confirmed' || booking.status === 'cancelled') return false;
+    if (booking.status === 'confirmed' || booking.status === 'cancelled' || booking.status === 'expired') return false;
     const hoursSinceBooking = getHoursSinceBooking(booking.created_at);
     return hoursSinceBooking <= 72;
   };
 
   // Check if user can edit (72 hours before event)
   const canEdit = (booking: Booking): boolean => {
-    if (booking.status === 'cancelled') return false;
+    if (booking.status === 'cancelled' || booking.status === 'expired') return false;
     const hoursUntilEvent = getHoursUntilEvent(booking.event_date);
     return hoursUntilEvent >= 72;
+  };
+
+  // Get status action message for user
+  const getStatusActionMessage = (booking: Booking): { message: string; type: 'success' | 'warning' | 'error' | 'info' } => {
+    switch (booking.status) {
+      case 'confirmed':
+        return { message: '✓ Confirmed by appointment - Deposit received', type: 'success' };
+      case 'pending':
+        const hoursSince = getHoursSinceBooking(booking.created_at);
+        if (hoursSince > 72) {
+          return { message: 'Deposit hold expired - Date may no longer be available', type: 'error' };
+        }
+        return { message: 'Action Required: Pay deposit to confirm booking', type: 'warning' };
+      case 'expired':
+        return { message: 'Booking cancelled - No deposit received within 72 hours', type: 'error' };
+      case 'cancelled':
+        return { message: 'Booking cancelled', type: 'error' };
+      default:
+        return { message: 'No action required', type: 'info' };
+    }
   };
 
   // Get time remaining for deposit
@@ -274,6 +294,8 @@ export default function MyBookings() {
         return <Badge className="bg-green-100 text-green-800 hover:bg-green-100"><CheckCircle className="w-3 h-3 mr-1" />Confirmed</Badge>;
       case 'pending':
         return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100"><Clock className="w-3 h-3 mr-1" />Pending Payment</Badge>;
+      case 'expired':
+        return <Badge className="bg-red-100 text-red-800 hover:bg-red-100"><AlertCircle className="w-3 h-3 mr-1" />Expired</Badge>;
       case 'cancelled':
         return <Badge className="bg-red-100 text-red-800 hover:bg-red-100"><AlertCircle className="w-3 h-3 mr-1" />Cancelled</Badge>;
       default:
@@ -340,6 +362,7 @@ export default function MyBookings() {
               const canPayDep = canPayDeposit(booking);
               const canEditBooking = canEdit(booking);
               const packageInfo = getPackageInfo(booking.service_tier);
+              const statusAction = getStatusActionMessage(booking);
 
               return (
                 <Card key={booking.id} className="overflow-hidden">
@@ -386,7 +409,36 @@ export default function MyBookings() {
                   {isExpanded && (
                     <CardContent className="pt-0 space-y-4">
                       <Separator />
-                      
+
+                      {/* Status Action Message */}
+                      <div className={`rounded-lg p-3 sm:p-4 ${
+                        statusAction.type === 'success' ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' :
+                        statusAction.type === 'warning' ? 'bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800' :
+                        statusAction.type === 'error' ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800' :
+                        'bg-muted/30 border border-border'
+                      }`}>
+                        <p className={`text-sm font-medium ${
+                          statusAction.type === 'success' ? 'text-green-700 dark:text-green-300' :
+                          statusAction.type === 'warning' ? 'text-yellow-700 dark:text-yellow-300' :
+                          statusAction.type === 'error' ? 'text-red-700 dark:text-red-300' :
+                          'text-foreground'
+                        }`}>
+                          {statusAction.message}
+                        </p>
+                        {(booking.status === 'expired' || booking.status === 'cancelled') && (
+                          <Button
+                            variant="link"
+                            size="sm"
+                            className="p-0 h-auto mt-2 text-primary"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate('/booking');
+                            }}
+                          >
+                            Check availability for a new booking →
+                          </Button>
+                        )}
+                      </div>
                       {/* Package Details */}
                       <div className="bg-muted/30 rounded-lg p-3 sm:p-4">
                         <h4 className="font-semibold text-sm sm:text-base mb-2 flex items-center gap-2">
