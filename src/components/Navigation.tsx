@@ -7,7 +7,24 @@ import vibeZoneLogo from "@/assets/vibe-zone-logo.png";
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const location = useLocation();
+
+  useEffect(() => {
+    checkAdminStatus();
+  }, []);
+
+  const checkAdminStatus = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: roles } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin');
+      setIsAdmin(roles && roles.length > 0);
+    }
+  };
 
   const links = [
     { path: "/", label: "Home", icon: Home },
@@ -18,6 +35,7 @@ export const Navigation = () => {
     { path: "/refunds", label: "Refunds", icon: RefreshCw },
     { path: "/vibeque", label: "VibeQue", icon: Music },
     { path: "/auth", label: "My Bookings", icon: BookOpen },
+    ...(isAdmin ? [{ path: "/admin", label: "Admin", icon: Shield }] : []),
   ];
 
   const isActive = (path: string) => location.pathname === path;
