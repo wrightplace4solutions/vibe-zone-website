@@ -81,8 +81,9 @@ export const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t mt-8 pt-8 text-center text-muted-foreground text-sm">
-          <p>&copy; {currentYear} Vibe Zone Entertainment and Soulware Systems. All rights reserved.</p>
+        <div className="border-t mt-8 pt-8 text-center text-muted-foreground text-sm space-y-1">
+          <p>&copy; 2023–2026 WrightPlace4Solutions LLC. All Rights Reserved.</p>
+          <p>Vibe Zone Entertainment is a brand of WrightPlace4Solutions LLC.</p>
         </div>
       </div>
     </footer>
