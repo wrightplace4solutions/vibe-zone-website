@@ -3,10 +3,10 @@ import { Mail, Phone, Instagram } from "lucide-react";
 
 export const ContactCTA = () => {
   return (
-    <section className="py-10 md:py-12 px-4 relative overflow-hidden">
+    <section className="py-12 md:py-14 px-4 relative overflow-hidden">
       {/* Background effects */}
-      <div className="absolute inset-0 bg-gradient-to-t from-primary/10 via-background to-background"></div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-primary/20 rounded-full blur-3xl animate-glow-pulse"></div>
+      <div className="absolute inset-0 bg-gradient-to-t from-primary/8 via-background to-background"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[240px] bg-primary/12 rounded-full blur-2xl animate-glow-pulse"></div>
       
       <div className="container mx-auto relative z-10">
         <div className="max-w-2xl mx-auto text-center animate-fade-in">

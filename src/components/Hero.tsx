@@ -4,44 +4,62 @@ import { Link } from "react-router-dom";
 
 export const Hero = () => {
   return (
-    <section className="relative min-h-[50vh] md:min-h-[60vh] flex items-center justify-center overflow-hidden bg-gradient-hero pt-16">
+    <section className="relative min-h-[68vh] md:min-h-[76vh] flex items-center overflow-hidden bg-gradient-hero pt-16">
       {/* Animated background grid */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(0,217,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,217,255,0.1)_1px,transparent_1px)] bg-[size:30px_30px] [perspective:1000px] [transform:rotateX(60deg)] opacity-30"></div>
       
-      {/* Glowing orbs - smaller */}
-      <div className="absolute top-1/4 left-1/4 w-48 h-48 md:w-64 md:h-64 bg-primary/20 rounded-full blur-3xl animate-float"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-48 h-48 md:w-64 md:h-64 bg-accent/20 rounded-full blur-3xl animate-float" style={{ animationDelay: "1s" }}></div>
+      {/* Controlled ambient accents */}
+      <div className="absolute top-24 left-10 w-40 h-40 md:w-56 md:h-56 bg-primary/12 rounded-full blur-2xl animate-float"></div>
+      <div className="absolute bottom-16 right-8 w-44 h-44 md:w-64 md:h-64 bg-accent/12 rounded-full blur-2xl animate-float" style={{ animationDelay: "1s" }}></div>
       
-      <div className="relative z-10 container mx-auto px-4 text-center animate-fade-in">
-        <div className="max-w-2xl mx-auto">
-          <img 
-            src={vibeZoneLogo} 
-            alt="Vibe Zone Entertainment - DJ Def Stef specializing in Line Dance and Trail Ride music" 
-            className="w-full max-w-[200px] md:max-w-[250px] mx-auto mb-4 animate-glow-pulse" 
-            loading="eager" 
-          />
-          
-          <p className="text-base md:text-lg text-muted-foreground mb-6 max-w-xl mx-auto px-2">
-            Specializing in <span className="text-neon-cyan font-bold">Line Dance</span> and{" "}
-            <span className="text-neon-orange font-bold">Trailride</span> songs that keep the party moving
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-            <Button
-              asChild
-              size="default"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm px-6 py-4 glow-neon transition-all hover:scale-105"
-            >
-              <Link to="/booking">Book DJ Def Stef</Link>
-            </Button>
-            <Button
-              asChild
-              size="default"
-              variant="outline"
-              className="border-2 border-accent text-accent hover:bg-accent hover:text-accent-foreground font-bold text-sm px-6 py-4 transition-all hover:scale-105"
-            >
-              <Link to="/vibeque">Explore Vibe Que App</Link>
-            </Button>
+      <div className="relative z-10 container mx-auto px-4 animate-fade-in">
+        <div className="grid items-center gap-10 lg:gap-14 md:grid-cols-2">
+          <div className="text-center md:text-left max-w-2xl">
+            <h1 className="text-4xl leading-tight md:text-5xl lg:text-6xl font-black tracking-tight mb-5">
+              <span className="text-neon-cyan">More Than Music.</span>{" "}
+              <span className="text-foreground">It&apos;s A Vibe.</span>
+            </h1>
+
+            <p className="text-base md:text-lg text-muted-foreground mb-8 md:mb-10 max-w-xl mx-auto md:mx-0 leading-relaxed">
+              Line Dance • Trail Ride • Weddings • Corporate Events • Interactive Crowd Experience
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center md:justify-start items-center">
+              <Button
+                asChild
+                size="lg"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm md:text-base px-7 py-6 glow-neon transition-all hover:scale-[1.03]"
+              >
+                <Link to="/booking">Book DJ Def Stef</Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="border-2 border-accent/70 text-accent hover:bg-accent hover:text-accent-foreground font-bold text-sm md:text-base px-7 py-6 transition-all hover:scale-[1.03]"
+              >
+                <Link to="/vibeque">Explore Vibe Que App</Link>
+              </Button>
+            </div>
+          </div>
+
+          <div className="relative flex items-center justify-center">
+            <div className="absolute w-[260px] h-[260px] md:w-[340px] md:h-[340px] bg-primary/15 rounded-full blur-2xl animate-glow-pulse"></div>
+            <div className="relative w-[250px] h-[250px] md:w-[330px] md:h-[330px] rounded-full border border-primary/35 bg-card/45 backdrop-blur-md flex items-center justify-center shadow-[0_0_35px_hsl(var(--primary)/0.18)]">
+              <div className="absolute inset-3 rounded-full border border-accent/20"></div>
+              <img
+                src={vibeZoneLogo}
+                alt="Vibe Zone Entertainment glowing emblem"
+                className="w-[72%] max-w-[240px] animate-float"
+                loading="eager"
+              />
+              <div className="absolute -top-3 right-3 text-[10px] md:text-xs uppercase tracking-[0.25em] text-primary/85 bg-background/70 border border-primary/30 px-2 py-1 rounded-full">
+                Nightlife Energy
+              </div>
+              <div className="absolute -bottom-3 left-4 text-[10px] md:text-xs uppercase tracking-[0.2em] text-accent/90 bg-background/70 border border-accent/30 px-2 py-1 rounded-full">
+                Premium Events
+              </div>
+            </div>
           </div>
         </div>
       </div>

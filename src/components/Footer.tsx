@@ -10,8 +10,12 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <h3 className="font-bold text-lg mb-4">Vibe Zone Entertainment</h3>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-muted-foreground text-sm mb-2">
               Professional DJ services for all occasions
+            </p>
+            <p className="text-muted-foreground text-sm">Serving Virginia & surrounding areas</p>
+            <p className="text-muted-foreground text-sm mt-1">
+              Available for weddings, corporate events, trail rides & private parties
             </p>
             <p className="text-primary font-bold mt-4 text-xl">#LETSWORK!!</p>
           </div>
@@ -77,6 +81,16 @@ export const Footer = () => {
               >
                 <Music2 className="h-6 w-6" />
               </a>
+            </div>
+
+            <div className="mt-5 space-y-2">
+              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground/80">Testimonials</p>
+              <div className="rounded-lg border border-border/70 bg-card/40 px-3 py-2 text-xs text-muted-foreground">
+                Guest review highlight coming soon.
+              </div>
+              <div className="rounded-lg border border-border/70 bg-card/40 px-3 py-2 text-xs text-muted-foreground">
+                Event partner feedback will appear here.
+              </div>
             </div>
           </div>
         </div>

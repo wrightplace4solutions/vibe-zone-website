@@ -27,20 +27,20 @@ const features = [
 
 export const VibeQueShowcase = () => {
   return (
-    <section className="py-10 md:py-12 px-4 relative overflow-hidden">
+    <section className="py-12 md:py-14 px-4 relative overflow-hidden">
       {/* Gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/6 via-background to-accent/8"></div>
       
       <div className="container mx-auto relative z-10">
         <div className="grid lg:grid-cols-2 gap-6 md:gap-8 items-center">
           {/* Left side - Content */}
           <div className="animate-fade-in">
-            <h2 className="text-xl md:text-2xl font-bold mb-3">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 tracking-tight">
               <span className="text-neon-cyan">Vibe Que</span>
               <br />
               <span className="text-neon-orange">Interactive DJ App</span>
             </h2>
-            <p className="text-sm md:text-base text-muted-foreground mb-4">
+            <p className="text-sm md:text-base text-muted-foreground mb-5 leading-relaxed">
               Revolutionize your event with our cutting-edge interactive DJ app. 
               Guests can request songs, vote on tracks, and stay connected with the music all night long.
             </p>
@@ -51,7 +51,7 @@ export const VibeQueShowcase = () => {
                 return (
                   <div 
                     key={index}
-                    className="flex items-start gap-3 p-2 md:p-3 rounded-lg bg-card/50 backdrop-blur border border-border hover:border-primary/50 transition-all animate-fade-in"
+                    className="flex items-start gap-3 p-2 md:p-3 rounded-lg bg-card/50 backdrop-blur border border-border hover:border-primary/40 transition-all animate-fade-in"
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     <div className="flex-shrink-0">
@@ -96,8 +96,8 @@ export const VibeQueShowcase = () => {
           <div className="relative animate-fade-in hidden md:block" style={{ animationDelay: "0.2s" }}>
             <div className="relative aspect-square max-w-[200px] mx-auto">
               {/* Phone mockup placeholder with glow effect */}
-              <div className="absolute inset-0 bg-gradient-neon rounded-2xl opacity-20 blur-2xl animate-glow-pulse"></div>
-              <div className="relative bg-card border-2 border-primary/50 rounded-2xl p-4 glow-neon">
+              <div className="absolute inset-0 bg-gradient-neon rounded-2xl opacity-12 blur-xl animate-glow-pulse"></div>
+              <div className="relative bg-card border-2 border-primary/35 rounded-2xl p-4 shadow-[0_0_28px_hsl(var(--primary)/0.15)]">
                 <div className="space-y-2">
                   <div className="h-6 bg-primary/20 rounded-lg animate-glow-pulse"></div>
                   <div className="h-16 bg-accent/20 rounded-lg animate-glow-pulse" style={{ animationDelay: "0.5s" }}></div>
