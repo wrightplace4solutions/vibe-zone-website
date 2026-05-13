@@ -74,6 +74,48 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
+  @keyframes float-soft {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  @keyframes pulse-soft {
+    0%,
+    100% {
+      opacity: 0.78;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes scroll-nudge {
+    0%,
+    100% {
+      transform: translate(-50%, 0);
+    }
+    50% {
+      transform: translate(-50%, 4px);
+    }
+  }
+
+  .animate-float-soft {
+    animation: float-soft 8s ease-in-out infinite;
+  }
+
+  .animate-pulse-soft {
+    animation: pulse-soft 5s ease-in-out infinite;
+  }
+
+  .animate-scroll-nudge {
+    animation: scroll-nudge 2.8s ease-in-out infinite;
+  }
+
   .text-neon-cyan {
     color: hsl(var(--neon-cyan));
     text-shadow: var(--shadow-neon-cyan);

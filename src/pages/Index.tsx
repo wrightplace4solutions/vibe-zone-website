@@ -3,6 +3,7 @@ import { Services } from "@/components/Services";
 import { EventEnergySection } from "@/components/EventEnergySection";
 import { VibeQueShowcase } from "@/components/VibeQueShowcase";
 import { ContactCTA } from "@/components/ContactCTA";
+import { LocalSeoContent } from "@/components/LocalSeoContent";
 
 const Index = () => {
   return (
@@ -12,6 +13,7 @@ const Index = () => {
       <EventEnergySection />
       <VibeQueShowcase />
       <ContactCTA />
+      <LocalSeoContent />
     </div>
   );
 };
