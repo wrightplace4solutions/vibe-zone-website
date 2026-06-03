@@ -180,9 +180,9 @@ const Terms = () => {
                 energy, lighting, etc.) that does not identify or focus on specific guests without consent.
               </p>
               <p className="text-xs sm:text-sm">
-                If Client wishes to opt out of this authorization or restrict specific types of media use, written
-                notice must be provided no later than 7 days before the event. Vibe Zone Entertainment will honor
-                all reasonable media restrictions communicated in advance.
+                Media authorization preferences — including any opt-out or restrictions on specific types of media
+                use — will be confirmed and documented in the signed service contract prior to the event. Vibe Zone
+                Entertainment will honor all media preferences as outlined in the executed agreement.
               </p>
             </div>
           </section>
