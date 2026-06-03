@@ -192,29 +192,17 @@ const Terms = () => {
             <div className="prose prose-sm sm:prose prose-slate dark:prose-invert">
               <p className="text-xs sm:text-sm">
                 Client and Vibe Zone Entertainment will coordinate audio system selection based on venue requirements
-                and event needs. The following options may apply:
+                and event needs. Two options may apply: a <strong>Venue-Provided Audio System (Plug &amp; Play
+                Package)</strong>, where Client or venue supplies the existing in-house sound system and Vibe Zone
+                Entertainment connects and operates using available infrastructure; or a <strong>Vibe Zone
+                Entertainment Audio System</strong>, where Vibe Zone Entertainment supplies, delivers, and operates
+                professional DJ audio equipment for the event.
               </p>
-              <ul className="list-none pl-2 sm:pl-4 space-y-2 text-xs sm:text-sm">
-                <li className="flex items-start gap-2">
-                  <span className="mt-0.5 text-base leading-none">☐</span>
-                  <span>
-                    <strong>Venue-Provided Audio System (Plug &amp; Play Package)</strong> — Client or venue supplies
-                    the existing in-house sound system; Vibe Zone Entertainment connects and operates using available
-                    infrastructure.
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="mt-0.5 text-base leading-none">☐</span>
-                  <span>
-                    <strong>Vibe Zone Entertainment Audio System</strong> — Vibe Zone Entertainment supplies,
-                    delivers, and operates professional DJ audio equipment for the event.
-                  </span>
-                </li>
-              </ul>
-              <p className="text-xs sm:text-sm mt-2">
+              <p className="text-xs sm:text-sm">
                 Additional equipment rental, setup, delivery, labor, and operational fees may apply depending on
-                venue requirements, guest count, equipment needs, and overall event logistics. Final audio
-                configuration will be confirmed prior to the event.
+                venue requirements, guest count, equipment needs, and overall event logistics. Sound system
+                selection must be confirmed prior to the signing of the final contract, and all associated costs
+                will be agreed upon and reflected in the final contract before execution.
               </p>
             </div>
           </section>
