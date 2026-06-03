@@ -144,8 +144,8 @@ const Refunds = () => {
               </ul>
               <p className="text-xs sm:text-sm">
                 If you have a genuine concern about our service, please contact us directly at{" "}
-                <a href="mailto:bookings@vzentertainment.fun" className="text-primary hover:underline break-all">
-                  bookings@vzentertainment.fun
+                <a href="mailto:booking@vzentertainment.fun" className="text-primary hover:underline break-all">
+                  booking@vzentertainment.fun
                 </a>{" "}
                 before initiating any payment disputes. We're committed to resolving all issues fairly.
               </p>
@@ -182,8 +182,8 @@ const Refunds = () => {
               </p>
               <p className="text-xs sm:text-sm">
                 Email:{" "}
-                <a href="mailto:bookings@vzentertainment.fun" className="text-primary hover:underline break-all">
-                  bookings@vzentertainment.fun
+                <a href="mailto:booking@vzentertainment.fun" className="text-primary hover:underline break-all">
+                  booking@vzentertainment.fun
                 </a>
               </p>
               <p className="text-xs text-muted-foreground mt-3 sm:mt-4">

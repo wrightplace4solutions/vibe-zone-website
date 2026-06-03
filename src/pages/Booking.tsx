@@ -1283,8 +1283,8 @@ const Booking = () => {
 
               <p className="text-xs text-center text-muted-foreground mt-3 sm:mt-4">
                 Need help? Email us at{" "}
-                <a href="mailto:bookings@vzentertainment.fun" className="text-primary hover:underline break-all">
-                  bookings@vzentertainment.fun
+                <a href="mailto:booking@vzentertainment.fun" className="text-primary hover:underline break-all">
+                  booking@vzentertainment.fun
                 </a>
               </p>
             </CardContent>
@@ -1333,8 +1333,8 @@ const Booking = () => {
 
               <p className="text-xs sm:text-sm text-center text-muted-foreground">
                 Questions? Email us at{" "}
-                <a href="mailto:bookings@vzentertainment.fun" className="text-primary hover:underline break-all">
-                  bookings@vzentertainment.fun
+                <a href="mailto:booking@vzentertainment.fun" className="text-primary hover:underline break-all">
+                  booking@vzentertainment.fun
                 </a>
               </p>
             </CardContent>

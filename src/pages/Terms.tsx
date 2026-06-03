@@ -242,8 +242,8 @@ const Terms = () => {
             <div className="prose prose-sm sm:prose prose-slate dark:prose-invert">
               <p className="text-xs sm:text-sm">
                 Questions about these terms? Contact us at{" "}
-                <a href="mailto:bookings@vzentertainment.fun" className="text-primary hover:underline break-all">
-                  bookings@vzentertainment.fun
+                <a href="mailto:booking@vzentertainment.fun" className="text-primary hover:underline break-all">
+                  booking@vzentertainment.fun
                 </a>
               </p>
               <p className="text-xs text-muted-foreground mt-3 sm:mt-4">
