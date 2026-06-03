@@ -52,6 +52,24 @@ const Terms = () => {
           </section>
 
           <section>
+            <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-3 sm:mb-4">Event Planning Timelines</h2>
+            <div className="prose prose-sm sm:prose prose-slate dark:prose-invert">
+              <p className="text-xs sm:text-sm">
+                <strong>Timeline Approval (Weddings &amp; Formal Events):</strong> Final event timeline details —
+                including ceremony order, reception flow, grand entrance order, and any scheduled announcements —
+                should be provided no later than <strong>14 days before the event date</strong> to allow adequate
+                planning and coordination.
+              </p>
+              <p className="text-xs sm:text-sm">
+                <strong>Music Planning:</strong> Must-play songs, special dances (first dance, parent dances, etc.),
+                introduction music, and do-not-play lists should be submitted no later than <strong>7 days before
+                the event</strong> whenever possible. Late submissions are accepted on a best-effort basis but cannot
+                be guaranteed. This applies to weddings, parties, and all events requiring curated playlists.
+              </p>
+            </div>
+          </section>
+
+          <section>
             <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-3 sm:mb-4">Client Responsibilities</h2>
             <div className="prose prose-sm sm:prose prose-slate dark:prose-invert">
               <ul className="list-disc pl-4 sm:pl-6 space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
@@ -62,13 +80,19 @@ const Terms = () => {
                   Ensure venue has appropriate permissions/licenses for music performance if required
                 </li>
                 <li>
-                  Communicate any special requests, song preferences, or do-not-play lists at least 72 hours before the event
+                  Submit must-play songs, special dances, introductions, and do-not-play lists no later than 7 days
+                  before the event; wedding timelines should be finalized no later than 14 days before the event
                 </li>
                 <li>
                   Provide a point of contact who will be available on the day of the event
                 </li>
                 <li>
                   Ensure safe and secure parking is available for equipment load-in/load-out
+                </li>
+                <li>
+                  <strong>Vendor Meal:</strong> For events exceeding five (5) consecutive hours, Client agrees to
+                  provide the DJ and any approved assistant(s), if applicable, with a meal or a reasonable meal
+                  break during the event. This provision applies to weddings, receptions, and extended party events.
                 </li>
               </ul>
             </div>
@@ -142,6 +166,56 @@ const Terms = () => {
                   may require equipment modifications and additional fees
                 </li>
               </ul>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-3 sm:mb-4">Photography &amp; Media Release</h2>
+            <div className="prose prose-sm sm:prose prose-slate dark:prose-invert">
+              <p className="text-xs sm:text-sm">
+                <strong>Optional Media Authorization:</strong> By booking our services, Client authorizes Vibe Zone
+                Entertainment to use non-sensitive photographs and video clips captured at the event for promotional
+                purposes, including but not limited to our website, social media channels, and marketing materials.
+                Non-sensitive content refers to general event atmosphere footage (DJ booth, dance floor, crowd
+                energy, lighting, etc.) that does not identify or focus on specific guests without consent.
+              </p>
+              <p className="text-xs sm:text-sm">
+                If Client wishes to opt out of this authorization or restrict specific types of media use, written
+                notice must be provided no later than 7 days before the event. Vibe Zone Entertainment will honor
+                all reasonable media restrictions communicated in advance.
+              </p>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-3 sm:mb-4">Sound System Selection</h2>
+            <div className="prose prose-sm sm:prose prose-slate dark:prose-invert">
+              <p className="text-xs sm:text-sm">
+                Client and Vibe Zone Entertainment will coordinate audio system selection based on venue requirements
+                and event needs. The following options may apply:
+              </p>
+              <ul className="list-none pl-2 sm:pl-4 space-y-2 text-xs sm:text-sm">
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5 text-base leading-none">☐</span>
+                  <span>
+                    <strong>Venue-Provided Audio System (Plug &amp; Play Package)</strong> — Client or venue supplies
+                    the existing in-house sound system; Vibe Zone Entertainment connects and operates using available
+                    infrastructure.
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5 text-base leading-none">☐</span>
+                  <span>
+                    <strong>Vibe Zone Entertainment Audio System</strong> — Vibe Zone Entertainment supplies,
+                    delivers, and operates professional DJ audio equipment for the event.
+                  </span>
+                </li>
+              </ul>
+              <p className="text-xs sm:text-sm mt-2">
+                Additional equipment rental, setup, delivery, labor, and operational fees may apply depending on
+                venue requirements, guest count, equipment needs, and overall event logistics. Final audio
+                configuration will be confirmed prior to the event.
+              </p>
             </div>
           </section>
 
