@@ -18,19 +18,25 @@ export const ContactCTA = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-6">
-            <Button 
+            <Button
+              asChild
               size="sm"
               className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm px-6 py-4 glow-neon transition-all hover:scale-105 gap-2"
             >
-              <Phone className="w-4 h-4" />
-              Call Now
+              <a href="tel:+18049247833">
+                <Phone className="w-4 h-4" />
+                Call Now
+              </a>
             </Button>
-            <Button 
+            <Button
+              asChild
               size="sm"
               className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold text-sm px-6 py-4 transition-all hover:scale-105 gap-2"
             >
-              <Mail className="w-4 h-4" />
-              Email Us
+              <a href="mailto:booking@vzentertainment.fun">
+                <Mail className="w-4 h-4" />
+                Email Us
+              </a>
             </Button>
           </div>
           
